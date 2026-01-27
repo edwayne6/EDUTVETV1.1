@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Library Management System</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .sidebar { transition: all 0.3s ease; }
+    .sidebar.collapsed { margin-left: -250px; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .pin-input { width: 50px; height: 50px; font-size: 30px; text-align: center; }
+    .pin-container { display: none; }
+    .pin-container.show { display: flex; }
+    .dashboard-container { display: none; }
+    .dashboard-container.show { display: block; }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+  <!-- PIN Entry Screen -->
+  <div id="pinContainer" class="pin-container show fixed inset-0 bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center z-50">
+    <div class="bg-white p-8 rounded-lg shadow-2xl max-w-md w-full">
+      <h2 class="text-3xl font-bold text-center text-blue-600 mb-2">Admin Access</h2>
+      <p class="text-center text-gray-600 mb-8">Enter your 4-digit PIN to continue</p>
+      
+      <div class="flex gap-3 justify-center mb-8">
+        <input type="password" id="pin1" class="pin-input border-2 border-gray-300 rounded focus:border-blue-500 focus:outline-none" maxlength="1" inputmode="numeric" oninput="moveFocus(this, 'pin2')">
+        <input type="password" id="pin2" class="pin-input border-2 border-gray-300 rounded focus:border-blue-500 focus:outline-none" maxlength="1" inputmode="numeric" oninput="moveFocus(this, 'pin3')">
+        <input type="password" id="pin3" class="pin-input border-2 border-gray-300 rounded focus:border-blue-500 focus:outline-none" maxlength="1" inputmode="numeric" oninput="moveFocus(this, 'pin4')">
+        <input type="password" id="pin4" class="pin-input border-2 border-gray-300 rounded focus:border-blue-500 focus:outline-none" maxlength="1" inputmode="numeric" oninput="checkPin()">
+      </div>
+
+      <button onclick="verifyPin()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition mb-3">
+        Enter
+      </button>
+
+      <p id="pinError" class="text-red-600 text-center text-sm hidden">Incorrect PIN. Please try again.</p>
+    </div>
+  </div>
+
+  <!-- Main Dashboard Container -->
+  <div id="dashboardContainer" class="dashboard-container">
+    <!-- Navbar -->
+  <nav class="bg-blue-700 text-white px-6 py-4 flex justify-between items-center sticky top-0 z-50">
+    <div class="flex items-center space-x-4">
+      <button id="sidebarToggle" class="text-2xl hover:bg-blue-600 p-2 rounded transition">
+        <i class="fas fa-bars"></i>
+      </button>
+      <h1 class="text-2xl font-bold">EduTVET Admin</h1>
+    </div>
+    <div class="flex items-center space-x-4">
+      <span id="adminName" class="text-sm">Administrator</span>
+      <a href="index.html" class="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded transition flex items-center space-x-2">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+      </a>
+      <button onclick="logoutAdmin()" class="bg-red-600 px-4 py-2 rounded hover:bg-red-700 transition">Logout</button>
+    </div>
+  </nav>
+
+  <div class="flex">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar bg-gray-900 text-white w-64 min-h-screen p-6 fixed left-0 top-16">
+      <nav class="space-y-4">
+        <button class="tab-btn w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition" data-tab="overview">
+          <i class="fas fa-chart-line mr-2"></i> Overview
+        </button>
+        <button class="tab-btn w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition" data-tab="documents">
+          <i class="fas fa-file-alt mr-2"></i> Manage Documents
+        </button>
+        <button class="tab-btn w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition" data-tab="upload">
+          <i class="fas fa-upload mr-2"></i> Upload Document
+        </button>
+        <button class="tab-btn w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition" data-tab="pending">
+          <i class="fas fa-clock mr-2"></i> Pending Approval
+        </button>
+        <button class="tab-btn w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition" data-tab="departments">
+          <i class="fas fa-building mr-2"></i> Departments
+        </button>
+        <button class="tab-btn w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition" data-tab="analytics">
+          <i class="fas fa-bar-chart mr-2"></i> Analytics
+        </button>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 ml-64 p-8">
+      <!-- Overview Tab -->
+      <div id="overview" class="tab-content active">
+        <div class="mb-8">
+          <h2 class="text-3xl font-bold text-gray-800 mb-6">Dashboard Overview</h2>
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
+              <div class="flex justify-between items-center">
+                <div>
+                  <p class="text-gray-600 text-sm">Total Documents</p>
+                  <p id="totalDocs" class="text-3xl font-bold text-blue-600">0</p>
+                </div>
+                <i class="fas fa-file-alt text-4xl text-blue-200"></i>
+              </div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
+              <div class="flex justify-between items-center">
+                <div>
+                  <p class="text-gray-600 text-sm">Pending Approval</p>
+                  <p id="pendingDocs" class="text-3xl font-bold text-yellow-600">0</p>
+                </div>
+                <i class="fas fa-hourglass-half text-4xl text-yellow-200"></i>
+              </div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
+              <div class="flex justify-between items-center">
+                <div>
+                  <p class="text-gray-600 text-sm">Published</p>
+                  <p id="publishedDocs" class="text-3xl font-bold text-green-600">0</p>
+                </div>
+                <i class="fas fa-check-circle text-4xl text-green-200"></i>
+              </div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
+              <div class="flex justify-between items-center">
+                <div>
+                  <p class="text-gray-600 text-sm">Departments</p>
+                  <p id="totalDepts" class="text-3xl font-bold text-purple-600">8</p>
+                </div>
+                <i class="fas fa-building text-4xl text-purple-200"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Manage Documents Tab -->
+      <div id="documents" class="tab-content">
+        <h2 class="text-3xl font-bold text-gray-800 mb-6">Manage Documents</h2>
+        
+        <div class="bg-white p-6 rounded-lg shadow mb-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <input 
+              type="text" 
+              id="searchDocs" 
+              placeholder="Search documents..." 
+              class="px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              oninput="filterDocuments()"
+            >
+            <select id="filterDept" class="px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" onchange="filterDocuments()">
+              <option value="">All Departments</option>
+              <option value="Agriculture">Agriculture</option>
+              <option value="Business">Business</option>
+              <option value="ICT">ICT</option>
+              <option value="Electrical">Electrical</option>
+              <option value="Mechanical">Mechanical</option>
+              <option value="Hospitality">Hospitality</option>
+              <option value="Agriculture Engineering">Agriculture Engineering</option>
+            </select>
+            <select id="filterStatus" class="px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" onchange="filterDocuments()">
+              <option value="">All Status</option>
+              <option value="published">Published</option>
+              <option value="draft">Draft</option>
+              <option value="pending">Pending</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+          <table class="w-full">
+            <thead class="bg-gray-200">
+              <tr>
+                <th class="px-6 py-3 text-left text-sm font-semibold">Title</th>
+                <th class="px-6 py-3 text-left text-sm font-semibold">Department</th>
+                <th class="px-6 py-3 text-left text-sm font-semibold">Status</th>
+                <th class="px-6 py-3 text-left text-sm font-semibold">Date</th>
+                <th class="px-6 py-3 text-left text-sm font-semibold">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="documentsTable" class="divide-y">
+              <!-- Documents will be loaded here -->
+            </tbody>
+          </table>
+          <div id="noDocsMessage" class="text-center py-8 text-gray-500">No documents found.</div>
+        </div>
+      </div>
+
+      <!-- Upload Document Tab -->
+      <div id="upload" class="tab-content">
+        <h2 class="text-3xl font-bold text-gray-800 mb-6">Upload New Document</h2>
+        
+        <div class="bg-white p-8 rounded-lg shadow max-w-2xl">
+          <form id="uploadForm" class="space-y-4">
+            <div>
+              <label class="block text-sm font-semibold mb-2">Document Title *</label>
+              <input type="text" id="docTitle" required class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            
+            <div>
+              <label class="block text-sm font-semibold mb-2">Description</label>
+              <textarea id="docDescription" rows="4" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-semibold mb-2">Department *</label>
+                <select id="docDepartment" required class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <option value="">Select Department</option>
+                  <option value="Agriculture">Agriculture</option>
+                  <option value="Business">Business</option>
+                  <option value="ICT">ICT</option>
+                  <option value="Electrical">Electrical</option>
+                  <option value="Mechanical">Mechanical</option>
+                  <option value="Hospitality">Hospitality</option>
+                  <option value="Agriculture Engineering">Agriculture Engineering</option>
+                </select>
+              </div>
+              
+              <div>
+                <label class="block text-sm font-semibold mb-2">Level *</label>
+                <select id="docLevel" required class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <option value="">Select Level</option>
+                  <option value="Level 3">Level 3</option>
+                  <option value="Level 4">Level 4</option>
+                  <option value="Level 5">Level 5</option>
+                  <option value="Level 6">Level 6</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold mb-2">Document Type *</label>
+              <select id="docType" required class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">Select Document Type</option>
+                <option value="Notes">Notes</option>
+                <option value="Curriculum">Curriculum</option>
+                <option value="Occupational Standards">Occupational Standards</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold mb-2">File Upload *</label>
+              <div class="border-2 border-dashed border-gray-300 rounded p-6 text-center cursor-pointer hover:border-blue-500 transition" onclick="document.getElementById('fileInput').click()">
+                <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-2"></i>
+                <p class="text-gray-600">Click to upload or drag and drop</p>
+                <p class="text-sm text-gray-500">PDF, DOC, DOCX up to 10MB</p>
+                <input type="file" id="fileInput" hidden accept=".pdf,.doc,.docx" onchange="updateFileName(this)">
+              </div>
+              <p id="fileName" class="text-sm text-gray-600 mt-2"></p>
+            </div>
+
+            <div class="pt-4">
+              <button type="button" onclick="publishDocument()" class="w-full bg-green-600 text-white px-6 py-3 rounded hover:bg-green-700 transition flex items-center justify-center space-x-2 font-medium">
+                <i class="fas fa-check-circle"></i> <span>Upload & Publish</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Pending Approval Tab -->
+      <div id="pending" class="tab-content">
+        <h2 class="text-3xl font-bold text-gray-800 mb-6">Pending Approval</h2>
+        
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+          <table class="w-full">
+            <thead class="bg-gray-200">
+              <tr>
+                <th class="px-6 py-3 text-left text-sm font-semibold">Title</th>
+                <th class="px-6 py-3 text-left text-sm font-semibold">Department</th>
+                <th class="px-6 py-3 text-left text-sm font-semibold">Submitted</th>
+                <th class="px-6 py-3 text-left text-sm font-semibold">Submitted By</th>
+                <th class="px-6 py-3 text-left text-sm font-semibold">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="pendingTable" class="divide-y">
+              <!-- Pending documents will be loaded here -->
+            </tbody>
+          </table>
+          <div id="noPendingMessage" class="text-center py-8 text-gray-500">No documents pending approval.</div>
+        </div>
+      </div>
+
+      <!-- Departments Tab -->
+      <div id="departments" class="tab-content">
+        <h2 class="text-3xl font-bold text-gray-800 mb-6">All Departments</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-lg shadow">
+            <h3 class="text-xl font-bold mb-2">Agriculture</h3>
+            <p id="agricultureCount" class="text-3xl font-bold mb-4">0</p>
+            <p class="text-sm">Documents in this department</p>
+          </div>
+          <div class="bg-gradient-to-br from-purple-500 to-purple-600 text-white p-6 rounded-lg shadow">
+            <h3 class="text-xl font-bold mb-2">Business</h3>
+            <p id="businessCount" class="text-3xl font-bold mb-4">0</p>
+            <p class="text-sm">Documents in this department</p>
+          </div>
+          <div class="bg-gradient-to-br from-green-500 to-green-600 text-white p-6 rounded-lg shadow">
+            <h3 class="text-xl font-bold mb-2">ICT</h3>
+            <p id="ictCount" class="text-3xl font-bold mb-4">0</p>
+            <p class="text-sm">Documents in this department</p>
+          </div>
+          <div class="bg-gradient-to-br from-red-500 to-red-600 text-white p-6 rounded-lg shadow">
+            <h3 class="text-xl font-bold mb-2">Electrical</h3>
+            <p id="electricalCount" class="text-3xl font-bold mb-4">0</p>
+            <p class="text-sm">Documents in this department</p>
+          </div>
+          <div class="bg-gradient-to-br from-yellow-500 to-yellow-600 text-white p-6 rounded-lg shadow">
+            <h3 class="text-xl font-bold mb-2">Mechanical</h3>
+            <p id="mechanicalCount" class="text-3xl font-bold mb-4">0</p>
+            <p class="text-sm">Documents in this department</p>
+          </div>
+          <div class="bg-gradient-to-br from-indigo-500 to-indigo-600 text-white p-6 rounded-lg shadow">
+            <h3 class="text-xl font-bold mb-2">Hospitality</h3>
+            <p id="hospitalityCount" class="text-3xl font-bold mb-4">0</p>
+            <p class="text-sm">Documents in this department</p>
+          </div>
+          <div class="bg-gradient-to-br from-pink-500 to-pink-600 text-white p-6 rounded-lg shadow">
+            <h3 class="text-xl font-bold mb-2">Agriculture Engineering</h3>
+            <p id="agroEngCount" class="text-3xl font-bold mb-4">0</p>
+            <p class="text-sm">Documents in this department</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Analytics Tab -->
+      <div id="analytics" class="tab-content">
+        <h2 class="text-3xl font-bold text-gray-800 mb-6">Analytics & Reports</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-xl font-bold mb-4">Documents by Status</h3>
+            <div class="space-y-3">
+              <div class="flex justify-between items-center">
+                <span>Published</span>
+                <div class="w-48 bg-gray-200 rounded-full h-2">
+                  <div id="publishedBar" class="bg-green-500 h-2 rounded-full" style="width: 0%"></div>
+                </div>
+                <span id="publishedCount" class="font-bold">0</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span>Draft</span>
+                <div class="w-48 bg-gray-200 rounded-full h-2">
+                  <div id="draftBar" class="bg-yellow-500 h-2 rounded-full" style="width: 0%"></div>
+                </div>
+                <span id="draftCount" class="font-bold">0</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span>Pending</span>
+                <div class="w-48 bg-gray-200 rounded-full h-2">
+                  <div id="pendingBar" class="bg-blue-500 h-2 rounded-full" style="width: 0%"></div>
+                </div>
+                <span id="pendingCount" class="font-bold">0</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-xl font-bold mb-4">Recent Activity</h3>
+            <div id="activityLog" class="space-y-3 max-h-96 overflow-y-auto">
+              <p class="text-gray-500">No recent activity</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  </div>
+
+  <!-- Preview Document Modal -->
+  <div id="previewModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white p-8 rounded-lg shadow-2xl max-w-4xl w-full mx-4 max-h-screen overflow-y-auto">
+      <div class="flex justify-between items-center mb-6">
+        <h2 id="previewTitle" class="text-2xl font-bold text-gray-800">Document Preview</h2>
+        <button onclick="closePreviewModal()" class="text-gray-600 hover:text-gray-900 text-2xl">&times;</button>
+      </div>
+      
+      <!-- PDF Preview -->
+      <div id="pdfPreview" class="hidden">
+        <iframe id="pdfFrame" style="width: 100%; height: 600px; border: 1px solid #ddd; border-radius: 4px;"></iframe>
+      </div>
+
+      <!-- Word Document Preview (Not Supported Inline) -->
+      <div id="wordPreview" class="hidden text-center py-12">
+        <i class="fas fa-file-word text-6xl text-blue-400 mb-4"></i>
+        <p class="text-gray-600 mb-4">Word documents cannot be previewed directly in the browser.</p>
+        <p class="text-gray-600 mb-6">Please download the document to view it.</p>
+      </div>
+
+      <!-- Document Info -->
+      <div class="bg-gray-50 p-4 rounded mt-6 border-t pt-6">
+        <h3 class="font-semibold text-gray-800 mb-3">Document Information</h3>
+        <div class="grid grid-cols-2 gap-4 text-sm">
+          <div><span class="font-semibold text-gray-700">Title:</span> <span id="previewDocTitle" class="text-gray-600"></span></div>
+          <div><span class="font-semibold text-gray-700">Department:</span> <span id="previewDocDept" class="text-gray-600"></span></div>
+          <div><span class="font-semibold text-gray-700">Level:</span> <span id="previewDocLevel" class="text-gray-600"></span></div>
+          <div><span class="font-semibold text-gray-700">Type:</span> <span id="previewDocType" class="text-gray-600"></span></div>
+          <div><span class="font-semibold text-gray-700">Status:</span> <span id="previewDocStatus" class="text-gray-600"></span></div>
+          <div><span class="font-semibold text-gray-700">Date:</span> <span id="previewDocDate" class="text-gray-600"></span></div>
+        </div>
+        <p class="mt-4 text-gray-700"><span class="font-semibold">Description:</span><br><span id="previewDocDesc" class="text-gray-600"></span></p>
+      </div>
+
+      <div class="flex gap-4 pt-6 border-t">
+        <button onclick="downloadCurrentDocument()" class="flex-1 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition flex items-center justify-center space-x-2">
+          <i class="fas fa-download"></i> <span>Download</span>
+        </button>
+        <button type="button" onclick="closePreviewModal()" class="flex-1 bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500 transition">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Document Modal -->
+  <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white p-8 rounded-lg shadow-2xl max-w-2xl w-full mx-4 max-h-96 overflow-y-auto">
+      <h2 class="text-2xl font-bold mb-6 text-gray-800">Edit Document</h2>
+      
+      <form id="editForm" class="space-y-4">
+        <div>
+          <label class="block text-sm font-semibold mb-2">Document Title *</label>
+          <input type="text" id="editTitle" required class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        
+        <div>
+          <label class="block text-sm font-semibold mb-2">Description</label>
+          <textarea id="editDescription" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-semibold mb-2">Department *</label>
+            <select id="editDepartment" required class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="">Select Department</option>
+              <option value="Agriculture">Agriculture</option>
+              <option value="Business">Business</option>
+              <option value="ICT">ICT</option>
+              <option value="Electrical">Electrical</option>
+              <option value="Mechanical">Mechanical</option>
+              <option value="Hospitality">Hospitality</option>
+              <option value="Agriculture Engineering">Agriculture Engineering</option>
+            </select>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-semibold mb-2">Level *</label>
+            <select id="editLevel" required class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="">Select Level</option>
+              <option value="Level 3">Level 3</option>
+              <option value="Level 4">Level 4</option>
+              <option value="Level 5">Level 5</option>
+              <option value="Level 6">Level 6</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold mb-2">Document Type *</label>
+          <select id="editDocType" required class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">Select Document Type</option>
+            <option value="Notes">Notes</option>
+            <option value="Curriculum">Curriculum</option>
+            <option value="Occupational Standards">Occupational Standards</option>
+          </select>
+        </div>
+
+        <div class="flex gap-4 pt-4">
+          <button type="submit" class="flex-1 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+            Save Changes
+          </button>
+          <button type="button" onclick="closeEditModal()" class="flex-1 bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500 transition">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // PIN Configuration
+    const CORRECT_PIN = "1998"; // Change this to your desired PIN
+    let pinAttempts = 0;
+    const maxAttempts = 2;
+
+    // Check PIN on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      const isPinVerified = sessionStorage.getItem('pinVerified');
+      if (isPinVerified === 'true') {
+        showDashboard();
+      } else {
+        showPinEntry();
+      }
+    });
+
+    function moveFocus(current, nextId) {
+      if (current.value.length === 1) {
+        document.getElementById(nextId).focus();
+      }
+    }
+
+    function checkPin() {
+      const pin4 = document.getElementById('pin4');
+      if (pin4.value.length === 1) {
+        verifyPin();
+      }
+    }
+
+    function verifyPin() {
+      const pin = document.getElementById('pin1').value + 
+                  document.getElementById('pin2').value + 
+                  document.getElementById('pin3').value + 
+                  document.getElementById('pin4').value;
+
+      if (pin === CORRECT_PIN) {
+        sessionStorage.setItem('pinVerified', 'true');
+        showDashboard();
+      } else {
+        pinAttempts++;
+        const errorMsg = document.getElementById('pinError');
+        errorMsg.classList.remove('hidden');
+        
+        if (pinAttempts >= maxAttempts) {
+          alert('Too many failed attempts. Please try again later.');
+          window.location.href = 'index.html';
+        }
+
+        // Clear PIN fields
+        document.getElementById('pin1').value = '';
+        document.getElementById('pin2').value = '';
+        document.getElementById('pin3').value = '';
+        document.getElementById('pin4').value = '';
+        document.getElementById('pin1').focus();
+
+        setTimeout(() => {
+          errorMsg.classList.add('hidden');
+        }, 3000);
+      }
+    }
+
+    function showPinEntry() {
+      document.getElementById('pinContainer').classList.add('show');
+      document.getElementById('dashboardContainer').classList.remove('show');
+      document.getElementById('pin1').focus();
+    }
+
+    function showDashboard() {
+      document.getElementById('pinContainer').classList.remove('show');
+      document.getElementById('dashboardContainer').classList.add('show');
+      loadDocumentsFromStorage(); // Load from storage first
+      loadAllData();
+      setupEventListeners();
+    }
+
+    // Mock data storage - only include published documents
+    let documents = [
+      { id: 1, title: 'Crop Protection Guide', department: 'Agriculture', level: 'Level 5', docType: 'Notes', status: 'published', date: '2025-01-20', description: 'Comprehensive guide on crop protection', fileName: null, submittedBy: 'System' },
+      { id: 2, title: 'Business Plans', department: 'Business', level: 'Level 6', docType: 'Curriculum', status: 'published', date: '2025-01-18', description: 'Guide to creating business plans', fileName: null, submittedBy: 'System' }
+    ];
+
+    let editingDocId = null;
+    let previewingDocId = null;
+
+    // Load documents from localStorage on startup
+    function loadDocumentsFromStorage() {
+      try {
+        const savedDocs = JSON.parse(localStorage.getItem('adminDocuments'));
+        if (savedDocs && Array.isArray(savedDocs) && savedDocs.length > 0) {
+          documents = savedDocs;
+        }
+      } catch (e) {
+        console.log('Could not load documents from storage, using defaults');
+      }
+    }
+
+    // Load pending submissions from public upload page
+    function loadPendingSubmissions() {
+      try {
+        const pendingSubmissions = JSON.parse(localStorage.getItem('pendingSubmissions')) || [];
+        // Add pending submissions to documents array with pending status
+        const submissionsAsDocuments = pendingSubmissions.map(sub => ({
+          ...sub,
+          status: 'pending',
+          submittedBy: sub.submittedBy || 'Public User'
+        }));
+        
+        // Merge with existing documents (avoid duplicates)
+        submissionsAsDocuments.forEach(sub => {
+          if (!documents.find(d => d.id === sub.id)) {
+            documents.push(sub);
+          }
+        });
+      } catch (error) {
+        console.error('Error loading pending submissions:', error);
+      }
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      loadAllData();
+      setupEventListeners();
+    });
+
+    function setupEventListeners() {
+      // Tab navigation
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+      });
+
+      // Sidebar toggle
+      document.getElementById('sidebarToggle').addEventListener('click', () => {
+        document.getElementById('sidebar').classList.toggle('collapsed');
+      });
+
+      // Upload form
+      document.getElementById('uploadForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        uploadNewDocument();
+      });
+
+      // Edit form
+      document.getElementById('editForm').addEventListener('submit', saveEditDocument);
+    }
+
+    function switchTab(tabName) {
+      // Hide all tabs
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      // Show selected tab
+      document.getElementById(tabName).classList.add('active');
+      // Update active button
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('bg-gray-700'));
+      event.target.classList.add('bg-gray-700');
+    }
+
+    function loadAllData() {
+      loadPendingSubmissions(); // Load public submissions first
+      updateDashboard();
+      loadDocuments();
+      loadPendingDocuments();
+      loadDepartmentCounts();
+      loadAnalytics();
+    }
+
+    function updateDashboard() {
+      document.getElementById('totalDocs').textContent = documents.length;
+      document.getElementById('pendingDocs').textContent = documents.filter(d => d.status === 'pending').length;
+      document.getElementById('publishedDocs').textContent = documents.filter(d => d.status === 'published').length;
+    }
+
+    function loadDocuments() {
+      const table = document.getElementById('documentsTable');
+      const noMsg = document.getElementById('noDocsMessage');
+      
+      if (documents.length === 0) {
+        table.innerHTML = '';
+        noMsg.style.display = 'block';
+        return;
+      }
+
+      noMsg.style.display = 'none';
+      table.innerHTML = documents.map(doc => `
+        <tr>
+          <td class="px-6 py-4">${doc.title}</td>
+          <td class="px-6 py-4">${doc.department}</td>
+          <td class="px-6 py-4">
+            <span class="px-3 py-1 rounded text-sm font-semibold ${
+              doc.status === 'published' ? 'bg-green-100 text-green-800' :
+              doc.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+              'bg-gray-100 text-gray-800'
+            }">
+              ${doc.status.charAt(0).toUpperCase() + doc.status.slice(1)}
+            </span>
+          </td>
+          <td class="px-6 py-4">${doc.date}</td>
+          <td class="px-6 py-4">
+            ${doc.fileName ? `<button onclick="previewDocument(${doc.id})" class="text-purple-600 hover:underline mr-3" title="Preview"><i class="fas fa-eye"></i></button>` : ''}
+            <button onclick="editDocument(${doc.id})" class="text-blue-600 hover:underline mr-3" title="Edit">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button onclick="publishDoc(${doc.id})" class="text-green-600 hover:underline mr-3" title="Publish">
+              <i class="fas fa-check-circle"></i>
+            </button>
+            <button onclick="deleteDocument(${doc.id})" class="text-red-600 hover:underline" title="Delete">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function loadPendingDocuments() {
+      const table = document.getElementById('pendingTable');
+      const noMsg = document.getElementById('noPendingMessage');
+      const pending = documents.filter(d => d.status === 'pending');
+      
+      if (pending.length === 0) {
+        table.innerHTML = '';
+        noMsg.style.display = 'block';
+        return;
+      }
+
+      noMsg.style.display = 'none';
+      table.innerHTML = pending.map(doc => `
+        <tr>
+          <td class="px-6 py-4">${doc.title}</td>
+          <td class="px-6 py-4">${doc.department}</td>
+          <td class="px-6 py-4">${doc.date}</td>
+          <td class="px-6 py-4 text-sm">${doc.submittedBy || 'System'}</td>
+          <td class="px-6 py-4">
+            <button onclick="approveDocument(${doc.id})" class="bg-green-600 text-white px-3 py-1 rounded mr-2 hover:bg-green-700 text-sm">
+              Approve
+            </button>
+            <button onclick="rejectDocument(${doc.id})" class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 text-sm">
+              Reject
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function loadDepartmentCounts() {
+      const departments = ['Agriculture', 'Business', 'ICT', 'Electrical', 'Mechanical', 'Hospitality', 'Agriculture Engineering'];
+      departments.forEach(dept => {
+        const count = documents.filter(d => d.department === dept).length;
+        const deptId = dept.toLowerCase().replace(' ', '');
+        const element = document.getElementById(deptId + 'Count');
+        if (element) element.textContent = count;
+      });
+    }
+
+    function loadAnalytics() {
+      const total = documents.length;
+      const published = documents.filter(d => d.status === 'published').length;
+      const draft = documents.filter(d => d.status === 'draft').length;
+      const pending = documents.filter(d => d.status === 'pending').length;
+
+      document.getElementById('publishedCount').textContent = published;
+      document.getElementById('draftCount').textContent = draft;
+      document.getElementById('pendingCount').textContent = pending;
+
+      if (total > 0) {
+        document.getElementById('publishedBar').style.width = (published / total * 100) + '%';
+        document.getElementById('draftBar').style.width = (draft / total * 100) + '%';
+        document.getElementById('pendingBar').style.width = (pending / total * 100) + '%';
+      }
+    }
+
+    function uploadNewDocument() {
+      const title = document.getElementById('docTitle').value;
+      const description = document.getElementById('docDescription').value;
+      const department = document.getElementById('docDepartment').value;
+      const level = document.getElementById('docLevel').value;
+      const docType = document.getElementById('docType').value;
+      const fileInput = document.getElementById('fileInput');
+
+      if (!title || !department || !docType) {
+        alert('Please fill in required fields');
+        return;
+      }
+
+      // Check if file is selected
+      if (!fileInput.files || fileInput.files.length === 0) {
+        alert('Please select a file to upload');
+        return;
+      }
+
+      // Create FormData for file upload
+      const formData = new FormData();
+      formData.append('title', title);
+      formData.append('description', description);
+      formData.append('department', department);
+      formData.append('level', level || 'N/A');
+      formData.append('docType', docType);
+      formData.append('file', fileInput.files[0]);
+      formData.append('submittedBy', 'Admin');
+
+      // Show loading state
+      const uploadBtn = event.target.querySelector('button[type="submit"]');
+      const originalText = uploadBtn.textContent;
+      uploadBtn.disabled = true;
+      uploadBtn.textContent = 'Uploading...';
+
+      // Send to backend
+      fetch('http://localhost:5000/api/documents/upload', {
+        method: 'POST',
+        body: formData
+      })
+      .then(res => {
+        console.log('Response status:', res.status);
+        return res.json().then(data => ({ status: res.status, data: data }));
+      })
+      .then(({ status, data }) => {
+        console.log('Response data:', data);
+        
+        if (status === 201 || status === 200) {
+          if (data.document) {
+            // Add to local array
+            documents.push(data.document);
+            alert('Document uploaded successfully!');
+            document.getElementById('uploadForm').reset();
+            document.getElementById('fileName').textContent = '';
+            saveDocumentsToSession();
+            loadAllData();
+          } else {
+            throw new Error(data.message || 'No document returned');
+          }
+        } else {
+          throw new Error(data.message || `Server error: ${status}`);
+        }
+      })
+      .catch(error => {
+        console.error('Upload error:', error);
+        alert('Upload failed: ' + error.message + '\n\nNote: File may have been uploaded. Check documents folder.');
+      })
+      .finally(() => {
+        uploadBtn.disabled = false;
+        uploadBtn.textContent = originalText;
+      });
+    }
+
+    function publishDocument() {
+      const title = document.getElementById('docTitle').value;
+      const description = document.getElementById('docDescription').value;
+      const department = document.getElementById('docDepartment').value;
+      const level = document.getElementById('docLevel').value;
+      const docType = document.getElementById('docType').value;
+      const fileInput = document.getElementById('fileInput');
+
+      if (!title || !department || !docType) {
+        alert('Please fill in required fields');
+        return;
+      }
+
+      // Check if file is selected
+      if (!fileInput.files || fileInput.files.length === 0) {
+        alert('Please select a file to upload');
+        return;
+      }
+
+      // Create FormData for file upload
+      const formData = new FormData();
+      formData.append('title', title);
+      formData.append('description', description);
+      formData.append('department', department);
+      formData.append('level', level || 'N/A');
+      formData.append('docType', docType);
+      formData.append('file', fileInput.files[0]);
+      formData.append('submittedBy', 'Admin');
+
+      // Show loading state
+      const publishBtn = event.target;
+      const originalText = publishBtn.textContent;
+      publishBtn.disabled = true;
+      publishBtn.textContent = 'Publishing...';
+
+      console.log('Starting upload to: http://localhost:5000/api/documents/upload');
+      console.log('File:', fileInput.files[0].name, 'Size:', fileInput.files[0].size);
+
+      // Send to backend
+      fetch('http://localhost:5000/api/documents/upload', {
+        method: 'POST',
+        body: formData
+      })
+      .then(res => {
+        console.log('Response received:');
+        console.log('- Status:', res.status);
+        console.log('- Status Text:', res.statusText);
+        console.log('- OK:', res.ok);
+        
+        // Parse response as JSON
+        return res.json().then(data => {
+          console.log('Response JSON:', data);
+          return { status: res.status, ok: res.ok, data: data };
+        });
+      })
+      .then(({ status, ok, data }) => {
+        // Check if upload was successful
+        if (ok || status === 201 || data.success === true) {
+          if (data.document) {
+            console.log('Upload successful! Document:', data.document);
+            documents.push(data.document);
+            alert('✓ Document published successfully!');
+            document.getElementById('uploadForm').reset();
+            document.getElementById('fileName').textContent = '';
+            saveDocumentsToSession();
+            loadAllData();
+          } else {
+            throw new Error('No document data returned');
+          }
+        } else {
+          // Server returned an error status
+          throw new Error(data.message || `Server error (${status})`);
+        }
+      })
+      .catch(error => {
+        console.error('Full error object:', error);
+        console.error('Error message:', error.message);
+        
+        // Distinguish between network errors and response errors
+        if (error instanceof TypeError && error.message.includes('fetch')) {
+          alert('❌ Cannot reach server.\n\nMake sure the Node.js server is running:\nnpm start');
+        } else {
+          alert('❌ ' + error.message);
+        }
+      })
+      .finally(() => {
+        publishBtn.disabled = false;
+        publishBtn.textContent = originalText;
+      });
+    }
+
+    function publishDoc(id) {
+      const doc = documents.find(d => d.id === id);
+      if (doc) {
+        doc.status = 'published';
+        alert('Document published!');
+        saveDocumentsToSession(); // Save to sessionStorage for documents page
+        loadAllData();
+      }
+    }
+
+    function saveDocumentsToSession() {
+      try {
+        sessionStorage.setItem('adminDocuments', JSON.stringify(documents));
+        // Also save to localStorage for persistence across sessions
+        localStorage.setItem('adminDocuments', JSON.stringify(documents));
+      } catch (e) {
+        console.log('Could not save documents');
+      }
+    }
+
+    function deleteDocument(id) {
+      if (confirm('Are you sure you want to delete this document?')) {
+        documents = documents.filter(d => d.id !== id);
+        alert('Document deleted successfully!');
+        saveDocumentsToSession();
+        loadAllData();
+      }
+    }
+
+    function editDocument(id) {
+      const doc = documents.find(d => d.id === id);
+      if (doc) {
+        editingDocId = id;
+        // Populate edit form with current document data
+        document.getElementById('editTitle').value = doc.title;
+        document.getElementById('editDescription').value = doc.description || '';
+        document.getElementById('editDepartment').value = doc.department;
+        document.getElementById('editLevel').value = doc.level;
+        document.getElementById('editDocType').value = doc.docType || 'Notes';
+        
+        // Show edit modal
+        document.getElementById('editModal').classList.remove('hidden');
+      }
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModal').classList.add('hidden');
+      editingDocId = null;
+      document.getElementById('editForm').reset();
+    }
+
+    function previewDocument(id) {
+      const doc = documents.find(d => d.id === id);
+      if (!doc) {
+        alert('Document not found');
+        return;
+      }
+
+      if (!doc.fileName) {
+        alert('No file available for preview');
+        return;
+      }
+
+      previewingDocId = id;
+
+      // Set document info
+      document.getElementById('previewTitle').textContent = 'Preview: ' + doc.title;
+      document.getElementById('previewDocTitle').textContent = doc.title;
+      document.getElementById('previewDocDept').textContent = doc.department;
+      document.getElementById('previewDocLevel').textContent = doc.level;
+      document.getElementById('previewDocType').textContent = doc.docType;
+      document.getElementById('previewDocStatus').textContent = doc.status.charAt(0).toUpperCase() + doc.status.slice(1);
+      document.getElementById('previewDocDate').textContent = doc.date;
+      document.getElementById('previewDocDesc').textContent = doc.description || 'No description';
+
+      // Determine file type and show appropriate preview
+      const fileExtension = doc.fileName.split('.').pop().toLowerCase();
+      const fileUrl = 'http://localhost:5000/documents/' + doc.fileName;
+
+      const pdfPreview = document.getElementById('pdfPreview');
+      const wordPreview = document.getElementById('wordPreview');
+
+      if (fileExtension === 'pdf') {
+        // Show PDF preview
+        pdfPreview.classList.remove('hidden');
+        wordPreview.classList.add('hidden');
+        document.getElementById('pdfFrame').src = fileUrl;
+      } else if (['doc', 'docx'].includes(fileExtension)) {
+        // Show Word preview message
+        pdfPreview.classList.add('hidden');
+        wordPreview.classList.remove('hidden');
+      } else {
+        // Unknown format
+        pdfPreview.classList.add('hidden');
+        wordPreview.classList.remove('hidden');
+      }
+
+      // Show modal
+      document.getElementById('previewModal').classList.remove('hidden');
+    }
+
+    function closePreviewModal() {
+      document.getElementById('previewModal').classList.add('hidden');
+      document.getElementById('pdfFrame').src = '';
+      previewingDocId = null;
+    }
+
+    function downloadCurrentDocument() {
+      if (previewingDocId === null) return;
+
+      const doc = documents.find(d => d.id === previewingDocId);
+      if (doc && doc.fileName) {
+        const downloadLink = 'http://localhost:5000/api/documents/' + doc.id + '/download';
+        const link = document.createElement('a');
+        link.href = downloadLink;
+        link.download = doc.title + '.' + doc.fileName.split('.').pop();
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    }
+
+    function saveEditDocument(e) {
+      e.preventDefault();
+      
+      if (editingDocId === null) {
+        alert('No document selected for editing');
+        return;
+      }
+
+      const doc = documents.find(d => d.id === editingDocId);
+      if (!doc) {
+        alert('Document not found');
+        return;
+      }
+
+      // Update document properties
+      doc.title = document.getElementById('editTitle').value;
+      doc.description = document.getElementById('editDescription').value;
+      doc.department = document.getElementById('editDepartment').value;
+      doc.level = document.getElementById('editLevel').value;
+      doc.docType = document.getElementById('editDocType').value;
+
+      alert('Document updated successfully!');
+      closeEditModal();
+      saveDocumentsToSession();
+      loadAllData();
+    }
+
+    function approveDocument(id) {
+      const doc = documents.find(d => d.id === id);
+      if (doc) {
+        doc.status = 'published';
+        alert('Document approved and published!');
+        
+        // Remove from localStorage pending submissions if it exists there
+        try {
+          const pendingSubmissions = JSON.parse(localStorage.getItem('pendingSubmissions')) || [];
+          const updatedPending = pendingSubmissions.filter(sub => sub.id !== id);
+          localStorage.setItem('pendingSubmissions', JSON.stringify(updatedPending));
+        } catch (e) {
+          console.log('Error updating pending submissions:', e);
+        }
+        
+        saveDocumentsToSession();
+        loadAllData();
+      }
+    }
+
+    function rejectDocument(id) {
+      if (confirm('Are you sure you want to reject this document? This action cannot be undone.')) {
+        // Remove from documents array
+        documents = documents.filter(d => d.id !== id);
+        
+        // Remove from localStorage pending submissions
+        try {
+          const pendingSubmissions = JSON.parse(localStorage.getItem('pendingSubmissions')) || [];
+          const updatedPending = pendingSubmissions.filter(sub => sub.id !== id);
+          localStorage.setItem('pendingSubmissions', JSON.stringify(updatedPending));
+        } catch (e) {
+          console.log('Error updating pending submissions:', e);
+        }
+        
+        // Update main documents in localStorage
+        try {
+          const adminDocs = JSON.parse(localStorage.getItem('adminDocuments')) || [];
+          const updatedDocs = adminDocs.filter(d => d.id !== id);
+          localStorage.setItem('adminDocuments', JSON.stringify(updatedDocs));
+        } catch (e) {
+          console.log('Error updating admin documents:', e);
+        }
+        
+        alert('Document rejected and permanently deleted!');
+        saveDocumentsToSession();
+        loadAllData();
+      }
+    }
+
+    function filterDocuments() {
+      const search = document.getElementById('searchDocs').value.toLowerCase();
+      const dept = document.getElementById('filterDept').value;
+      const status = document.getElementById('filterStatus').value;
+
+      const filtered = documents.filter(doc => {
+        const matchSearch = doc.title.toLowerCase().includes(search) || doc.description.toLowerCase().includes(search);
+        const matchDept = !dept || doc.department === dept;
+        const matchStatus = !status || doc.status === status;
+        return matchSearch && matchDept && matchStatus;
+      });
+
+      const table = document.getElementById('documentsTable');
+      const noMsg = document.getElementById('noDocsMessage');
+
+      if (filtered.length === 0) {
+        table.innerHTML = '';
+        noMsg.style.display = 'block';
+        return;
+      }
+
+      noMsg.style.display = 'none';
+      table.innerHTML = filtered.map(doc => `
+        <tr>
+          <td class="px-6 py-4">${doc.title}</td>
+          <td class="px-6 py-4">${doc.department}</td>
+          <td class="px-6 py-4">
+            <span class="px-3 py-1 rounded text-sm font-semibold ${
+              doc.status === 'published' ? 'bg-green-100 text-green-800' :
+              doc.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+              'bg-gray-100 text-gray-800'
+            }">
+              ${doc.status.charAt(0).toUpperCase() + doc.status.slice(1)}
+            </span>
+          </td>
+          <td class="px-6 py-4">${doc.date}</td>
+          <td class="px-6 py-4">
+            ${doc.fileName ? `<button onclick="previewDocument(${doc.id})" class="text-purple-600 hover:underline mr-3" title="Preview"><i class="fas fa-eye"></i></button>` : ''}
+            <button onclick="editDocument(${doc.id})" class="text-blue-600 hover:underline mr-3" title="Edit">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button onclick="publishDoc(${doc.id})" class="text-green-600 hover:underline mr-3" title="Publish">
+              <i class="fas fa-check-circle"></i>
+            </button>
+            <button onclick="deleteDocument(${doc.id})" class="text-red-600 hover:underline" title="Delete">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function updateFileName(input) {
+      if (input.files && input.files[0]) {
+        document.getElementById('fileName').textContent = 'Selected: ' + input.files[0].name;
+      }
+    }
+
+    function logoutAdmin() {
+      sessionStorage.removeItem('pinVerified');
+      alert('Logged out successfully!');
+      window.location.href = 'index.html';
+    }
+  </script>
+</body>
+</html>

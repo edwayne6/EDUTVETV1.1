@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Upload documents to EduTVET for teaching, learning, and professional growth.">
+  <title>Upload Document - EduTVET</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css"> <!-- Link to the custom stylesheet -->
+</head>
+<body class="bg-gradient-to-b from-blue-50 to-white text-gray-800">
+
+  <!-- Navbar -->
+  <header class="bg-white shadow">
+    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+      <h1 class="text-2xl font-bold text-blue-600">EduTVET</h1>
+      <nav class="space-x-4">
+        <a href="documents.html" class="text-gray-700 hover:text-blue-600" aria-label="Go to Documents page">Documents</a>
+        <a href="index.html" class="text-gray-700 hover:text-blue-600" aria-label="Go to Home page">Home</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Upload Section -->
+  <section class="container mx-auto px-4 py-16">
+    <h2 class="text-3xl font-bold text-center mb-8">Upload New Document</h2>
+    <p class="text-center text-gray-600 mb-12">Share your resources with the EduTVET community by uploading approved documents for teaching and learning.</p>
+
+    <!-- Upload Form -->
+    <form id="uploadForm" class="space-y-6 max-w-2xl mx-auto bg-white p-8 rounded-lg shadow">
+      <div>
+        <label for="file" class="block font-medium text-gray-700">Document File</label>
+        <input type="file" id="file" name="file" accept=".pdf,.docx,.pptx" class="mt-2 block w-full p-2 border border-gray-300 rounded" required>
+        <p class="text-sm text-gray-500 mt-1">Accepted formats: PDF, DOCX, PPTX. Max size: 5MB.</p>
+      </div>
+      <div>
+        <label for="title" class="block font-medium text-gray-700">Document Title</label>
+        <input type="text" id="title" name="title" class="mt-2 block w-full p-2 border border-gray-300 rounded" placeholder="Title of the document" required>
+      </div>
+      <div>
+        <label for="category" class="block font-medium text-gray-700">Department/Course *</label>
+        <select id="category" name="category" class="mt-2 block w-full p-2 border border-gray-300 rounded" required>
+          <option value="">Select Department</option>
+          <option value="Agriculture">Agriculture</option>
+          <option value="Business">Business</option>
+          <option value="ICT">ICT</option>
+          <option value="Electrical">Electrical</option>
+          <option value="Mechanical">Mechanical</option>
+          <option value="Hospitality">Hospitality</option>
+          <option value="Agriculture Engineering">Agriculture Engineering</option>
+        </select>
+      </div>
+      <div>
+        <label for="level" class="block font-medium text-gray-700">Level</label>
+        <select id="level" name="level" class="mt-2 block w-full p-2 border border-gray-300 rounded" required>
+          <option value="">Select Level</option>
+          <option value="Level 3">Level 3</option>
+          <option value="Level 4">Level 4</option>
+          <option value="Level 5">Level 5</option>
+          <option value="Level 6">Level 6</option>
+        </select>
+      </div>
+      <div>
+        <label for="docType" class="block font-medium text-gray-700">Document Type *</label>
+        <select id="docType" name="docType" class="mt-2 block w-full p-2 border border-gray-300 rounded" required>
+          <option value="">Select Document Type</option>
+          <option value="Notes">Notes</option>
+          <option value="Curriculum">Curriculum</option>
+          <option value="Occupational Standards">Occupational Standards</option>
+        </select>
+      </div>
+      <div>
+        <label for="description" class="block font-medium text-gray-700">Description</label>
+        <textarea id="description" name="description" class="mt-2 block w-full p-2 border border-gray-300 rounded" placeholder="Provide a brief description of the document" required></textarea>
+      </div>
+      <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 w-full">Upload Document</button>
+    </form>
+
+    <!-- Success and Error Messages -->
+    <div class="text-center mt-4">
+      <p id="successMessage" class="text-green-600 font-semibold hidden">Document uploaded successfully! It will be reviewed by the admin.</p>
+      <p id="errorMessage" class="text-red-600 font-semibold hidden">Failed to upload document. Please try again.</p>
+    </div>
+
+    <!-- Back to Documents Button -->
+    <div class="text-center mt-8">
+      <a href="documents.html" class="text-blue-600 hover:underline">← Back to Documents</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-white py-6 text-center">
+    <p>&copy; 2025 EduTVET. All rights reserved.</p>
+  </footer>
+
+  <script>
+    // Initialize pending submissions from localStorage
+    function initializePendingSubmissions() {
+      if (!localStorage.getItem('pendingSubmissions')) {
+        localStorage.setItem('pendingSubmissions', JSON.stringify([]));
+      }
+    }
+
+    // Handle form submission
+    document.getElementById('uploadForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const formData = {
+        id: Date.now(), // Unique ID based on timestamp
+        title: document.getElementById('title').value,
+        department: document.getElementById('category').value,
+        level: document.getElementById('level').value,
+        docType: document.getElementById('docType').value,
+        description: document.getElementById('description').value,
+        status: 'pending',
+        date: new Date().toISOString().split('T')[0],
+        submittedBy: 'Public User'
+      };
+
+      try {
+        // Get existing submissions
+        let submissions = JSON.parse(localStorage.getItem('pendingSubmissions')) || [];
+        
+        // Add new submission
+        submissions.push(formData);
+        
+        // Save back to localStorage
+        localStorage.setItem('pendingSubmissions', JSON.stringify(submissions));
+
+        // Show success message
+        document.getElementById('successMessage').classList.remove('hidden');
+        document.getElementById('errorMessage').classList.add('hidden');
+
+        // Reset form
+        document.getElementById('uploadForm').reset();
+
+        // Clear message after 5 seconds
+        setTimeout(() => {
+          document.getElementById('successMessage').classList.add('hidden');
+        }, 5000);
+
+      } catch (error) {
+        console.error('Error saving submission:', error);
+        document.getElementById('errorMessage').classList.remove('hidden');
+        document.getElementById('successMessage').classList.add('hidden');
+      }
+    });
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', initializePendingSubmissions);
+  </script>
+
+</body>
+</html>

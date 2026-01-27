@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Browse and download TVET documents categorized by type and level.">
+  <title>EduTVET - Documents</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script>
+    let allDocuments = [];
+    let currentType = 'All';
+    let currentLevel = 'All';
+    let currentDepartment = 'All';
+
+    // Load documents from admin dashboard
+    function loadDocuments() {
+      // Try to load from admin sessionStorage first (for current session)
+      try {
+        const sessionData = sessionStorage.getItem('adminDocuments');
+        if (sessionData) {
+          const adminDocs = JSON.parse(sessionData);
+          if (Array.isArray(adminDocs) && adminDocs.length > 0) {
+            // Filter for published documents, but include documents without explicit status as published
+            allDocuments = adminDocs.filter(d => d.status === 'published' || !d.status);
+            if (allDocuments.length > 0) {
+              populateDropdowns();
+              displayDocuments();
+              return; // Data loaded successfully from sessionStorage
+            }
+          }
+        }
+      } catch (e) {
+        console.log('Error loading from sessionStorage:', e);
+      }
+
+      // Also check localStorage as fallback (more persistent)
+      try {
+        const localData = localStorage.getItem('adminDocuments');
+        if (localData) {
+          const localDocs = JSON.parse(localData);
+          if (Array.isArray(localDocs) && localDocs.length > 0) {
+            // Filter for published documents, but include documents without explicit status as published
+            allDocuments = localDocs.filter(d => d.status === 'published' || !d.status);
+            populateDropdowns();
+            displayDocuments();
+            return; // Data loaded successfully from localStorage
+          }
+        }
+      } catch (e) {
+        console.log('Error loading from localStorage:', e);
+      }
+
+      // If no data found, display empty state
+      populateDropdowns();
+      displayDocuments();
+    }
+
+    function populateDropdowns() {
+      // Get unique values for filters
+      const departments = ['All', 'Agriculture', 'Business', 'Agriculture Engineering', 'ICT', 'Electrical', 'Mechanical', 'Hospitality', 'Agricultural Engineering'];
+      const types = ['Notes', 'Curriculum', 'Occupational Standards'];
+      const levels = ['Level 3', 'Level 4', 'Level 5', 'Level 6'];
+
+      // Populate Department dropdown
+      const deptSelect = document.getElementById('departmentFilter');
+      if (deptSelect) {
+        deptSelect.innerHTML = '';
+        departments.forEach(dept => {
+          const option = document.createElement('option');
+          option.value = dept;
+          option.textContent = dept;
+          if (dept === 'All') option.selected = true;
+          deptSelect.appendChild(option);
+        });
+      }
+
+      // Populate Type buttons
+      const typeContainer = document.getElementById('typeButtons');
+      if (typeContainer) {
+        typeContainer.innerHTML = '<button class="filter-btn bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold transition" onclick="selectType(\'All\')" data-type="All">All Types</button>';
+        types.forEach(type => {
+          const btn = document.createElement('button');
+          btn.className = 'filter-btn bg-gray-200 text-gray-800 px-4 py-2 rounded-lg font-semibold hover:bg-blue-600 hover:text-white transition';
+          btn.textContent = type;
+          btn.setAttribute('data-type', type);
+          btn.onclick = () => selectType(type);
+          typeContainer.appendChild(btn);
+        });
+      }
+
+      // Populate Level buttons
+      const levelContainer = document.getElementById('levelButtons');
+      if (levelContainer) {
+        levelContainer.innerHTML = '<button class="filter-btn bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold transition" onclick="selectLevel(\'All\')" data-level="All">All Levels</button>';
+        levels.forEach(level => {
+          const btn = document.createElement('button');
+          btn.className = 'filter-btn bg-gray-200 text-gray-800 px-4 py-2 rounded-lg font-semibold hover:bg-blue-600 hover:text-white transition';
+          btn.textContent = level;
+          btn.setAttribute('data-level', level);
+          btn.onclick = () => selectLevel(level);
+          levelContainer.appendChild(btn);
+        });
+      }
+    }
+
+    function displayDocuments() {
+      const documentsContainer = document.querySelector('.grid');
+      documentsContainer.innerHTML = '';
+
+      const filteredDocs = filterDocumentsArray();
+      updateActiveFiltersDisplay();
+
+      if (filteredDocs.length === 0) {
+        documentsContainer.innerHTML = '<p class="col-span-3 text-center text-gray-500 py-8">No documents found. Try adjusting your filters or search terms.</p>';
+        return;
+      }
+
+      // Show results count
+      const resultsDiv = document.createElement('p');
+      resultsDiv.className = 'col-span-3 text-sm text-gray-600 mb-4 font-semibold';
+      resultsDiv.innerHTML = `Found <strong>${filteredDocs.length}</strong> document(s)`;
+      documentsContainer.appendChild(resultsDiv);
+
+      filteredDocs.forEach(doc => {
+        const card = document.createElement('div');
+        card.className = 'document-card bg-white p-4 rounded shadow hover:shadow-lg transition';
+        
+        card.innerHTML = `
+          <h4 class="font-bold text-lg mb-2">${doc.title}</h4>
+          <p class="text-sm mb-1"><strong>Department:</strong> ${doc.department}</p>
+          <p class="text-sm mb-1"><strong>Type:</strong> ${doc.docType || 'Notes'} | <strong>Level:</strong> ${doc.level}</p>
+          <p class="text-xs text-gray-500 mb-2">Uploaded: ${doc.date}</p>
+          <p class="text-sm text-gray-600 mb-3">${doc.description}</p>
+          <a href="#" class="text-blue-600 hover:underline">Download</a>
+        `;
+        
+        documentsContainer.appendChild(card);
+      });
+    }
+
+    function filterDocumentsArray() {
+      const query = document.getElementById("searchInput").value.toLowerCase();
+
+      return allDocuments.filter(doc => {
+        const matchesSearch = query === '' || doc.title.toLowerCase().includes(query) || 
+                             doc.description.toLowerCase().includes(query) ||
+                             doc.department.toLowerCase().includes(query);
+        const matchesType = currentType === 'All' || doc.docType === currentType;
+        const matchesLevel = currentLevel === 'All' || doc.level === currentLevel;
+        const matchesDepartment = currentDepartment === 'All' || doc.department === currentDepartment;
+
+        return matchesSearch && matchesType && matchesLevel && matchesDepartment;
+      });
+    }
+
+    function onFilterChange() {
+      currentType = document.getElementById('typeFilter').value;
+      currentLevel = document.getElementById('levelFilter').value;
+      currentDepartment = document.getElementById('departmentFilter').value;
+      displayDocuments();
+      updateActiveFiltersDisplay();
+    }
+
+    function selectDepartment(dept) {
+      currentDepartment = dept;
+      updateButtonStates();
+      displayDocuments();
+    }
+
+    function selectType(type) {
+      currentType = type;
+      updateButtonStates();
+      displayDocuments();
+    }
+
+    function selectLevel(level) {
+      currentLevel = level;
+      updateButtonStates();
+      displayDocuments();
+    }
+
+    function updateButtonStates() {
+      // Update department buttons
+      const deptBtns = document.querySelectorAll('#departmentButtons .filter-btn');
+      deptBtns.forEach(btn => {
+        if (btn.getAttribute('data-dept') === currentDepartment || btn.textContent === currentDepartment) {
+          btn.className = 'filter-btn bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold transition';
+        } else {
+          btn.className = 'filter-btn bg-gray-200 text-gray-800 px-4 py-2 rounded-lg font-semibold hover:bg-blue-600 hover:text-white transition';
+        }
+      });
+
+      // Update type buttons
+      const typeBtns = document.querySelectorAll('#typeButtons .filter-btn');
+      typeBtns.forEach(btn => {
+        if (btn.getAttribute('data-type') === currentType || btn.textContent === currentType) {
+          btn.className = 'filter-btn bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold transition';
+        } else {
+          btn.className = 'filter-btn bg-gray-200 text-gray-800 px-4 py-2 rounded-lg font-semibold hover:bg-blue-600 hover:text-white transition';
+        }
+      });
+
+      // Update level buttons
+      const levelBtns = document.querySelectorAll('#levelButtons .filter-btn');
+      levelBtns.forEach(btn => {
+        if (btn.getAttribute('data-level') === currentLevel || btn.textContent === currentLevel) {
+          btn.className = 'filter-btn bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold transition';
+        } else {
+          btn.className = 'filter-btn bg-gray-200 text-gray-800 px-4 py-2 rounded-lg font-semibold hover:bg-blue-600 hover:text-white transition';
+        }
+      });
+
+      updateActiveFiltersDisplay();
+    }
+
+    function onSearchInput() {
+      displayDocuments();
+    }
+
+    function onDepartmentChange() {
+      currentDepartment = document.getElementById('departmentFilter').value;
+      updateButtonStates();
+      displayDocuments();
+    }
+
+    function resetFilters() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('departmentFilter').value = 'All';
+      currentType = 'All';
+      currentLevel = 'All';
+      currentDepartment = 'All';
+      updateButtonStates();
+      displayDocuments();
+      updateActiveFiltersDisplay();
+    }
+
+    function updateActiveFiltersDisplay() {
+      const filters = [];
+      const searchQuery = document.getElementById('searchInput').value;
+      
+      if (searchQuery) filters.push(`Search: "${searchQuery}"`);
+      if (currentDepartment !== 'All') filters.push(`Department: ${currentDepartment}`);
+      if (currentType !== 'All') filters.push(`Type: ${currentType}`);
+      if (currentLevel !== 'All') filters.push(`Level: ${currentLevel}`);
+
+      const activeFiltersDiv = document.getElementById('activeFilters');
+      const filterTags = document.getElementById('filterTags');
+
+      if (filters.length > 0) {
+        filterTags.innerHTML = filters.map(f => `<span class="bg-blue-200 text-blue-800 px-2 py-1 rounded mx-1 inline-block">${f}</span>`).join('');
+        activeFiltersDiv.classList.remove('hidden');
+      } else {
+        activeFiltersDiv.classList.add('hidden');
+      }
+    }
+
+    // Load documents when page loads
+    document.addEventListener('DOMContentLoaded', loadDocuments);
+  </script>
+  <script src="scripts.js"></script>
+  <script type="module">
+    import config from './scripts/config.json'; // Updated path
+  </script>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+  <!-- Navbar -->
+  <header class="bg-white shadow">
+    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+      <h1 class="text-2xl font-bold text-blue-600">EduTVET</h1>
+      <nav class="space-x-4">
+        <a href="index.html" class="text-gray-700 hover:text-blue-600">Home</a>
+        <a href="upload.html" class="text-gray-700 hover:text-blue-600">Upload</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section with Integrated Search Engine -->
+  <section class="bg-gradient-to-b from-blue-50 to-blue-100 py-16">
+    <div class="container mx-auto px-4">
+      <h2 class="text-4xl font-bold mb-2 text-blue-700 text-center">Find the Documents You Need</h2>
+      <p class="text-lg text-gray-700 mb-8 text-center">Search and filter by keywords, department, document type, and level.</p>
+      
+      <!-- Advanced Search Engine -->
+      <div class="bg-white rounded-lg shadow-lg p-8 max-w-5xl mx-auto">
+        <!-- Search Input -->
+        <div class="mb-6">
+          <label class="block text-sm font-semibold text-gray-700 mb-2">Search by Keywords</label>
+          <input 
+            type="text" 
+            id="searchInput" 
+            placeholder="Search by title, description, or keyword..." 
+            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-600 transition"
+            oninput="onSearchInput()"
+          >
+        </div>
+
+        <!-- Department Filter Dropdown -->
+        <div class="mb-6">
+          <label class="block text-sm font-semibold text-gray-700 mb-2">Select Department</label>
+          <select id="departmentFilter" onchange="onDepartmentChange()" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 transition">
+            <option value="All">All Departments</option>
+          </select>
+        </div>
+
+        <!-- Document Type Filter Buttons -->
+        <div class="mb-6">
+          <label class="block text-sm font-semibold text-gray-700 mb-3">Select Document Type</label>
+          <div id="typeButtons" class="flex flex-wrap gap-2">
+            <!-- Buttons will be populated here -->
+          </div>
+        </div>
+
+        <!-- Level Filter Buttons -->
+        <div class="mb-6">
+          <label class="block text-sm font-semibold text-gray-700 mb-3">Select Level</label>
+          <div id="levelButtons" class="flex flex-wrap gap-2">
+            <!-- Buttons will be populated here -->
+          </div>
+        </div>
+
+        <!-- Reset Button -->
+        <div class="flex mb-6">
+          <button onclick="resetFilters()" class="bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-6 rounded-lg transition">
+            Reset All Filters
+          </button>
+        </div>
+
+        <!-- Active Filters Display -->
+        <div id="activeFilters" class="text-sm text-gray-600 mt-4 p-3 bg-gray-50 rounded-lg hidden">
+          <span class="font-semibold">Active Filters:</span>
+          <span id="filterTags" class="ml-2"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Documents Section -->
+  <section class="py-12 bg-gray-50">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+        <!-- Documents will be loaded here dynamically -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-gray-800 text-white py-6 text-center">
+    <p>&copy; 2025 EduTVET. All rights reserved.</p>
+  </footer>
+
+</body>
+</html>
