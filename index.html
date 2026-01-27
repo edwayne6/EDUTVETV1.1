@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="EduTVET provides access to quality TVET documents for teaching, learning, and professional growth.">
+  <title>EduTVET - Empowering Learning</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css"> <!-- Link to the custom stylesheet -->
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js" crossorigin="anonymous"></script>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+  <!-- Navbar -->
+  <header class="bg-white shadow">
+    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+      <h1 class="text-2xl font-bold text-blue-600 animate-header">EduTVET</h1>
+      <nav class="space-x-4 flex items-center">
+        <a href="documents.html" class="text-gray-700 hover:text-blue-600" aria-label="Go to Documents page">Documents</a>
+        <a href="#features" class="text-gray-700 hover:text-blue-600" aria-label="Learn about features">Features</a>
+        <a href="admin.html" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition" aria-label="Admin Dashboard">Admin</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="bg-blue-50 py-16 text-center">
+    <div class="container mx-auto px-4">
+      <h2 class="text-4xl font-bold mb-4 text-blue-700">Access Quality Modularised TVET Documents Anytime</h2>
+      <p class="text-lg text-gray-700 mb-6">Download or upload approved documents for teaching, learning, and professional growth.</p>
+      <div class="max-w-lg mx-auto mb-6">
+        <input 
+          type="text" 
+          id="searchInput" 
+          placeholder="Search documents..." 
+          class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring focus:ring-blue-200"
+          oninput="filterDocuments()"
+          aria-label="Search documents"
+        >
+      </div>
+      <div id="searchResults" class="grid grid-cols-1 md:grid-cols-3 gap-8"></div>
+      <a href="documents.html" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700" aria-label="Browse all documents">Browse Documents</a>
+    </div>
+  </section>
+
+  <!-- Slider Section -->
+  <section class="slider-container py-16 relative">
+    <div class="slider-overlay absolute inset-0 bg-black opacity-50"></div>
+    <div class="container mx-auto px-4 text-center relative z-10">
+      <h2 class="text-4xl font-bold text-white mb-4">Welcome to EduTVET</h2>
+      <p class="text-lg text-gray-200 mb-6">Empowering learning with quality TVET resources.</p>
+      <a href="#features" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">Learn More</a>
+    </div>
+  </section>
+
+  <!-- Featured Documents -->
+  <section id="documents" class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+      <h3 class="text-2xl font-semibold mb-8 text-center">Popular Documents</h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="bg-gray-100 p-4 rounded shadow">
+          <h4 class="font-bold text-lg mb-2">Crop Protection Guide</h4>
+          <p class="text-sm mb-2">By Edwin chemain • Agriculture</p>
+          <a href="" class="text-blue-600 hover:underline">Download</a>
+        </div>
+        <div class="bg-gray-100 p-4 rounded shadow">
+          <h4 class="font-bold text-lg mb-2">TVET Curriculum Outline</h4>
+          <p class="text-sm mb-2">By edwin chesaro • Curriculum</p>
+          <a href="#" class="text-blue-600 hover:underline">Download</a>
+        </div>
+        <div class="bg-gray-100 p-4 rounded shadow">
+          <h4 class="font-bold text-lg mb-2">Lesson Plan Template</h4>
+          <p class="text-sm mb-2">By Edwin Chesaro • Teaching Aids</p>
+          <a href="#" class="text-blue-600 hover:underline">Download</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Section -->
+<section id="features" class="bg-white py-16">
+  <div class="container mx-auto px-4 text-center">
+    <h2 class="text-3xl font-bold text-blue-700 mb-6">Why Choose EduTVET?</h2>
+    <p class="text-gray-600 mb-12 max-w-2xl mx-auto">
+      EduTVET is designed with educators and learners in mind — offering a reliable platform for accessing high-quality, curriculum-aligned documents anytime, anywhere.
+    </p>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div class="bg-gray-50 p-6 rounded-lg shadow hover:shadow-lg transition">
+        <div class="text-blue-600 text-4xl mb-4">📚</div>
+        <h3 class="text-xl font-semibold mb-2">Curriculum-Based Materials</h3>
+        <p class="text-gray-600">All our documents are reviewed to ensure they meet approved TVET standards and training objectives.</p>
+      </div>
+      <div class="bg-gray-50 p-6 rounded-lg shadow hover:shadow-lg transition">
+        <div class="text-blue-600 text-4xl mb-4">📥</div>
+        <h3 class="text-xl font-semibold mb-2">Instant Downloads</h3>
+        <p class="text-gray-600">Access your documents immediately after payment or approval, with easy tracking from your dashboard.</p>
+      </div>
+      <div class="bg-gray-50 p-6 rounded-lg shadow hover:shadow-lg transition">
+        <div class="text-blue-600 text-4xl mb-4">🔒</div>
+        <h3 class="text-xl font-semibold mb-2">Secure & Verified</h3>
+        <p class="text-gray-600">Our platform uses secure payment gateways and document approval processes to protect users and content quality.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+  <!-- Call to Action -->
+  <section class="bg-blue-600 text-white py-12 text-center">
+    <h4 class="text-2xl font-semibold mb-4">Ready to Get Started?</h4>
+    <p class="mb-6">Create an account and start uploading or downloading quality documents today.</p>
+    <a href="documents.html" class="bg-white text-blue-600 px-6 py-3 rounded-lg hover:bg-gray-100">Learn More</a>
+  </section>
+
+  <!-- Professional Footer -->
+<footer class="bg-gray-900 text-white py-10">
+  <div class="container mx-auto px-4">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
+
+      <!-- Departments -->
+      <div>
+        <h4 class="text-xl font-semibold mb-4 text-blue-400">Departments</h4>
+        <ul class="space-y-2 text-gray-300">
+          <li>Agriculture</li>
+          <li>Business</li>
+          <li>Agriculture Engineering</li>
+          <li>ICT</li>
+          <li>Electrical</li>
+          <li>Mechanical</li>
+          <li>Hospitality</li>
+          <li>Agricultural Engineering</li>
+        </ul>
+      </div>
+
+      <!-- Contact Information -->
+      <div>
+        <h4 class="text-xl font-semibold mb-4 text-blue-400">Contact Us</h4>
+        <p class="text-gray-300">Phone: <a href="tel:0708715547" class="text-blue-300 hover:underline">0708715547</a></p>
+        <p class="text-gray-300">Email: <a href="mailto:educhemain@gmail.com" class="text-blue-300 hover:underline">educhemain@gmail.com</a></p>
+      </div>
+
+      <!-- Social Media -->
+      <div>
+        <h4 class="text-xl font-semibold mb-4 text-blue-400">Follow Us</h4>
+        <div class="flex flex-col items-center md:items-start space-y-4 text-gray-300">
+          <a href="https://x.com" target="_blank" class="flex items-center space-x-2 hover:text-blue-400 transition" aria-label="Follow us on X">
+            <i class="fab fa-twitter"></i> <!-- FontAwesome icon for X -->
+            <span>X</span>
+          </a>
+          <a href="https://facebook.com" target="_blank" class="flex items-center space-x-2 hover:text-blue-400 transition" aria-label="Follow us on Facebook">
+            <i class="fab fa-facebook"></i> <!-- FontAwesome icon for Facebook -->
+            <span>Facebook</span>
+          </a>
+          <a href="https://linkedin.com" target="_blank" class="flex items-center space-x-2 hover:text-blue-400 transition" aria-label="Follow us on LinkedIn">
+            <i class="fab fa-linkedin"></i> <!-- FontAwesome icon for LinkedIn -->
+            <span>LinkedIn</span>
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="border-t border-gray-700 mt-8 pt-4 text-center text-sm text-gray-400">
+      &copy; 2025 <span class="text-blue-400 font-semibold">EduTVET</span>. All rights reserved.
+    </div>
+  </div>
+</footer>
+
+
+  <!-- Add FontAwesome for icons -->
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <script type="module" src="scripts/scripts.js"></script> <!-- Updated path -->
+
+</body>
+</html>
