@@ -125,7 +125,33 @@ header h1 {
 }
 
 header nav a {
-  transition: color 0.3s ease;
+  transition: all 0.3s ease;
+  position: relative;
+  display: inline-block;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Blue button hover effect */
+header nav a.bg-blue-500 {
+  transition: all 0.3s ease;
+}
+
+header nav a.bg-blue-500:hover {
+  background-color: #2563eb;
+  color: white;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+  transform: translateY(-2px);
+}
+
+/* Green button hover effect */
+header nav a.bg-green-500 {
+  transition: all 0.3s ease;
+}
+
+header nav a.bg-green-500:hover {
+  background-color: #16a34a;
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
+  transform: translateY(-2px);
 }
 
 /* General hover effect for navigation links */
@@ -210,21 +236,26 @@ footer a:hover {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  height: 400px; /* Adjust height as needed */
+  height: auto;
+  min-height: 600px; /* Increased height to cover hero section */
   animation: fadeBackground 20s infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .slider-container::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.3); /* Reduce opacity for better visibility */
+  background: rgba(0, 0, 0, 0.5); /* Slightly darker overlay for better text contrast */
   z-index: 1;
 }
 
-slider-container .container {
+.slider-container .container {
   position: relative;
   z-index: 2; /* Ensure text is above the overlay */
+  width: 100%;
 }
 
 /* Slider Wrapper */
