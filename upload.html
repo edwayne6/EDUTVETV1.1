@@ -93,10 +93,13 @@
 
   <!-- Footer -->
   <footer class="bg-gray-900 text-white py-6 text-center">
-    <p>&copy; 2025 EduTVET. All rights reserved.</p>
+    <p>&copy; <span id="year">2026</span> EduTVET. All rights reserved.</p>
   </footer>
 
   <script>
+    // Auto-update copyright year
+    document.getElementById('year').textContent = new Date().getFullYear();
+    
     // Initialize pending submissions from localStorage
     function initializePendingSubmissions() {
       if (!localStorage.getItem('pendingSubmissions')) {
@@ -153,5 +156,6 @@
     document.addEventListener('DOMContentLoaded', initializePendingSubmissions);
   </script>
 
+  <script src="scripts/analytics.js"></script> <!-- Visitor tracking -->
 </body>
 </html>

@@ -335,6 +335,110 @@ app.get("/api/documents/:id/download", (req, res) => {
 // Serve static files from documents folder
 app.use('/documents', express.static(documentsFolder));
 
+// ============================================
+// VISITOR TRACKING
+// ============================================
+
+// Stats file path
+const statsFile = path.join(__dirname, 'stats.json');
+
+// Initialize stats file if it doesn't exist
+function initializeStats() {
+  if (!fs.existsSync(statsFile)) {
+    fs.writeFileSync(statsFile, JSON.stringify({ 
+      totalVisits: 0, 
+      uniqueVisitors: new Set(),
+      visits: []
+    }, null, 2));
+  }
+}
+
+// Read stats from file
+function readStats() {
+  try {
+    const data = fs.readFileSync(statsFile, 'utf8');
+    const stats = JSON.parse(data);
+    // Convert uniqueVisitors array back to Set
+    stats.uniqueVisitors = new Set(stats.uniqueVisitors);
+    return stats;
+  } catch (error) {
+    console.error('Error reading stats:', error);
+    return { totalVisits: 0, uniqueVisitors: new Set(), visits: [] };
+  }
+}
+
+// Write stats to file
+function writeStats(stats) {
+  try {
+    // Convert Set to array before writing
+    const dataToWrite = {
+      totalVisits: stats.totalVisits,
+      uniqueVisitors: Array.from(stats.uniqueVisitors),
+      visits: stats.visits
+    };
+    fs.writeFileSync(statsFile, JSON.stringify(dataToWrite, null, 2));
+  } catch (error) {
+    console.error('Error writing stats:', error);
+  }
+}
+
+// Record a visit
+app.post("/api/visit", (req, res) => {
+  try {
+    const { visitorId, page } = req.body;
+
+    if (!visitorId) {
+      return res.status(400).json({ message: "visitorId is required" });
+    }
+
+    initializeStats();
+    const stats = readStats();
+
+    // Increment total visits
+    stats.totalVisits = (stats.totalVisits || 0) + 1;
+
+    // Track unique visitors
+    if (!stats.uniqueVisitors.has(visitorId)) {
+      stats.uniqueVisitors.add(visitorId);
+    }
+
+    // Record visit details
+    stats.visits.push({
+      visitorId,
+      page: page || '/',
+      timestamp: new Date().toISOString()
+    });
+
+    writeStats(stats);
+
+    res.json({
+      message: "Visit recorded",
+      totalVisits: stats.totalVisits,
+      uniqueVisitors: stats.uniqueVisitors.size
+    });
+  } catch (error) {
+    console.error('Error recording visit:', error);
+    res.status(500).json({ message: "Error recording visit", error: error.message });
+  }
+});
+
+// Get visitor stats
+app.get("/api/stats", (req, res) => {
+  try {
+    initializeStats();
+    const stats = readStats();
+
+    res.json({
+      totalVisits: stats.totalVisits || 0,
+      uniqueVisitors: stats.uniqueVisitors.size || 0,
+      recentVisits: (stats.visits || []).slice(-10).reverse()
+    });
+  } catch (error) {
+    console.error('Error fetching stats:', error);
+    res.status(500).json({ message: "Error fetching stats", error: error.message });
+  }
+});
+
 // Health check
 app.get("/api/health", (req, res) => {
   res.json({ 

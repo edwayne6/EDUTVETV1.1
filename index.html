@@ -8,7 +8,6 @@
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link rel="stylesheet" href="styles.css"> <!-- Link to the custom stylesheet -->
   <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js" crossorigin="anonymous"></script>
 </head>
 <body class="bg-gray-50 text-gray-800">
 
@@ -78,7 +77,6 @@
           <li>Electrical</li>
           <li>Mechanical</li>
           <li>Hospitality</li>
-          <li>Agricultural Engineering</li>
         </ul>
       </div>
 
@@ -111,15 +109,18 @@
     </div>
 
     <div class="border-t border-gray-700 mt-8 pt-4 text-center text-sm text-gray-400">
-      &copy; 2025 <span class="text-blue-400 font-semibold">EduTVET</span>. All rights reserved.
+      &copy; <span id="year">2026</span> <span class="text-blue-400 font-semibold">EduTVET</span>. All rights reserved.
     </div>
   </div>
 </footer>
 
-
-  <!-- Add FontAwesome for icons -->
-  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
   <script type="module" src="scripts/scripts.js"></script> <!-- Updated path -->
+  <script src="scripts/analytics.js"></script> <!-- Visitor tracking -->
+
+  <!-- Auto-update copyright year -->
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
 
 </body>
 </html>

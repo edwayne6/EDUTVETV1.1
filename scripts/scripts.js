@@ -1,10 +1,5 @@
 import config from './config.json';
 
-// Initialize Supabase
-const SUPABASE_URL = "https://frtueyicmjftwtsrmxfi.supabase.co"; // Your Supabase URL
-const SUPABASE_KEY = "your-supabase-key"; // Replace with your actual Supabase API Key
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
 document.addEventListener("DOMContentLoaded", () => {
   // Form Validation
   const forms = document.querySelectorAll("form");
@@ -31,100 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Handle Sign Up Form Submission
-  const signupForm = document.getElementById("signupForm");
-  if (signupForm) {
-    signupForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const username = document.getElementById("username").value;
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
-
-      if (!emailRegex.test(email)) {
-        alert("Please enter a valid email address.");
-        return;
-      }
-
-      if (!passwordRegex.test(password)) {
-        alert("Password must be at least 8 characters long and include both letters and numbers.");
-        return;
-      }
-
-      try {
-        const { user, error } = await supabase.auth.signUp({
-          email,
-          password,
-        });
-
-        if (error) {
-          alert(error.message);
-          return;
-        }
-
-        alert("Sign-up successful! Please check your email to confirm your account.");
-        window.location.href = "/login.html";
-      } catch (err) {
-        console.error("Sign-up error:", err);
-        alert("An error occurred. Please try again.");
-      }
-    });
-  }
-
-  // Handle Login Form Submission
-  const loginForm = document.getElementById("loginForm");
-  if (loginForm) {
-    loginForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-
-      try {
-        const { user, session, error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-
-        if (error) {
-          alert(error.message);
-          return;
-        }
-
-        alert("Login successful!");
-        window.location.href = "/dashboard.html";
-      } catch (err) {
-        console.error("Login error:", err);
-        alert("An error occurred. Please try again.");
-      }
-    });
-  }
-
-  // Handle Google Login
-  const googleLoginButton = document.getElementById("googleLogin");
-  if (googleLoginButton) {
-    googleLoginButton.addEventListener("click", async () => {
-      try {
-        const { user, session, error } = await supabase.auth.signInWithOAuth({
-          provider: "google",
-        });
-
-        if (error) {
-          alert(error.message);
-          return;
-        }
-
-        alert("Login successful!");
-        window.location.href = "/dashboard.html";
-      } catch (err) {
-        console.error("Google login error:", err);
-        alert("An error occurred. Please try again.");
-      }
-    });
-  }
+  // (Removed: legacy sign-up / login / OAuth handlers — not used in current site)
 
   // Handle Upload Form Submission
   const uploadForm = document.getElementById("uploadForm");
@@ -169,35 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Check Authentication on Page Load
-  (async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-
-    if (!session && !window.location.pathname.includes("login.html")) {
-      window.location.href = "/login.html";
-    }
-  })();
-
-  // Handle Logout
-  const logoutButton = document.getElementById("logout");
-  if (logoutButton) {
-    logoutButton.addEventListener("click", async () => {
-      try {
-        const { error } = await supabase.auth.signOut();
-
-        if (error) {
-          alert(error.message);
-          return;
-        }
-
-        alert("Logged out successfully!");
-        window.location.href = "/login.html";
-      } catch (err) {
-        console.error("Logout error:", err);
-        alert("An error occurred. Please try again.");
-      }
-    });
-  }
+  // (Removed: legacy auth check and logout handlers — site uses local/session storage and page-specific auth flows)
 
   // Mobile Menu Toggle
   const nav = document.querySelector("header nav");
@@ -323,50 +197,7 @@ function filterDocuments() {
   });
 }
 
-// Handle Reset Password Form Submission
-document.addEventListener("DOMContentLoaded", () => {
-  const resetPasswordForm = document.getElementById("resetPasswordForm");
-  if (resetPasswordForm) {
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get("token");
-
-    if (!token) {
-      alert("Invalid or missing token. Please try resetting your password again.");
-      window.location.href = "/index.html";
-      return;
-    }
-
-    resetPasswordForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const newPassword = document.getElementById("newPassword").value;
-
-      const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
-      if (!passwordRegex.test(newPassword)) {
-        alert("Password must be at least 8 characters long and include both letters and numbers.");
-        return;
-      }
-
-      try {
-        const response = await fetch("/api/reset-password", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ token, newPassword }),
-        });
-
-        const result = await response.json();
-        if (response.ok) {
-          alert(result.msg);
-          window.location.href = "/login.html";
-        } else {
-          alert(result.msg);
-        }
-      } catch (error) {
-        alert("An error occurred. Please try again later.");
-        console.error(error);
-      }
-    });
-  }
-});
+// (Removed: legacy password-reset handler — site uses simpler local submission flow)
 
 document.addEventListener("DOMContentLoaded", () => {
   const slides = document.querySelector(".slides");
@@ -411,52 +242,7 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
   });
 });
 
-// Particle.js Configuration
-particlesJS("particles-js", {
-  particles: {
-    number: { value: 100, density: { enable: true, value_area: 800 } },
-    color: { value: "#ffffff" },
-    shape: {
-      type: "circle",
-      stroke: { width: 0, color: "#000000" },
-      polygon: { nb_sides: 5 },
-    },
-    opacity: { value: 0.5, random: false },
-    size: { value: 3, random: true },
-    line_linked: {
-      enable: true,
-      distance: 150,
-      color: "#ffffff",
-      opacity: 0.4,
-      width: 1,
-    },
-    move: {
-      enable: true,
-      speed: 6,
-      direction: "none",
-      random: false,
-      straight: false,
-      out_mode: "out",
-      bounce: false,
-    },
-  },
-  interactivity: {
-    detect_on: "canvas",
-    events: {
-      onhover: { enable: true, mode: "repulse" },
-      onclick: { enable: true, mode: "push" },
-      resize: true,
-    },
-    modes: {
-      grab: { distance: 400, line_linked: { opacity: 1 } },
-      bubble: { distance: 400, size: 40, duration: 2, opacity: 8 },
-      repulse: { distance: 200 },
-      push: { particles_nb: 4 },
-      remove: { particles_nb: 2 },
-    },
-  },
-  retina_detect: true,
-});
+// (Removed: particle.js background configuration — no particles container present in pages)
 
 document.querySelectorAll("button, a").forEach((element) => {
   element.addEventListener("click", (e) => {

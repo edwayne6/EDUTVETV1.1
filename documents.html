@@ -6,6 +6,30 @@
   <meta name="description" content="Browse and download TVET documents categorized by type and level.">
   <title>EduTVET - Documents</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    .document-card {
+      transition: all 0.3s ease;
+    }
+    .document-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    }
+    .filter-btn {
+      transition: all 0.3s ease;
+    }
+    .filter-btn:active {
+      transform: scale(0.95);
+    }
+    @media (max-width: 768px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+      #typeButtons, #levelButtons {
+        flex-wrap: wrap;
+      }
+    }
+  </style>
   <script>
     let allDocuments = [];
     let currentType = 'All';
@@ -57,7 +81,7 @@
 
     function populateDropdowns() {
       // Get unique values for filters
-      const departments = ['All', 'Agriculture', 'Business', 'Agriculture Engineering', 'ICT', 'Electrical', 'Mechanical', 'Hospitality', 'Agricultural Engineering'];
+      const departments = ['All', 'Agriculture', 'Business', 'Agriculture Engineering', 'ICT', 'Electrical', 'Mechanical', 'Hospitality'];
       const types = ['Notes', 'Curriculum', 'Occupational Standards'];
       const levels = ['Level 3', 'Level 4', 'Level 5', 'Level 6'];
 
@@ -111,7 +135,7 @@
       updateActiveFiltersDisplay();
 
       if (filteredDocs.length === 0) {
-        documentsContainer.innerHTML = '<p class="col-span-3 text-center text-gray-500 py-8">No documents found. Try adjusting your filters or search terms.</p>';
+        documentsContainer.innerHTML = '<div class="col-span-full text-center py-12"><i class="fas fa-search text-5xl text-gray-300 mb-4"></i><p class="text-gray-500 text-lg">No documents found. Try adjusting your filters or search terms.</p></div>';
         return;
       }
 
@@ -126,12 +150,12 @@
         card.className = 'document-card bg-white p-4 rounded shadow hover:shadow-lg transition';
         
         card.innerHTML = `
-          <h4 class="font-bold text-lg mb-2">${doc.title}</h4>
-          <p class="text-sm mb-1"><strong>Department:</strong> ${doc.department}</p>
-          <p class="text-sm mb-1"><strong>Type:</strong> ${doc.docType || 'Notes'} | <strong>Level:</strong> ${doc.level}</p>
+          <h4 class="font-bold text-lg mb-2 text-blue-700">${doc.title}</h4>
+          <p class="text-sm mb-1 text-gray-600"><strong>Department:</strong> ${doc.department}</p>
+          <p class="text-sm mb-1 text-gray-600"><strong>Type:</strong> ${doc.docType || 'Notes'} | <strong>Level:</strong> ${doc.level}</p>
           <p class="text-xs text-gray-500 mb-2">Uploaded: ${doc.date}</p>
-          <p class="text-sm text-gray-600 mb-3">${doc.description}</p>
-          <a href="#" class="text-blue-600 hover:underline">Download</a>
+          <p class="text-sm text-gray-600 mb-4">${doc.description || 'No description available'}</p>
+          <a href="javascript:void(0)" class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition" onclick="alert('Download feature coming soon! Document: ${doc.title}')"><i class="fas fa-download"></i> Download</a>
         `;
         
         documentsContainer.appendChild(card);
@@ -257,9 +281,14 @@
     // Load documents when page loads
     document.addEventListener('DOMContentLoaded', loadDocuments);
   </script>
-  <script src="scripts.js"></script>
+  <script src="scripts/scripts.js"></script>
   <script type="module">
     import config from './scripts/config.json'; // Updated path
+  </script>
+
+  <!-- Auto-update copyright year -->
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
   </script>
 </head>
 <body class="bg-gray-50 text-gray-800">
@@ -274,6 +303,15 @@
       </nav>
     </div>
   </header>
+
+  <!-- Breadcrumb Navigation -->
+  <nav class="bg-gray-100 py-3">
+    <div class="container mx-auto px-4 text-sm text-gray-600">
+      <a href="index.html" class="text-blue-600 hover:underline">Home</a>
+      <span class="mx-2">/</span>
+      <span class="text-gray-800 font-semibold">Documents</span>
+    </div>
+  </nav>
 
   <!-- Hero Section with Integrated Search Engine -->
   <section class="bg-gradient-to-b from-blue-50 to-blue-100 py-16">
@@ -344,10 +382,59 @@
     </div>
   </section>
 
-  <!-- Footer -->
-  <footer class="bg-gray-800 text-white py-6 text-center">
-    <p>&copy; 2025 EduTVET. All rights reserved.</p>
-  </footer>
+  <!-- Professional Footer -->
+<footer class="bg-gray-900 text-white py-10">
+  <div class="container mx-auto px-4">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
 
+      <!-- Departments -->
+      <div>
+        <h4 class="text-xl font-semibold mb-4 text-blue-400">Departments</h4>
+        <ul class="space-y-2 text-gray-300">
+          <li>Agriculture</li>
+          <li>Business</li>
+          <li>Agriculture Engineering</li>
+          <li>ICT</li>
+          <li>Electrical</li>
+          <li>Mechanical</li>
+          <li>Hospitality</li>
+        </ul>
+      </div>
+
+      <!-- Contact Information -->
+      <div>
+        <h4 class="text-xl font-semibold mb-4 text-blue-400">Contact Us</h4>
+        <p class="text-gray-300">Phone: <a href="tel:0708715547" class="text-blue-300 hover:underline">0708715547</a></p>
+        <p class="text-gray-300">Email: <a href="mailto:educhemain@gmail.com" class="text-blue-300 hover:underline">educhemain@gmail.com</a></p>
+      </div>
+
+      <!-- Social Media -->
+      <div>
+        <h4 class="text-xl font-semibold mb-4 text-blue-400">Follow Us</h4>
+        <div class="flex flex-col items-center md:items-start space-y-4 text-gray-300">
+          <a href="https://x.com" target="_blank" class="flex items-center space-x-2 hover:text-blue-400 transition" aria-label="Follow us on X">
+            <i class="fab fa-twitter"></i>
+            <span>X</span>
+          </a>
+          <a href="https://facebook.com" target="_blank" class="flex items-center space-x-2 hover:text-blue-400 transition" aria-label="Follow us on Facebook">
+            <i class="fab fa-facebook"></i>
+            <span>Facebook</span>
+          </a>
+          <a href="https://linkedin.com" target="_blank" class="flex items-center space-x-2 hover:text-blue-400 transition" aria-label="Follow us on LinkedIn">
+            <i class="fab fa-linkedin"></i>
+            <span>LinkedIn</span>
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="border-t border-gray-700 mt-8 pt-4 text-center text-sm text-gray-400">
+      &copy; <span id="year">2026</span> <span class="text-blue-400 font-semibold">EduTVET</span>. All rights reserved.
+    </div>
+  </div>
+</footer>
+
+  <script src="scripts/analytics.js"></script> <!-- Visitor tracking -->
 </body>
 </html>

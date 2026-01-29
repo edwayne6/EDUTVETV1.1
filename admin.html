@@ -8,8 +8,9 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link rel="stylesheet" href="styles.css">
   <style>
-    .sidebar { transition: all 0.3s ease; }
-    .sidebar.collapsed { margin-left: -250px; }
+    .sidebar { transition: transform 0.25s ease, box-shadow 0.25s ease; transform: translateX(0); }
+    /* Collapsed moves sidebar mostly off-screen leaving small edge for hover */
+    .sidebar.collapsed { transform: translateX(-220px); }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
     .pin-input { width: 50px; height: 50px; font-size: 30px; text-align: center; }
@@ -18,6 +19,21 @@
     .dashboard-container { display: none; }
     .dashboard-container.show { display: block; }
     .hidden { display: none !important; }
+    /* Collapse button inside sidebar */
+    .sidebar .collapse-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: transparent;
+      border: none;
+      color: rgba(255,255,255,0.85);
+      padding: 6px;
+      border-radius: 6px;
+      transition: background 0.15s ease, transform 0.2s ease;
+    }
+    .sidebar .collapse-btn:hover { background: rgba(255,255,255,0.04); color: #fff; transform: translateX(2px); }
+    .sidebar.collapsed .collapse-btn { transform: rotate(180deg); }
+  </style>
   </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
@@ -47,9 +63,7 @@
     <!-- Navbar -->
   <nav class="bg-blue-700 text-white px-6 py-4 flex justify-between items-center sticky top-0 z-50">
     <div class="flex items-center space-x-4">
-      <button id="sidebarToggle" class="text-2xl hover:bg-blue-600 p-2 rounded transition">
-        <i class="fas fa-bars"></i>
-      </button>
+      <!-- sidebar toggle removed -->
       <a href="index.html" class="text-2xl font-bold hover:text-blue-200 transition">EduTVET Admin</a>
     </div>
     <div class="flex items-center space-x-4">
@@ -65,6 +79,7 @@
   <div class="flex">
     <!-- Sidebar -->
     <aside id="sidebar" class="sidebar bg-gray-900 text-white w-64 min-h-screen p-6 fixed left-0 top-16">
+      <button id="sidebarCollapseBtn" class="collapse-btn" aria-label="Collapse sidebar" title="Collapse sidebar"><i class="fas fa-chevron-left"></i></button>
       <nav class="space-y-4">
         <button class="tab-btn w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition" data-tab="overview">
           <i class="fas fa-chart-line mr-2"></i> Overview
@@ -327,6 +342,36 @@
       <!-- Analytics Tab -->
       <div id="analytics" class="tab-content">
         <h2 class="text-3xl font-bold text-gray-800 mb-6">Analytics & Reports</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <div class="bg-white p-6 rounded-lg shadow">
+            <div class="flex justify-between items-center">
+              <div>
+                <p class="text-gray-600 text-sm">Total Visits</p>
+                <p id="totalVisits" class="text-3xl font-bold text-purple-600">0</p>
+              </div>
+              <i class="fas fa-globe text-4xl text-purple-200"></i>
+            </div>
+          </div>
+          <div class="bg-white p-6 rounded-lg shadow">
+            <div class="flex justify-between items-center">
+              <div>
+                <p class="text-gray-600 text-sm">Unique Visitors</p>
+                <p id="uniqueVisitors" class="text-3xl font-bold text-indigo-600">0</p>
+              </div>
+              <i class="fas fa-users text-4xl text-indigo-200"></i>
+            </div>
+          </div>
+          <div class="bg-white p-6 rounded-lg shadow">
+            <div class="flex justify-between items-center">
+              <div>
+                <p class="text-gray-600 text-sm">Total Documents</p>
+                <p id="totalDocsCount" class="text-3xl font-bold text-blue-600">0</p>
+              </div>
+              <i class="fas fa-file-alt text-4xl text-blue-200"></i>
+            </div>
+          </div>
+        </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div class="bg-white p-6 rounded-lg shadow">
@@ -605,19 +650,51 @@
     function setupEventListeners() {
       // Tab navigation
       document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+        btn.addEventListener('click', () => {
+          switchTab(btn.dataset.tab);
+          // On mobile, close the sidebar after selecting a tab
+          if (window.innerWidth <= 768) {
+            document.getElementById('sidebar').classList.remove('show');
+          }
+        });
       });
 
-      // Sidebar toggle
-      document.getElementById('sidebarToggle').addEventListener('click', () => {
-        document.getElementById('sidebar').classList.toggle('collapsed');
-      });
+      // Sidebar toggle removed per user request
 
       // Upload form
       document.getElementById('uploadForm').addEventListener('submit', (e) => {
         e.preventDefault();
         uploadNewDocument();
       });
+
+      // Sidebar collapse button inside sidebar header
+      const collapseBtn = document.getElementById('sidebarCollapseBtn');
+      if (collapseBtn) {
+        collapseBtn.addEventListener('click', () => {
+          const sidebar = document.getElementById('sidebar');
+          const main = document.querySelector('main');
+          sidebar.classList.toggle('collapsed');
+          // mark manual action so auto-hide won't override
+          sidebar.dataset.manual = sidebar.classList.contains('collapsed') ? 'true' : 'false';
+          // toggle margin on main so content expands/collapses
+          if (main) main.classList.toggle('ml-64');
+        });
+
+        // Auto-hide on desktop: collapse when mouse leaves, expand on enter, unless manually collapsed
+        const sidebarEl = document.getElementById('sidebar');
+        sidebarEl.addEventListener('mouseenter', () => {
+          if (window.innerWidth > 768 && sidebarEl.dataset.manual !== 'true') {
+            sidebarEl.classList.remove('collapsed');
+            document.querySelector('main')?.classList.add('ml-64');
+          }
+        });
+        sidebarEl.addEventListener('mouseleave', () => {
+          if (window.innerWidth > 768 && sidebarEl.dataset.manual !== 'true') {
+            sidebarEl.classList.add('collapsed');
+            document.querySelector('main')?.classList.remove('ml-64');
+          }
+        });
+      }
 
       // Edit form
       document.getElementById('editForm').addEventListener('submit', saveEditDocument);
@@ -735,6 +812,7 @@
       const draft = documents.filter(d => d.status === 'draft').length;
       const pending = documents.filter(d => d.status === 'pending').length;
 
+      document.getElementById('totalDocsCount').textContent = total;
       document.getElementById('publishedCount').textContent = published;
       document.getElementById('draftCount').textContent = draft;
       document.getElementById('pendingCount').textContent = pending;
@@ -744,6 +822,41 @@
         document.getElementById('draftBar').style.width = (draft / total * 100) + '%';
         document.getElementById('pendingBar').style.width = (pending / total * 100) + '%';
       }
+
+      // Load visitor stats
+      loadVisitorStats();
+    }
+
+    function loadVisitorStats() {
+      fetch('http://localhost:5000/api/stats')
+        .then(res => res.json())
+        .then(data => {
+          const totalVisits = data.totalVisits || 0;
+          const uniqueVisitors = data.uniqueVisitors || 0;
+          const recentVisits = data.recentVisits || [];
+
+          // Update visitor stats display
+          document.getElementById('totalVisits').textContent = totalVisits;
+          document.getElementById('uniqueVisitors').textContent = uniqueVisitors;
+
+          // Update recent activity
+          const activityLog = document.getElementById('activityLog');
+          if (recentVisits && recentVisits.length > 0) {
+            activityLog.innerHTML = recentVisits.map(visit => `
+              <div class="flex justify-between items-center text-sm border-b pb-2">
+                <span class="text-gray-700"><strong>Visit</strong> from ${visit.visitorId.substring(0, 12)}...</span>
+                <span class="text-xs text-gray-500">${new Date(visit.timestamp).toLocaleString()}</span>
+              </div>
+            `).join('');
+          } else {
+            activityLog.innerHTML = '<p class="text-gray-500">No recent visits</p>';
+          }
+        })
+        .catch(error => {
+          console.error('Error loading visitor stats:', error);
+          document.getElementById('totalVisits').textContent = '—';
+          document.getElementById('uniqueVisitors').textContent = '—';
+        });
     }
 
     function uploadNewDocument() {
