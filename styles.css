@@ -453,3 +453,81 @@ input:focus {
   background: linear-gradient(to bottom, #6dd5ed, #2193b0);
   z-index: -1;
 }
+
+/* ============================================
+   ADMIN DASHBOARD STYLES
+   ============================================ */
+
+/* PIN Entry Screen */
+.pin-input {
+  width: 50px;
+  height: 50px;
+  font-size: 30px;
+  text-align: center;
+}
+
+.pin-container {
+  display: none;
+}
+
+.pin-container.show {
+  display: flex;
+}
+
+/* Dashboard Container */
+.dashboard-container {
+  display: none;
+}
+
+.dashboard-container.show {
+  display: block;
+}
+
+/* Tab Navigation */
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Sidebar Styles */
+.sidebar {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  transform: translateX(0);
+}
+
+.sidebar.collapsed {
+  transform: translateX(calc(-100% + 48px));
+}
+
+/* Sidebar Collapse Button */
+.sidebar .collapse-btn {
+  position: absolute;
+  top: 12px;
+  right: -28px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.95);
+  padding: 8px;
+  border-radius: 8px;
+  transition: background 0.15s ease, transform 0.2s ease;
+  z-index: 60;
+  cursor: pointer;
+}
+
+.sidebar .collapse-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  transform: translateX(2px);
+}
+
+.sidebar.collapsed .collapse-btn {
+  transform: rotate(180deg);
+}
+
+/* Utility Classes */
+.hidden {
+  display: none !important;
+}
