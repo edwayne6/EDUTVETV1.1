@@ -7,6 +7,7 @@
   <title>EduTVET - Documents</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
   <style>
     .document-card {
       transition: all 0.3s ease;
@@ -436,5 +437,17 @@
 </footer>
 
   <script src="scripts/analytics.js"></script> <!-- Visitor tracking -->
+  <script src="scripts/scroll-animations.js"></script> <!-- Scroll animations -->
+
+  <script>
+    // Add animation class to document cards as they're displayed
+    const originalDisplayDocuments = window.displayDocuments;
+    window.displayDocuments = function() {
+      originalDisplayDocuments.call(this);
+      document.querySelectorAll('.document-card').forEach((card) => {
+        card.classList.add('animate-on-scroll', 'animate-scale-in');
+      });
+    };
+  </script>
 </body>
 </html>

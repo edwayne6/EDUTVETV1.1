@@ -180,6 +180,26 @@ nav a:hover::after {
   width: 100%; /* Expand underline on hover */
 }
 
+/* Make header navigation wrap on small screens */
+header nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+/* Footer adjustments for smaller screens */
+footer .container {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (max-width: 640px) {
+  header h1 { font-size: 1.25rem; }
+  .departments-sidebar { min-height: auto; }
+  footer .grid { grid-template-columns: 1fr; }
+}
+
 /* Hero Section */
 section.bg-blue-50 {
   background-color: #f0f9ff;
@@ -248,7 +268,7 @@ footer a:hover {
   content: '';
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5); /* Slightly darker overlay for better text contrast */
+  background: rgba(0, 0, 0, 0.25); /* Lighter overlay so images are more visible but text remains readable */
   z-index: 1;
 }
 
@@ -637,3 +657,88 @@ input:focus {
     border: 1px solid #e5e7eb;
   }
 }
+
+/* Scroll Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Animation Classes */
+.animate-on-scroll {
+  opacity: 0;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.8s ease-in-out forwards;
+}
+
+.animate-slide-in-up {
+  animation: slideInUp 0.8s ease-out forwards;
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.8s ease-out forwards;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.8s ease-out forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.8s ease-out forwards;
+}
+
+/* Staggered animations for multiple elements */
+.animate-on-scroll:nth-child(1) { animation-delay: 0s; }
+.animate-on-scroll:nth-child(2) { animation-delay: 0.15s; }
+.animate-on-scroll:nth-child(3) { animation-delay: 0.3s; }
+.animate-on-scroll:nth-child(4) { animation-delay: 0.45s; }

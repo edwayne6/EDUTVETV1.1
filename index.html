@@ -24,32 +24,32 @@
   </header>
 
   <!-- Main Content Wrapper with Sidebar -->
-  <div class="main-content-wrapper flex">
+  <div class="main-content-wrapper flex flex-col md:flex-row">
     
     <!-- Left Sidebar - Departments -->
-    <aside class="departments-sidebar bg-gray-100 border-r border-gray-300 py-8 px-6" style="width: 25%; min-height: calc(100vh - 200px);">
-      <h4 class="text-xl font-semibold mb-6 text-blue-700">Departments</h4>
+    <aside class="departments-sidebar bg-gray-100 border-r border-gray-300 py-8 px-6 w-full md:w-1/4" style="min-height: calc(100vh - 200px);">
+      <h4 class="text-xl font-semibold mb-6 text-blue-700">Click Your Department Here</h4>
       <ul class="space-y-3 text-gray-700 text-sm">
-        <li class="hover:text-blue-600 cursor-pointer transition"><a href="agriculture-page.html"><span>🔹</span> Agriculture and Environmental studies</a></li>
-        <li class="hover:text-blue-600 cursor-pointer transition"><a href="applied-sciences-page.html"><span>🔹</span> Applied Sciences</a></li>
-        <li class="hover:text-blue-600 cursor-pointer transition"><a href="automotive-page.html"><span>🔹</span> Automotive and Mechanical Engineering</a></li>
-        <li class="hover:text-blue-600 cursor-pointer transition"><a href="building-page.html"><span>🔹</span> Building & Civil Engineering</a></li>
-        <li class="hover:text-blue-600 cursor-pointer transition"><a href="business-page.html"><span>🔹</span> Business & Entrepreneurship Studies</a></li>
-        <li class="hover:text-blue-600 cursor-pointer transition"><a href="computing-page.html"><span>🔹</span> Computing & Informatics</a></li>
-        <li class="hover:text-blue-600 cursor-pointer transition"><a href="cosmetology-page.html"><span>🔹</span> Cosmetology</a></li>
-        <li class="hover:text-blue-600 cursor-pointer transition"><a href="electrical-page.html"><span>🔹</span> Electrical & Electronics Engineering</a></li>
-        <li class="hover:text-blue-600 cursor-pointer transition"><a href="fashion-page.html"><span>🔹</span> Fashion & Design</a></li>
-        <li class="hover:text-blue-600 cursor-pointer transition"><a href="health-page.html"><span>🔹</span> Health Sciences</a></li>
-        <li class="hover:text-blue-600 cursor-pointer transition"><a href="liberal-page.html"><span>🔹</span> Liberal Studies</a></li>
-        <li class="hover:text-blue-600 cursor-pointer transition"><a href="tourism-page.html"><span>🔹</span> Tourism & Hospitality</a></li>
+        <li class="hover:text-blue-600 cursor-pointer transition"><a href="departments/agriculture-page.html"><span>🔹</span> Agriculture and Environmental studies</a></li>
+        <li class="hover:text-blue-600 cursor-pointer transition"><a href="departments/applied-sciences-page.html"><span>🔹</span> Applied Sciences</a></li>
+        <li class="hover:text-blue-600 cursor-pointer transition"><a href="departments/automotive-page.html"><span>🔹</span> Automotive and Mechanical Engineering</a></li>
+        <li class="hover:text-blue-600 cursor-pointer transition"><a href="departments/building-page.html"><span>🔹</span> Building & Civil Engineering</a></li>
+        <li class="hover:text-blue-600 cursor-pointer transition"><a href="departments/business-page.html"><span>🔹</span> Business & Entrepreneurship Studies</a></li>
+        <li class="hover:text-blue-600 cursor-pointer transition"><a href="departments/computing-page.html"><span>🔹</span> Computing & Informatics</a></li>
+        <li class="hover:text-blue-600 cursor-pointer transition"><a href="departments/cosmetology-page.html"><span>🔹</span> Cosmetology</a></li>
+        <li class="hover:text-blue-600 cursor-pointer transition"><a href="departments/electrical-page.html"><span>🔹</span> Electrical & Electronics Engineering</a></li>
+        <li class="hover:text-blue-600 cursor-pointer transition"><a href="departments/fashion-page.html"><span>🔹</span> Fashion & Design</a></li>
+        <li class="hover:text-blue-600 cursor-pointer transition"><a href="departments/health-page.html"><span>🔹</span> Health Sciences</a></li>
+        <li class="hover:text-blue-600 cursor-pointer transition"><a href="departments/liberal-page.html"><span>🔹</span> Liberal Studies</a></li>
+        <li class="hover:text-blue-600 cursor-pointer transition"><a href="departments/tourism-page.html"><span>🔹</span> Tourism & Hospitality</a></li>
       </ul>
     </aside>
 
     <!-- Right Content Area -->
-    <div class="content-area" style="width: 75%; flex: 1;">
+    <div class="content-area w-full md:w-3/4" style="flex: 1;">
       <!-- Slider Section with Hero Content -->
       <section class="slider-container py-16 relative">
-        <div class="slider-overlay absolute inset-0 bg-black opacity-50"></div>
+        <div class="slider-overlay absolute inset-0 bg-black opacity-25" style="background: rgba(0,0,0,0.25);"></div>
         <div class="container mx-auto px-4 text-center relative z-10">
           <h2 class="text-4xl font-bold mb-4 text-white">Access Quality CDAAC Modularised TVET Documents Anytime</h2>
           <p class="text-lg text-gray-200 mb-6">Download or upload approved documents for teaching, learning, and professional growth.</p>
@@ -60,23 +60,23 @@
       <!-- Featured Section -->
       <section id="features" class="bg-blue-50 py-16">
         <div class="container mx-auto px-4 text-center">
-          <h2 class="text-3xl font-bold text-blue-700 mb-6">Why Choose Edu-TVET?</h2>
-          <p class="text-gray-600 mb-12 max-w-2xl mx-auto">
+          <h2 class="text-3xl font-bold text-blue-700 mb-6 animate-on-scroll animate-slide-in-up">Why Choose Edu-TVET?</h2>
+          <p class="text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll animate-slide-in-up">
             Edu-TVET is designed with trainers and trainees in mind — offering a reliable platform for accessing high-quality, curriculum-aligned documents anytime, anywhere.
           </p>
           
           <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="bg-gray-50 p-6 rounded-lg shadow hover:shadow-lg transition">
+            <div class="bg-gray-50 p-6 rounded-lg shadow hover:shadow-lg transition animate-on-scroll animate-scale-in">
               <div class="text-blue-600 text-4xl mb-4">📚</div>
               <h3 class="text-xl font-semibold mb-2">Curriculum-Based Materials</h3>
               <p class="text-gray-600">All our documents are reviewed to ensure they meet approved TVET standards and training objectives.</p>
             </div>
-            <div class="bg-gray-50 p-6 rounded-lg shadow hover:shadow-lg transition">
+            <div class="bg-gray-50 p-6 rounded-lg shadow hover:shadow-lg transition animate-on-scroll animate-scale-in">
               <div class="text-blue-600 text-4xl mb-4">📥</div>
               <h3 class="text-xl font-semibold mb-2">Instant Downloads</h3>
               <p class="text-gray-600">Access your documents immediately after payment or approval, with easy tracking from your dashboard.</p>
             </div>
-            <div class="bg-gray-50 p-6 rounded-lg shadow hover:shadow-lg transition">
+            <div class="bg-gray-50 p-6 rounded-lg shadow hover:shadow-lg transition animate-on-scroll animate-scale-in">
               <div class="text-blue-600 text-4xl mb-4">🔒</div>
               <h3 class="text-xl font-semibold mb-2">Secure & Verified</h3>
               <p class="text-gray-600">Our platform uses secure payment gateways and document approval processes to protect users and content quality.</p>
@@ -88,47 +88,107 @@
 
   </div>
 
-  <!-- Professional Footer -->
-<footer class="bg-gray-900 text-white py-10">
-  <div class="container mx-auto px-4">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-center md:text-left">
-
-      <!-- Contact Information -->
-      <div>
-        <h4 class="text-xl font-semibold mb-4 text-blue-400">Contact Us</h4>
-        <p class="text-gray-300">Phone: <a href="tel:0708715547" class="text-blue-300 hover:underline">0708715547</a></p>
-        <p class="text-gray-300">Email: <a href="mailto:educhemain@gmail.com" class="text-blue-300 hover:underline">educhemain@gmail.com</a></p>
-      </div>
-
-      <!-- Social Media -->
-      <div>
-        <h4 class="text-xl font-semibold mb-4 text-blue-400">Follow Us</h4>
-        <div class="flex flex-col items-center md:items-start space-y-4 text-gray-300">
-          <a href="https://x.com" target="_blank" class="flex items-center space-x-2 hover:text-blue-400 transition" aria-label="Follow us on X">
-            <i class="fab fa-twitter"></i> <!-- FontAwesome icon for X -->
-            <span>X</span>
-          </a>
-          <a href="https://facebook.com" target="_blank" class="flex items-center space-x-2 hover:text-blue-400 transition" aria-label="Follow us on Facebook">
-            <i class="fab fa-facebook"></i> <!-- FontAwesome icon for Facebook -->
-            <span>Facebook</span>
-          </a>
-          <a href="https://linkedin.com" target="_blank" class="flex items-center space-x-2 hover:text-blue-400 transition" aria-label="Follow us on LinkedIn">
-            <i class="fab fa-linkedin"></i> <!-- FontAwesome icon for LinkedIn -->
-            <span>LinkedIn</span>
-          </a>
+  <!-- Statistics Section -->
+  <section class="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-8">
+    <div class="container mx-auto px-4">
+      <h2 class="text-xl font-semibold text-center mb-8 animate-on-scroll animate-slide-in-up">Edu-TVET Impact</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+        <div class="animate-on-scroll animate-scale-in">
+          <div class="text-3xl font-bold mb-1">5,000+</div>
+          <p class="text-sm text-blue-100">Quality Documents</p>
+        </div>
+        <div class="animate-on-scroll animate-scale-in">
+          <div class="text-3xl font-bold mb-1">2,000+</div>
+          <p class="text-sm text-blue-100">Active Users</p>
+        </div>
+        <div class="animate-on-scroll animate-scale-in">
+          <div class="text-3xl font-bold mb-1">12</div>
+          <p class="text-sm text-blue-100">Departments</p>
         </div>
       </div>
-
     </div>
+  </section>
 
-    <div class="border-t border-gray-700 mt-8 pt-4 text-center text-sm text-gray-400">
-      &copy; <span id="year">2026</span> <span class="text-blue-400 font-semibold">Edu-TVET</span>. All rights reserved.
+  <!-- Professional Footer -->
+  <footer class="bg-gray-900 text-white py-10">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 text-center md:text-left">
+
+        <!-- About -->
+        <div>
+          <h4 class="text-xl font-semibold mb-4 text-blue-400">About Edu-TVET</h4>
+          <p class="text-gray-300 max-w-md mx-auto md:mx-0">
+            A Kenyan ODEL platform delivering curriculum-aligned TVET resources to support trainers and trainees.
+          </p>
+        </div>
+
+        <!-- Contact Information -->
+        <div>
+          <h4 class="text-xl font-semibold mb-4 text-blue-400">Contact Us</h4>
+          <p class="text-gray-300">Phone: <a href="tel:0708715547" class="text-blue-300 hover:underline">0708715547</a></p>
+          <p class="text-gray-300">Email: <a href="mailto:educhemain@gmail.com" class="text-blue-300 hover:underline">educhemain@gmail.com</a></p>
+        </div>
+
+        <!-- Social Media -->
+        <div>
+          <h4 class="text-xl font-semibold mb-4 text-blue-400">Follow Us</h4>
+          <div class="flex flex-col items-center md:items-start space-y-4 text-gray-300">
+            <a href="https://x.com" target="_blank" class="flex items-center space-x-2 hover:text-blue-400 transition" aria-label="Follow us on X">
+              <i class="fab fa-twitter"></i>
+              <span>X</span>
+            </a>
+            <a href="https://facebook.com" target="_blank" class="flex items-center space-x-2 hover:text-blue-400 transition" aria-label="Follow us on Facebook">
+              <i class="fab fa-facebook"></i>
+              <span>Facebook</span>
+            </a>
+            <a href="https://linkedin.com" target="_blank" class="flex items-center space-x-2 hover:text-blue-400 transition" aria-label="Follow us on LinkedIn">
+              <i class="fab fa-linkedin"></i>
+              <span>LinkedIn</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Legal -->
+        <div>
+          <ul class="space-y-2 text-gray-300">
+            <li><a href="privacy-policy.html" class="text-blue-300 hover:underline">Privacy Policy</a></li>
+            <li><a href="terms-of-service.html" class="text-blue-300 hover:underline">Terms of Service</a></li>
+            <li><a href="cookie-policy.html" class="text-blue-300 hover:underline">Cookie Policy</a></li>
+          </ul>
+        </div>
+
+        <!-- Quick Links -->
+        <div>
+          <ul class="space-y-2 text-gray-300">
+            <li><a href="index.html" class="text-blue-300 hover:underline">Home</a></li>
+            <li><a href="documents.html" class="text-blue-300 hover:underline">Documents</a></li>
+            <li><a href="#features" class="text-blue-300 hover:underline">Features</a></li>
+            <li><a href="admin.html" class="text-blue-300 hover:underline">Admin</a></li>
+          </ul>
+        </div>
+
+        <!-- FAQ -->
+        <div>
+          <h4 class="text-xl font-semibold mb-4 text-blue-400">FAQ</h4>
+          <ul class="space-y-2 text-gray-300 text-sm">
+            <li><a href="documents.html#how-to-download" class="text-blue-300 hover:underline">How do I download documents?</a></li>
+            <li><a href="documents.html#pricing" class="text-blue-300 hover:underline">What are the pricing options?</a></li>
+            <li><a href="documents.html#access" class="text-blue-300 hover:underline">How do I get access?</a></li>
+            <li><a href="documents.html#upload" class="text-blue-300 hover:underline">How can I upload materials?</a></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="border-t border-gray-700 mt-8 pt-4 text-center text-sm text-gray-400">
+        &copy; <span id="year">2026</span> <span class="text-blue-400 font-semibold">Edu-TVET</span>. All rights reserved.
+      </div>
     </div>
-  </div>
-</footer>
+  </footer>
 
   <script type="module" src="scripts/scripts.js"></script> <!-- Updated path -->
   <script src="scripts/analytics.js"></script> <!-- Visitor tracking -->
+  <script src="scripts/scroll-animations.js"></script> <!-- Scroll animations -->
 
   <!-- Auto-update copyright year -->
   <script>
