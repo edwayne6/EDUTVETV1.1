@@ -68,6 +68,7 @@
     </div>
     <div class="flex items-center space-x-4">
       <span id="adminName" class="text-sm">Administrator</span>
+      <button onclick="openAIAssistant()" class="bg-indigo-600 hover:bg-indigo-700 px-3 py-2 rounded text-white">AI Assistant</button>
       <a href="index.html" class="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded transition flex items-center space-x-2">
         <i class="fas fa-home"></i>
         <span>Home</span>
@@ -162,6 +163,10 @@
               class="px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               oninput="filterDocuments()"
             >
+              <div class="flex">
+                <input type="text" id="aiSearchInput" placeholder="AI semantic search..." class="px-4 py-2 border border-gray-300 rounded-l w-full focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                <button onclick="aiSearch()" class="bg-indigo-600 text-white px-4 rounded-r">Search</button>
+              </div>
             <select id="filterDept" class="px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" onchange="filterDocuments()">
               <option value="">All Departments</option>
               <option value="Agriculture">Agriculture</option>
@@ -265,9 +270,12 @@
             </div>
 
             <div class="pt-4">
-              <button type="button" onclick="publishDocument()" class="w-full bg-green-600 text-white px-6 py-3 rounded hover:bg-green-700 transition flex items-center justify-center space-x-2 font-medium">
-                <i class="fas fa-check-circle"></i> <span>Upload & Publish</span>
-              </button>
+              <div class="flex gap-3">
+                <button type="button" onclick="publishDocument()" class="flex-1 bg-green-600 text-white px-6 py-3 rounded hover:bg-green-700 transition flex items-center justify-center space-x-2 font-medium">
+                  <i class="fas fa-check-circle"></i> <span>Upload & Publish</span>
+                </button>
+                <button type="button" onclick="autoSummarize()" class="bg-gray-200 text-gray-800 px-4 py-3 rounded hover:bg-gray-300">Auto-summarize</button>
+              </div>
             </div>
           </form>
         </div>
@@ -414,7 +422,7 @@
   </div>
 
   <!-- Preview Document Modal -->
-  <div id="previewModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div id="previewModal" class="hidden fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
     <div class="bg-white p-8 rounded-lg shadow-2xl max-w-4xl w-full mx-4 max-h-screen overflow-y-auto">
       <div class="flex justify-between items-center mb-6">
         <h2 id="previewTitle" class="text-2xl font-bold text-gray-800">Document Preview</h2>
@@ -459,7 +467,7 @@
   </div>
 
   <!-- Edit Document Modal -->
-  <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+  <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 hidden">
     <div class="bg-white p-8 rounded-lg shadow-2xl max-w-2xl w-full mx-4 max-h-96 overflow-y-auto">
       <h2 class="text-2xl font-bold mb-6 text-gray-800">Edit Document</h2>
       
@@ -500,6 +508,23 @@
             </select>
           </div>
         </div>
+
+          <!-- AI Assistant Modal -->
+          <div id="aiAssistantModal" class="hidden fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
+            <div class="bg-white p-6 rounded-lg shadow-2xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto flex flex-col">
+              <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold">AI Assistant</h2>
+                <button onclick="closeAIAssistant()" class="text-gray-600 hover:text-gray-900 text-2xl">&times;</button>
+              </div>
+              <div id="aiChatWindow" class="flex-1 overflow-y-auto p-3 space-y-3 border rounded bg-gray-50">
+                <p class="text-gray-500">Ask the assistant about documents, trends, or request summaries.</p>
+              </div>
+              <div class="mt-3 flex items-center gap-3">
+                <input id="aiChatInput" type="text" placeholder="Type a message and press Enter" class="flex-1 px-3 py-2 border rounded focus:outline-none" onkeydown="if(event.key==='Enter'){ sendAIMessage(); }" />
+                <button onclick="sendAIMessage()" class="bg-indigo-600 text-white px-4 py-2 rounded">Send</button>
+              </div>
+            </div>
+          </div>
 
         <div>
           <label class="block text-sm font-semibold mb-2">Document Type *</label>
@@ -1273,9 +1298,121 @@
       `).join('');
     }
 
+    async function autoSummarize() {
+      const title = document.getElementById('docTitle').value || '';
+      const desc = document.getElementById('docDescription').value || '';
+      const text = (title + '\n\n' + desc).trim();
+      if (!text) { alert('Please enter title or description first'); return; }
+      try {
+        const res = await fetch('/api/ai/summarize', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text })
+        });
+        const data = await res.json();
+        if (data.summary) {
+          document.getElementById('docDescription').value = data.summary;
+          alert('Summary inserted into description');
+        } else {
+          alert('No summary returned');
+        }
+      } catch (e) {
+        console.error('Auto-summarize error', e);
+        alert('Auto-summarize failed. See console.');
+      }
+    }
+
+    async function aiSearch() {
+      const q = document.getElementById('aiSearchInput').value || document.getElementById('searchDocs').value || '';
+      if (!q) { alert('Enter a query'); return; }
+      try {
+        const res = await fetch('/api/ai/search', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: q, topK: 10 })
+        });
+        const data = await res.json();
+        if (!data.results || data.results.length === 0) {
+          alert('No results');
+          return;
+        }
+        const table = document.getElementById('documentsTable');
+        const noMsg = document.getElementById('noDocsMessage');
+        noMsg.style.display = 'none';
+        table.innerHTML = data.results.map(r => {
+          const doc = r.document;
+          return `
+            <tr>
+              <td class="px-6 py-4">${doc.title}</td>
+              <td class="px-6 py-4">${doc.department}</td>
+              <td class="px-6 py-4"><span class="px-3 py-1 rounded text-sm font-semibold ${doc.status === 'published' ? 'bg-green-100 text-green-800' : doc.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'}">${doc.status.charAt(0).toUpperCase()+doc.status.slice(1)}</span></td>
+              <td class="px-6 py-4">${doc.date}</td>
+              <td class="px-6 py-4">
+                ${doc.fileName ? `<button onclick="previewDocument(${doc.id})" class="text-purple-600 hover:underline mr-3" title="Preview"><i class="fas fa-eye"></i></button>` : ''}
+                <button onclick="editDocument(${doc.id})" class="text-blue-600 hover:underline mr-3" title="Edit"><i class="fas fa-edit"></i></button>
+                <button onclick="publishDoc(${doc.id})" class="text-green-600 hover:underline mr-3" title="Publish"><i class="fas fa-check-circle"></i></button>
+                <button onclick="deleteDocument(${doc.id})" class="text-red-600 hover:underline" title="Delete"><i class="fas fa-trash"></i></button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      } catch (e) {
+        console.error('AI search error', e);
+        alert('AI search failed. See console.');
+      }
+    }
+
     function updateFileName(input) {
       if (input.files && input.files[0]) {
         document.getElementById('fileName').textContent = 'Selected: ' + input.files[0].name;
+      }
+    }
+
+    function openAIAssistant() {
+      document.getElementById('aiAssistantModal').classList.remove('hidden');
+      document.getElementById('aiChatInput').focus();
+    }
+
+    function closeAIAssistant() {
+      document.getElementById('aiAssistantModal').classList.add('hidden');
+    }
+
+    function appendAIMessage(text, from = 'assistant') {
+      const win = document.getElementById('aiChatWindow');
+      const wrapper = document.createElement('div');
+      wrapper.className = from === 'assistant' ? 'text-left' : 'text-right';
+      wrapper.innerHTML = `<div class="inline-block max-w-full px-3 py-2 rounded ${from === 'assistant' ? 'bg-white border' : 'bg-indigo-600 text-white'}">${text}</div>`;
+      win.appendChild(wrapper);
+      win.scrollTop = win.scrollHeight;
+    }
+
+    let aiPending = false;
+    async function sendAIMessage() {
+      const input = document.getElementById('aiChatInput');
+      const text = input.value.trim();
+      if (!text || aiPending) return;
+      appendAIMessage(text, 'user');
+      input.value = '';
+      aiPending = true;
+      appendAIMessage('...', 'assistant');
+      try {
+        const res = await fetch('/api/ai/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text })
+        });
+        const data = await res.json();
+        // remove the placeholder '...'
+        const win = document.getElementById('aiChatWindow');
+        const last = win.lastChild;
+        if (last && last.innerText === '...') last.remove();
+        if (data.reply) appendAIMessage(data.reply, 'assistant');
+        else appendAIMessage('No reply from AI', 'assistant');
+      } catch (e) {
+        console.error('AI chat error', e);
+        appendAIMessage('AI chat failed. See console.', 'assistant');
+      } finally {
+        aiPending = false;
       }
     }
 

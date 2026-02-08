@@ -49,4 +49,43 @@ For inquiries, contributions, or partnerships, open an issue or contact the owne
 - Add automated checks for file naming and metadata completeness
 - Publish a stable release of curated starter packs for common TVET trades
 
+## Security, Privacy & AI usage
+- Do not commit secrets: store API keys in a `.env` file and add `.env` to `.gitignore`.
+- The server expects `OPENAI_API_KEY` for AI features. Keep this key private and rotate if exposed.
+- AI endpoints are proxied through the backend to avoid exposing secrets to the browser.
+- Rate limiting is enabled for all routes and stricter limits apply to AI endpoints to reduce abuse and costs.
+- Uploaded document content is moderated before being accepted; flagged content will be rejected.
+- Embeddings are stored in-memory for the prototype — for production, use a managed vector DB and control retention.
+- Consider redacting personally-identifiable information (PII) from uploads before sending to external AI services.
+- Monitor usage and costs from your AI provider and set quotas/budgets accordingly.
+
+## Running locally (quick)
+1. Create `.env` with:
+
+```
+OPENAI_API_KEY=sk-...
+```
+
+2. Install and run:
+
+```bash
+npm install
+npm start
+```
+
+3. Open the admin UI at `http://localhost:5000` (or open `admin.html` via a server).
+
+## Next recommended improvements
+- ✅ Define AI features (summarize, search, chat)
+- ✅ Add server AI endpoints
+- ✅ Frontend UI controls (search, summarize, chat modal)
+- ✅ Auto-moderation & approval workflow (basic moderation added)
+- ✅ Security, privacy & docs (rate limiting, moderation, docs updated)
+- 🔄 Semantic search & vector DB (in-memory implemented, persistent DB pending)
+- 🔄 Document processing pipeline (OCR/text extraction implemented, full pipeline like auto-tags pending)
+- ⏳ Analytics + anomaly detection (not started)
+- Persist embeddings and chat history in a secure datastore (do not store raw user content without consent).
+- Harden file upload checks (virus scanning, stricter mime checking).
+- Add logging and alerting for suspicious activity and failed moderation.
+
 Thank you for using and contributing to EDUTVET — together we can make practical skills education more accessible.

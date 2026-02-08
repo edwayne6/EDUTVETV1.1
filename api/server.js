@@ -8,11 +8,25 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const app = express();
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 
 // Enable CORS
 app.use(cors({
-  origin: ["http://localhost:3000", "http://localhost:5000", "file://"],
+  origin: ["http://localhost:3000", "http://localhost:5000"],
 }));
+
+// Security headers
+app.use(helmet());
+
+// Global rate limiter (basic)
+const globalLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 300, // limit each IP to 300 requests per windowMs
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use(globalLimiter);
 
 app.use(express.json());
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
@@ -21,7 +35,6 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 const documentsFolder = path.join(__dirname, '../documents');
 if (!fs.existsSync(documentsFolder)) {
   fs.mkdirSync(documentsFolder, { recursive: true });
-  console.log('Documents folder created at:', documentsFolder);
 }
 
 // Configure multer for file uploads
@@ -133,12 +146,16 @@ app.get("/api/documents/:id", (req, res) => {
 });
 
 // Upload document
-app.post("/api/documents/upload", upload.single('file'), (req, res) => {
+app.post("/api/documents/upload", upload.single('file'), async (req, res) => {
   try {
     const { title, description, department, level, docType, submittedBy } = req.body;
 
+    // Basic sanitation and trimming
+    const cleanTitle = (title || '').toString().trim().slice(0, 300);
+    const cleanDesc = (description || '').toString().trim().slice(0, 5000);
+
     // Validation
-    if (!title || !department || !docType) {
+    if (!cleanTitle || !department || !docType) {
       if (req.file) {
         try {
           fs.unlinkSync(req.file.path);
@@ -153,25 +170,61 @@ app.post("/api/documents/upload", upload.single('file'), (req, res) => {
       return res.status(400).json({ message: "No file provided" });
     }
 
+    // Moderate content before saving
+    try {
+      const mod = await moderateText(cleanTitle + "\n\n" + cleanDesc);
+      if (mod.flagged) {
+        // delete uploaded file to avoid storing disallowed content
+        try { fs.unlinkSync(req.file.path); } catch (e) { }
+        return res.status(403).json({ message: 'Content flagged by moderation and rejected', details: mod.categories || mod });
+      }
+    } catch (e) {
+      console.log('Moderation check failed, continuing upload (fail-open):', e.message || e);
+    }
+
     const newDocument = {
       id: nextDocId++,
-      title,
-      description: description || '',
+      title: cleanTitle,
+      description: cleanDesc,
       department,
       level: level || 'N/A',
       docType,
       status: 'published', // Admin uploads are directly published
       date: new Date().toISOString().split('T')[0],
       fileName: req.file.filename,
-      submittedBy: submittedBy || 'Admin'
+      submittedBy: submittedBy || 'Admin',
+      fullText: '' // Will be populated below
     };
+
+    // Extract full text from the uploaded file
+    const filePath = req.file.path;
+    const mimeType = req.file.mimetype;
+    try {
+      const extractedText = await extractText(filePath, mimeType);
+      newDocument.fullText = extractedText;
+
+      // Moderate the extracted text as well
+      if (extractedText) {
+        const mod = await moderateText(extractedText);
+        if (mod.flagged) {
+          try { fs.unlinkSync(filePath); } catch (e) { }
+          return res.status(403).json({ message: 'Extracted content flagged by moderation and rejected', details: mod.categories || mod });
+        }
+      }
+    } catch (e) {
+      console.log('Text extraction failed, proceeding without full text:', e.message || e);
+    }
 
     documents.push(newDocument);
     
-    console.log('Document uploaded successfully:');
-    console.log('- ID:', newDocument.id);
-    console.log('- Title:', newDocument.title);
-    console.log('- File:', newDocument.fileName);
+    // Generate embedding for the new document (best-effort)
+    try {
+      const textForEmbedding = (newDocument.fullText ? `${newDocument.title}\n\n${newDocument.description}\n\n${newDocument.fullText}` : `${newDocument.title}\n\n${newDocument.description}`).slice(0, 2000);
+      const emb = await createEmbedding(textForEmbedding);
+      embeddingsIndex[newDocument.id] = emb;
+    } catch (e) {
+      console.log('Could not create embedding for new document:', e.message || e);
+    }
     
     res.status(201).json({ 
       message: "Document uploaded and published successfully!",
@@ -335,6 +388,250 @@ app.get("/api/documents/:id/download", (req, res) => {
 // Serve static files from documents folder
 app.use('/documents', express.static(documentsFolder));
 
+// --- Text Extraction Helpers ---
+const pdfParse = require('pdf-parse');
+const mammoth = require('mammoth');
+const { createWorker } = require('tesseract.js');
+
+async function extractText(filePath, mimeType) {
+  try {
+    const ext = path.extname(filePath).toLowerCase();
+    let text = '';
+
+    if (mimeType === 'application/pdf' || ext === '.pdf') {
+      // Try pdf-parse first for text-based PDFs
+      const dataBuffer = fs.readFileSync(filePath);
+      const pdfData = await pdfParse(dataBuffer);
+      text = pdfData.text.trim();
+
+      // If text is too short (likely scanned), use OCR
+      if (text.length < 100) {
+        console.log('PDF appears scanned, running OCR...');
+        const worker = await createWorker('eng');
+        const { data: { text: ocrText } } = await worker.recognize(filePath);
+        await worker.terminate();
+        text = ocrText.trim();
+      }
+    } else if (mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || ext === '.docx') {
+      // Extract from Word doc
+      const result = await mammoth.extractRawText({ path: filePath });
+      text = result.value.trim();
+    } else {
+      throw new Error('Unsupported file type for text extraction');
+    }
+
+    // Sanitize: limit length, remove excessive whitespace
+    text = text.replace(/\s+/g, ' ').trim().slice(0, 10000); // Limit to 10k chars
+    return text;
+  } catch (error) {
+    console.error('Text extraction error:', error.message);
+    return ''; // Fallback to empty string
+  }
+}
+
+// --- AI Integration (basic summarize + embeddings + search) ---
+const fetch = require('node-fetch');
+
+const OPENAI_KEY = process.env.OPENAI_API_KEY || '';
+if (!OPENAI_KEY) {
+  console.warn('Warning: OPENAI_API_KEY not set. AI endpoints will fail without a key.');
+}
+
+// In-memory embeddings index: { docId: [vector] }
+const embeddingsIndex = {};
+
+// AI moderation helper
+async function moderateText(text) {
+  if (!OPENAI_KEY) throw new Error('Missing OPENAI_API_KEY');
+  try {
+    const resp = await fetch('https://api.openai.com/v1/moderations', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${OPENAI_KEY}`
+      },
+      body: JSON.stringify({ model: 'omni-moderation-latest', input: text })
+    });
+    const data = await resp.json();
+    // Response structure: results[0].categories / flagged boolean
+    const result = data && data.results && data.results[0] ? data.results[0] : null;
+    if (!result) return { flagged: false };
+    return { flagged: !!result.flagged, categories: result.categories || {}, category_scores: result.category_scores || {} };
+  } catch (e) {
+    console.error('Moderation error:', e.message || e);
+    // Fail-open: do not block on moderation service errors, but log
+    return { flagged: false, error: e.message };
+  }
+}
+
+// Per-route AI rate limiter
+const aiLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 30, // limit per IP for AI endpoints
+  message: { error: 'Too many AI requests, please slow down' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use('/api/ai', aiLimiter);
+
+async function createEmbedding(text) {
+  if (!OPENAI_KEY) throw new Error('Missing OPENAI_API_KEY');
+  const resp = await fetch('https://api.openai.com/v1/embeddings', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${OPENAI_KEY}`
+    },
+    body: JSON.stringify({ model: 'text-embedding-3-small', input: text })
+  });
+  const data = await resp.json();
+  if (!data || !data.data || !data.data[0] || !data.data[0].embedding) throw new Error('Embedding failed');
+  return data.data[0].embedding;
+}
+
+async function openaiChat(prompt, max_tokens = 200) {
+  if (!OPENAI_KEY) throw new Error('Missing OPENAI_API_KEY');
+  const resp = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${OPENAI_KEY}`
+    },
+    body: JSON.stringify({
+      model: 'gpt-4o-mini',
+      messages: [{ role: 'user', content: prompt }],
+      max_tokens
+    })
+  });
+  const data = await resp.json();
+  return data;
+}
+
+function cosineSim(a, b) {
+  let dot = 0, na = 0, nb = 0;
+  for (let i = 0; i < a.length; i++) {
+    dot += a[i] * b[i];
+    na += a[i] * a[i];
+    nb += b[i] * b[i];
+  }
+  if (na === 0 || nb === 0) return 0;
+  return dot / (Math.sqrt(na) * Math.sqrt(nb));
+}
+
+// Build initial embeddings for existing documents (non-blocking)
+(async function buildInitialEmbeddings() {
+  try {
+    for (const doc of documents) {
+      const text = (doc.fullText ? `${doc.title}\n\n${doc.description || ''}\n\n${doc.fullText}` : `${doc.title}\n\n${doc.description || ''}`).slice(0, 2000);
+      try {
+        const emb = await createEmbedding(text);
+        embeddingsIndex[doc.id] = emb;
+      } catch (e) {
+        // ignore embedding errors during startup
+        console.log('Embedding error for doc', doc.id, e.message);
+      }
+    }
+  } catch (e) {
+    console.error('Error building initial embeddings:', e.message);
+  }
+})();
+
+// Summarize endpoint
+app.post('/api/ai/summarize', async (req, res) => {
+  try {
+    const { text, docId } = req.body || {};
+    let inputText = text;
+    if (!inputText && docId) {
+      const doc = documents.find(d => d.id === parseInt(docId));
+      if (doc) inputText = doc.fullText ? `${doc.title}\n\n${doc.description || ''}\n\n${doc.fullText}` : `${doc.title}\n\n${doc.description || ''}`;
+    }
+    if (!inputText) return res.status(400).json({ error: 'Missing text or docId' });
+
+    // Moderate before sending to AI
+    try {
+      const mod = await moderateText(inputText.slice(0, 5000));
+      if (mod.flagged) return res.status(403).json({ error: 'Content flagged by moderation' , details: mod.categories});
+    } catch (e) {
+      console.log('Moderation service error (summarize):', e.message || e);
+    }
+
+    const prompt = `Summarize the following document in 2-3 concise sentences:\n\n${inputText}`;
+    const aiResp = await openaiChat(prompt, 200);
+    const summary = aiResp?.choices?.[0]?.message?.content || aiResp?.choices?.[0]?.text || '';
+    res.json({ summary });
+  } catch (error) {
+    console.error('Summarize error:', error.message || error);
+    res.status(500).json({ error: error.message || 'AI summarize failed' });
+  }
+});
+
+// Embedding endpoint (optional)
+app.post('/api/ai/embed', async (req, res) => {
+  try {
+    const { text, docId } = req.body || {};
+    if (!text) return res.status(400).json({ error: 'Missing text' });
+    const emb = await createEmbedding(text);
+    // optionally store if docId provided
+    if (docId) embeddingsIndex[docId] = emb;
+    res.json({ embedding: emb });
+  } catch (error) {
+    console.error('Embed error:', error.message || error);
+    res.status(500).json({ error: error.message || 'Embedding failed' });
+  }
+});
+
+// Semantic search endpoint
+app.post('/api/ai/search', async (req, res) => {
+  try {
+    const { query, topK } = req.body || {};
+    if (!query) return res.status(400).json({ error: 'Missing query' });
+    const qEmb = await createEmbedding(query.slice(0, 2000));
+    const scores = [];
+    for (const doc of documents) {
+      const emb = embeddingsIndex[doc.id];
+      if (!emb) continue;
+      const score = cosineSim(qEmb, emb);
+      scores.push({ id: doc.id, score });
+    }
+    scores.sort((a, b) => b.score - a.score);
+    const k = Math.max(1, Math.min(10, topK || 5));
+    const top = scores.slice(0, k).map(s => {
+      const d = documents.find(x => x.id === s.id);
+      return { document: d, score: s.score };
+    });
+    res.json({ results: top });
+  } catch (error) {
+    console.error('Search error:', error.message || error);
+    res.status(500).json({ error: error.message || 'Search failed' });
+  }
+});
+
+// AI Assistant chat proxy endpoint
+app.post('/api/ai/chat', async (req, res) => {
+  try {
+    const { message, context } = req.body || {};
+    if (!message) return res.status(400).json({ error: 'Missing message' });
+
+    // Moderate user message before sending
+    try {
+      const mod = await moderateText(message.slice(0, 4000));
+      if (mod.flagged) return res.status(403).json({ error: 'Message flagged by moderation', details: mod.categories });
+    } catch (e) {
+      console.log('Moderation error (chat):', e.message || e);
+    }
+
+    // Optionally include short context for better responses
+    const prompt = context ? `Context:\n${context}\n\nUser: ${message}` : `User: ${message}`;
+    const aiResp = await openaiChat(prompt, 800);
+    const reply = aiResp?.choices?.[0]?.message?.content || aiResp?.choices?.[0]?.text || '';
+    res.json({ reply });
+  } catch (error) {
+    console.error('Chat error:', error.message || error);
+    res.status(500).json({ error: error.message || 'Chat failed' });
+  }
+});
+
+
 // ============================================
 // VISITOR TRACKING
 // ============================================
@@ -452,7 +749,4 @@ app.get("/api/health", (req, res) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`\n========================================`);
-  console.log(`EduTVET API Server running on port ${PORT}`);
-  console.log(`Documents stored in: ${documentsFolder}`);
-  console.log(`========================================\n`);
-});
+  // Server started
