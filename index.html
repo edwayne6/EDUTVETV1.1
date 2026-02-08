@@ -191,9 +191,168 @@
   <script src="scripts/analytics.js"></script> <!-- Visitor tracking -->
   <script src="scripts/scroll-animations.js"></script> <!-- Scroll animations -->
 
+  <!-- Chat Widget -->
+  <!-- Floating Chat Button -->
+  <button id="chatButton" class="fixed bottom-6 right-6 bg-blue-600 text-white rounded-lg px-6 py-3 shadow-lg hover:bg-blue-700 transition z-40 flex items-center gap-2 font-semibold" title="Open Chat">
+    <i class="fas fa-comments text-lg"></i>
+    <span>Chat with us</span>
+  </button>
+
+  <!-- Chat Modal -->
+  <div id="chatModal" class="hidden fixed bottom-24 right-6 bg-white rounded-lg shadow-2xl w-80 max-h-96 flex flex-col z-50 overflow-hidden">
+    <!-- Chat Header -->
+    <div class="bg-blue-600 text-white p-4 flex justify-between items-center">
+      <h3 class="font-bold">EduTVET Support</h3>
+      <button id="closeChatBtn" class="text-white hover:text-gray-200" onclick="toggleChat()">
+        <i class="fas fa-times text-xl"></i>
+      </button>
+    </div>
+
+    <!-- Messages Area -->
+    <div id="chatMessages" class="flex-1 overflow-y-auto p-4 bg-gray-50 space-y-3" style="max-height: 250px;">
+      <div class="text-center text-gray-500 text-sm py-4">
+        <p>Welcome! How can we help you?</p>
+      </div>
+    </div>
+
+    <!-- Input Area -->
+    <div class="border-t p-3 bg-white">
+      <form id="chatForm" class="flex gap-2">
+        <input 
+          type="text" 
+          id="chatInput" 
+          placeholder="Type your message..." 
+          class="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+          autocomplete="off"
+        >
+        <button type="submit" class="bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 transition">
+          <i class="fas fa-send"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
   <!-- Auto-update copyright year -->
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Chat Widget Functions
+    function toggleChat() {
+      const modal = document.getElementById('chatModal');
+      modal.classList.toggle('hidden');
+      if (!modal.classList.contains('hidden')) {
+        document.getElementById('chatInput').focus();
+      }
+    }
+
+    // Open/close chat
+    document.getElementById('chatButton').addEventListener('click', toggleChat);
+
+    // Load messages when chat opens
+    document.getElementById('chatModal').addEventListener('click', (e) => {
+      if (e.target.id === 'chatModal') {
+        toggleChat();
+      }
+    });
+
+    // Handle message submission
+    document.getElementById('chatForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const input = document.getElementById('chatInput');
+      const message = input.value.trim();
+      
+      if (!message) return;
+
+      // Generate visitor ID
+      let visitorId = localStorage.getItem('edutvet_visitor_id');
+      if (!visitorId) {
+        visitorId = 'visitor_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('edutvet_visitor_id', visitorId);
+      }
+
+      // Create message object
+      const msgObj = {
+        id: Date.now(),
+        visitorId: visitorId,
+        visitorName: 'Visitor',
+        message: message,
+        timestamp: new Date().toISOString(),
+        reply: null,
+        replyTime: null
+      };
+
+      // Save to localStorage
+      let messages = JSON.parse(localStorage.getItem('edutvet_chat_messages') || '[]');
+      messages.push(msgObj);
+      localStorage.setItem('edutvet_chat_messages', JSON.stringify(messages));
+
+      // Display message
+      displayMessage(msgObj, true);
+      input.value = '';
+
+      // Scroll to bottom
+      setTimeout(() => {
+        const messagesDiv = document.getElementById('chatMessages');
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      }, 100);
+    });
+
+    // Display message in chat
+    function displayMessage(msgObj, isOwn = false) {
+      const messagesDiv = document.getElementById('chatMessages');
+      
+      const wrapper = document.createElement('div');
+      wrapper.className = isOwn ? 'flex justify-end' : 'flex justify-start';
+      
+      const msgDiv = document.createElement('div');
+      msgDiv.className = isOwn 
+        ? 'bg-blue-600 text-white px-3 py-2 rounded-lg max-w-xs text-sm rounded-br-none'
+        : 'bg-gray-300 text-gray-800 px-3 py-2 rounded-lg max-w-xs text-sm rounded-bl-none';
+      
+      let replyHtml = '';
+      if (msgObj.reply) {
+        replyHtml = `
+          <div class="mt-3 border-t pt-2 bg-gradient-to-r from-green-50 to-emerald-50 p-2 rounded text-green-900 text-xs">
+            <p class="font-bold mb-1">
+              <i class="fas fa-check-circle mr-1"></i>Admin Reply:
+            </p>
+            <p class="text-green-800">${msgObj.reply}</p>
+            <p class="text-xs opacity-70 mt-1">${new Date(msgObj.replyTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+          </div>
+        `;
+      }
+      
+      msgDiv.innerHTML = `
+        <p>${msgObj.message}</p>
+        <p class="text-xs opacity-70 mt-1">${new Date(msgObj.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+        ${replyHtml}
+      `;
+      
+      wrapper.appendChild(msgDiv);
+      messagesDiv.appendChild(wrapper);
+    }
+
+    // Load existing messages on page load
+    function loadChatMessages() {
+      const messagesDiv = document.getElementById('chatMessages');
+      let messages = JSON.parse(localStorage.getItem('edutvet_chat_messages') || '[]');
+      
+      if (messages.length === 0) {
+        messagesDiv.innerHTML = '<div class="text-center text-gray-500 text-sm py-4"><p>Welcome! How can we help you?</p></div>';
+        return;
+      }
+
+      messagesDiv.innerHTML = '';
+      let visitorId = localStorage.getItem('edutvet_visitor_id');
+      
+      messages.forEach(msg => {
+        const isOwn = msg.visitorId === visitorId;
+        displayMessage(msg, isOwn);
+      });
+    }
+
+    // Load messages on page load
+    loadChatMessages();
   </script>
 
 </body>
