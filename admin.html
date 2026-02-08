@@ -7,6 +7,7 @@
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link rel="stylesheet" href="styles.css">
+  <script src="scripts/tracker.js"></script>
   <style>
     .sidebar { transition: transform 0.25s ease, box-shadow 0.25s ease; transform: translateX(0); }
     /* Collapsed moves sidebar mostly off-screen leaving small edge for hover */
@@ -319,39 +320,64 @@
         <h2 class="text-3xl font-bold text-gray-800 mb-6">All Departments</h2>
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-lg shadow">
-            <h3 class="text-xl font-bold mb-2">Agriculture</h3>
-            <p id="agricultureCount" class="text-3xl font-bold mb-4">0</p>
+          <div class="bg-indigo-700 text-white p-6 rounded-lg shadow hover:shadow-lg transition">
+            <h3 class="text-lg font-bold mb-2">Agriculture & Environmental</h3>
+            <p id="deptCount-agriculture-and-environmental-studies" class="text-3xl font-bold mb-4">0</p>
             <p class="text-sm">Documents in this department</p>
           </div>
-          <div class="bg-gradient-to-br from-purple-500 to-purple-600 text-white p-6 rounded-lg shadow">
-            <h3 class="text-xl font-bold mb-2">Business</h3>
-            <p id="businessCount" class="text-3xl font-bold mb-4">0</p>
+          <div class="bg-indigo-700 text-white p-6 rounded-lg shadow hover:shadow-lg transition">
+            <h3 class="text-lg font-bold mb-2">Applied Sciences</h3>
+            <p id="deptCount-applied-sciences" class="text-3xl font-bold mb-4">0</p>
             <p class="text-sm">Documents in this department</p>
           </div>
-          <div class="bg-gradient-to-br from-green-500 to-green-600 text-white p-6 rounded-lg shadow">
-            <h3 class="text-xl font-bold mb-2">ICT</h3>
-            <p id="ictCount" class="text-3xl font-bold mb-4">0</p>
+          <div class="bg-indigo-700 text-white p-6 rounded-lg shadow hover:shadow-lg transition">
+            <h3 class="text-lg font-bold mb-2">Automotive & Mechanical</h3>
+            <p id="deptCount-automotive-and-mechanical-engineering" class="text-3xl font-bold mb-4">0</p>
             <p class="text-sm">Documents in this department</p>
           </div>
-          <div class="bg-gradient-to-br from-red-500 to-red-600 text-white p-6 rounded-lg shadow">
-            <h3 class="text-xl font-bold mb-2">Electrical</h3>
-            <p id="electricalCount" class="text-3xl font-bold mb-4">0</p>
+          <div class="bg-indigo-700 text-white p-6 rounded-lg shadow hover:shadow-lg transition">
+            <h3 class="text-lg font-bold mb-2">Building & Civil Eng</h3>
+            <p id="deptCount-building-civil-engineering" class="text-3xl font-bold mb-4">0</p>
             <p class="text-sm">Documents in this department</p>
           </div>
-          <div class="bg-gradient-to-br from-yellow-500 to-yellow-600 text-white p-6 rounded-lg shadow">
-            <h3 class="text-xl font-bold mb-2">Mechanical</h3>
-            <p id="mechanicalCount" class="text-3xl font-bold mb-4">0</p>
+          <div class="bg-indigo-700 text-white p-6 rounded-lg shadow hover:shadow-lg transition">
+            <h3 class="text-lg font-bold mb-2">Business & Entrepreneurship</h3>
+            <p id="deptCount-business-entrepreneurship-studies" class="text-3xl font-bold mb-4">0</p>
             <p class="text-sm">Documents in this department</p>
           </div>
-          <div class="bg-gradient-to-br from-indigo-500 to-indigo-600 text-white p-6 rounded-lg shadow">
-            <h3 class="text-xl font-bold mb-2">Hospitality</h3>
-            <p id="hospitalityCount" class="text-3xl font-bold mb-4">0</p>
+          <div class="bg-indigo-700 text-white p-6 rounded-lg shadow hover:shadow-lg transition">
+            <h3 class="text-lg font-bold mb-2">Computing & Informatics</h3>
+            <p id="deptCount-computing-informatics" class="text-3xl font-bold mb-4">0</p>
             <p class="text-sm">Documents in this department</p>
           </div>
-          <div class="bg-gradient-to-br from-pink-500 to-pink-600 text-white p-6 rounded-lg shadow">
-            <h3 class="text-xl font-bold mb-2">Agriculture Engineering</h3>
-            <p id="agroEngCount" class="text-3xl font-bold mb-4">0</p>
+          <div class="bg-indigo-700 text-white p-6 rounded-lg shadow hover:shadow-lg transition">
+            <h3 class="text-lg font-bold mb-2">Cosmetology</h3>
+            <p id="deptCount-cosmetology" class="text-3xl font-bold mb-4">0</p>
+            <p class="text-sm">Documents in this department</p>
+          </div>
+          <div class="bg-indigo-700 text-white p-6 rounded-lg shadow hover:shadow-lg transition">
+            <h3 class="text-lg font-bold mb-2">Electrical & Electronics</h3>
+            <p id="deptCount-electrical-electronics-engineering" class="text-3xl font-bold mb-4">0</p>
+            <p class="text-sm">Documents in this department</p>
+          </div>
+          <div class="bg-indigo-700 text-white p-6 rounded-lg shadow hover:shadow-lg transition">
+            <h3 class="text-lg font-bold mb-2">Fashion & Design</h3>
+            <p id="deptCount-fashion-design" class="text-3xl font-bold mb-4">0</p>
+            <p class="text-sm">Documents in this department</p>
+          </div>
+          <div class="bg-indigo-700 text-white p-6 rounded-lg shadow hover:shadow-lg transition">
+            <h3 class="text-lg font-bold mb-2">Health Sciences</h3>
+            <p id="deptCount-health-sciences" class="text-3xl font-bold mb-4">0</p>
+            <p class="text-sm">Documents in this department</p>
+          </div>
+          <div class="bg-indigo-700 text-white p-6 rounded-lg shadow hover:shadow-lg transition">
+            <h3 class="text-lg font-bold mb-2">Liberal Studies</h3>
+            <p id="deptCount-liberal-studies" class="text-3xl font-bold mb-4">0</p>
+            <p class="text-sm">Documents in this department</p>
+          </div>
+          <div class="bg-indigo-700 text-white p-6 rounded-lg shadow hover:shadow-lg transition">
+            <h3 class="text-lg font-bold mb-2">Tourism & Hospitality</h3>
+            <p id="deptCount-tourism-hospitality" class="text-3xl font-bold mb-4">0</p>
             <p class="text-sm">Documents in this department</p>
           </div>
         </div>
@@ -837,11 +863,24 @@
     }
 
     function loadDepartmentCounts() {
-      const departments = ['Agriculture', 'Business', 'ICT', 'Electrical', 'Mechanical', 'Hospitality', 'Agriculture Engineering'];
-      departments.forEach(dept => {
-        const count = documents.filter(d => d.department === dept).length;
-        const deptId = dept.toLowerCase().replace(' ', '');
-        const element = document.getElementById(deptId + 'Count');
+      const departmentMap = {
+        'Agriculture and Environmental studies': 'deptCount-agriculture-and-environmental-studies',
+        'Applied Sciences': 'deptCount-applied-sciences',
+        'Automotive and Mechanical Engineering': 'deptCount-automotive-and-mechanical-engineering',
+        'Building & Civil Engineering': 'deptCount-building-civil-engineering',
+        'Business & Entrepreneurship Studies': 'deptCount-business-entrepreneurship-studies',
+        'Computing & Informatics': 'deptCount-computing-informatics',
+        'Cosmetology': 'deptCount-cosmetology',
+        'Electrical & Electronics Engineering': 'deptCount-electrical-electronics-engineering',
+        'Fashion & Design': 'deptCount-fashion-design',
+        'Health Sciences': 'deptCount-health-sciences',
+        'Liberal Studies': 'deptCount-liberal-studies',
+        'Tourism & Hospitality': 'deptCount-tourism-hospitality'
+      };
+      
+      Object.entries(departmentMap).forEach(([deptName, elementId]) => {
+        const count = documents.filter(d => d.department === deptName).length;
+        const element = document.getElementById(elementId);
         if (element) element.textContent = count;
       });
     }
