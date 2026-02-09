@@ -28,6 +28,30 @@ const globalLimiter = rateLimit({
 });
 app.use(globalLimiter);
 
+// Cache control middleware for different asset types
+app.use((req, res, next) => {
+  const path = req.path;
+  
+  // Static assets - cache for 1 year (they have content hashes)
+  if (/\.(js|css|jpg|jpeg|png|gif|svg|woff|woff2|eot|ttf)$/i.test(path)) {
+    res.set('Cache-Control', 'public, max-age=31536000, immutable');
+  }
+  // HTML pages - cache for 1 hour (content may change)
+  else if (/\.html$/i.test(path)) {
+    res.set('Cache-Control', 'public, max-age=3600, must-revalidate');
+  }
+  // API responses - cache for 5 minutes
+  else if (path.startsWith('/api/')) {
+    res.set('Cache-Control', 'public, max-age=300');
+  }
+  // Default - no cache
+  else {
+    res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+  }
+  
+  next();
+});
+
 app.use(express.json());
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
@@ -736,12 +760,105 @@ app.get("/api/stats", (req, res) => {
   }
 });
 
+// ============================================
+// SERVER-SIDE RENDERING (SSR) ROUTES
+// ============================================
+
+// Initialize SSR utilities
+let ssr = null;
+try {
+  ssr = require('../utils/ssr');
+  app.use(ssr.ssrMiddleware);
+  console.log('✅ SSR enabled');
+} catch (e) {
+  console.warn('⚠️  SSR module not available, using standard rendering');
+}
+
+// Home page - Server-Side Rendered
+app.get('/', async (req, res) => {
+  try {
+    if (ssr) {
+      const data = {
+        title: 'Edu-TVET - Empowering Learning',
+        description: 'EduTVET provides access to quality TVET documents for teaching, learning, and professional growth.',
+        scripts: ['/scripts/scripts.js', '/scripts/scroll-animations.js', '/scripts/document-cache.js']
+      };
+      // Use cache key to avoid re-rendering
+      await res.renderSSR('index', data, 'home-page');
+    } else {
+      // Fallback to static file
+      res.sendFile(path.join(__dirname, '../index.html'));
+    }
+  } catch (error) {
+    console.error('Home page error:', error);
+    res.status(500).send('Error loading home page');
+  }
+});
+
+// Documents page - Server-Side Rendered with caching
+app.get('/documents', async (req, res) => {
+  try {
+    if (ssr) {
+      const data = {
+        title: 'EduTVET - Documents',
+        description: 'Browse and download TVET documents categorized by type and level.',
+        departments: [
+          'Agriculture & Environmental',
+          'Applied Sciences',
+          'Automotive & Mechanical',
+          'Building & Civil Eng',
+          'Business & Entrepreneurship',
+          'Business Studies',
+          'Computing & ICT',
+          'Cosmetology',
+          'Electrical & Electronics',
+          'Fashion & Apparel Design',
+          'Health & Applied Sciences',
+          'Liberal Studies',
+          'Tourism & Hospitality'
+        ],
+        documents: documents.filter(d => d.status === 'published'),
+        scripts: ['/scripts/document-cache.js']
+      };
+      // Use cache key based on filters
+      const cacheKey = `documents-${JSON.stringify(req.query)}`;
+      await res.renderSSR('documents', data, cacheKey);
+    } else {
+      // Fallback to static file
+      res.sendFile(path.join(__dirname, '../documents.html'));
+    }
+  } catch (error) {
+    console.error('Documents page error:', error);
+    res.status(500).send('Error loading documents page');
+  }
+});
+
+// Admin page - Server-Side Rendered
+app.get('/ssr-admin', async (req, res) => {
+  try {
+    if (ssr) {
+      const data = {
+        title: 'Admin Dashboard',
+        description: 'Administrative panel for document management',
+        scripts: ['/scripts/cache-manager.js']
+      };
+      await res.renderSSR('admin', data, 'admin-page');
+    } else {
+      res.sendFile(path.join(__dirname, '../admin.html'));
+    }
+  } catch (error) {
+    console.error('Admin page error:', error);
+    res.status(500).send('Error loading admin page');
+  }
+});
+
 // Health check
 app.get("/api/health", (req, res) => {
   res.json({ 
     status: "Server is running",
     documentsCount: documents.length,
-    documentsFolder: documentsFolder
+    documentsFolder: documentsFolder,
+    ssrEnabled: ssr !== null
   });
 });
 

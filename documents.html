@@ -8,30 +8,9 @@
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link rel="stylesheet" href="styles.css">
+  <script src="scripts/cache-manager.js"></script>
+  <script src="scripts/document-cache.js"></script>
   <script src="scripts/tracker.js"></script>
-  <style>
-    .document-card {
-      transition: all 0.3s ease;
-    }
-    .document-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-    }
-    .filter-btn {
-      transition: all 0.3s ease;
-    }
-    .filter-btn:active {
-      transform: scale(0.95);
-    }
-    @media (max-width: 768px) {
-      .grid {
-        grid-template-columns: 1fr;
-      }
-      #typeButtons, #levelButtons {
-        flex-wrap: wrap;
-      }
-    }
-  </style>
   <script>
     let allDocuments = [];
     let currentType = 'All';
@@ -449,6 +428,17 @@
         card.classList.add('animate-on-scroll', 'animate-scale-in');
       });
     };
+  </script>
+
+  <!-- Service Worker Registration for caching -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(registration => console.log('Service Worker registered:', registration))
+          .catch(error => console.log('Service Worker registration failed:', error));
+      });
+    }
   </script>
 </body>
 </html>

@@ -8,35 +8,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+  <script src="scripts/cache-manager.js"></script>
   <script src="scripts/tracker.js"></script>
-  <style>
-    .sidebar { transition: transform 0.25s ease, box-shadow 0.25s ease; transform: translateX(0); }
-    /* Collapsed moves sidebar mostly off-screen leaving small edge for hover */
-    .sidebar.collapsed { transform: translateX(-220px); }
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-    .pin-input { width: 50px; height: 50px; font-size: 30px; text-align: center; }
-    .pin-container { display: none; }
-    .pin-container.show { display: flex; }
-    .dashboard-container { display: none; }
-    .dashboard-container.show { display: block; }
-    .hidden { display: none !important; }
-    /* Collapse button inside sidebar */
-    .sidebar .collapse-btn {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      background: transparent;
-      border: none;
-      color: rgba(255,255,255,0.85);
-      padding: 6px;
-      border-radius: 6px;
-      transition: background 0.15s ease, transform 0.2s ease;
-    }
-    .sidebar .collapse-btn:hover { background: rgba(255,255,255,0.04); color: #fff; transform: translateX(2px); }
-    .sidebar.collapsed .collapse-btn { transform: rotate(180deg); }
-  </style>
-  </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
   <!-- PIN Entry Screen -->
@@ -1882,6 +1855,17 @@
       sessionStorage.removeItem('pinVerified');
       alert('Logged out successfully!');
       window.location.href = 'index.html';
+    }
+  </script>
+
+  <!-- Service Worker Registration for caching -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(registration => console.log('Service Worker registered:', registration))
+          .catch(error => console.log('Service Worker registration failed:', error));
+      });
     }
   </script>
 </body>

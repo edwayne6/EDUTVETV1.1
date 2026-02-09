@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="<%= description || 'EduTVET provides access to quality TVET documents for teaching, learning, and professional growth.' %>">
+  <meta property="og:title" content="<%= title || 'Edu-TVET - Empowering Learning' %>">
+  <meta property="og:description" content="<%= description %>">
+  <title><%= title || 'Edu-TVET' %></title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <script src="/scripts/cache-manager.js"></script>
+  <script src="/scripts/tracker.js"></script>
+  <% if (typeof preloadScripts !== 'undefined' && preloadScripts.length > 0) { %>
+    <% preloadScripts.forEach(src => { %>
+      <link rel="preload" as="script" href="<%= src %>">
+    <% }); %>
+  <% } %>
+</head>
+<body class="bg-gray-50 text-gray-800">
+  <!-- Navigation -->
+  <header class="bg-white shadow">
+    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+      <h1 class="text-2xl font-bold text-blue-600">Edu-TVET</h1>
+      <nav class="space-x-4 flex items-center flex-wrap">
+        <a href="/" class="text-blue-600 hover:text-blue-800 transition">Home</a>
+        <a href="/documents" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">Documents</a>
+        <a href="/admin" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">Admin</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container mx-auto px-4 py-8">
+    <%- body %>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-white mt-12">
+    <div class="container mx-auto px-4 py-8 text-center">
+      <p>&copy; 2026 EduTVET. All rights reserved.</p>
+      <div class="flex justify-center gap-4 mt-4">
+        <a href="/privacy-policy.html" class="hover:text-blue-400">Privacy</a>
+        <a href="/terms-of-service.html" class="hover:text-blue-400">Terms</a>
+        <a href="/cookie-policy.html" class="hover:text-blue-400">Cookies</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(registration => console.log('✅ Service Worker registered'))
+          .catch(error => console.log('Service Worker registration failed:', error));
+      });
+    }
+  </script>
+
+  <% if (typeof scripts !== 'undefined' && scripts.length > 0) { %>
+    <% scripts.forEach(src => { %>
+      <script src="<%= src %>"><\/script>
+    <% }); %>
+  <% } %>
+</body>
+</html>

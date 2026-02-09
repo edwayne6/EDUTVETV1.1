@@ -742,3 +742,53 @@ input:focus {
 .animate-on-scroll:nth-child(2) { animation-delay: 0.15s; }
 .animate-on-scroll:nth-child(3) { animation-delay: 0.3s; }
 .animate-on-scroll:nth-child(4) { animation-delay: 0.45s; }
+
+/* Admin Dashboard Styles */
+.sidebar { transition: transform 0.25s ease, box-shadow 0.25s ease; transform: translateX(0); }
+/* Collapsed moves sidebar mostly off-screen leaving small edge for hover */
+.sidebar.collapsed { transform: translateX(-220px); }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+.pin-input { width: 50px; height: 50px; font-size: 30px; text-align: center; }
+.pin-container { display: none; }
+.pin-container.show { display: flex; }
+.dashboard-container { display: none; }
+.dashboard-container.show { display: block; }
+.hidden { display: none !important; }
+/* Collapse button inside sidebar */
+.sidebar .collapse-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.85);
+  padding: 6px;
+  border-radius: 6px;
+  transition: background 0.15s ease, transform 0.2s ease;
+}
+.sidebar .collapse-btn:hover { background: rgba(255,255,255,0.04); color: #fff; transform: translateX(2px); }
+.sidebar.collapsed .collapse-btn { transform: rotate(180deg); }
+
+/* Documents Page Styles */
+.document-card {
+  transition: all 0.3s ease;
+}
+.document-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+.filter-btn {
+  transition: all 0.3s ease;
+}
+.filter-btn:active {
+  transform: scale(0.95);
+}
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  #typeButtons, #levelButtons {
+    flex-wrap: wrap;
+  }
+}

@@ -9,21 +9,127 @@
   <link rel="stylesheet" href="../styles.css">
   <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
   <style>
-    .course-level { background-color: #f0f9ff; border-left: 4px solid #3b82f6; margin-bottom: 24px; padding: 20px; border-radius: 8px; }
-    .empty-state { text-align: center; padding: 40px 20px; color: #6b7280; }
+    .course-sidebar { max-height: calc(100vh - 200px); overflow-y: auto; }
+    .course-button { cursor: pointer; transition: all 0.3s ease; border-left: 4px solid transparent; padding: 12px 16px; margin: 4px 0; border-radius: 6px; background: white; font-size: 14px; }
+    .course-button:hover { background-color: #e0e7ff; border-left-color: #3b82f6; }
+    .course-button.active { background-color: #3b82f6; color: white; border-left-color: #1e40af; }
+    .tab-button { cursor: pointer; padding: 12px 20px; border-bottom: 3px solid transparent; transition: all 0.3s ease; font-weight: 500; }
+    .tab-button:hover { border-bottom-color: #3b82f6; color: #3b82f6; }
+    .tab-button.active { border-bottom-color: #3b82f6; color: #3b82f6; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
   <header class="bg-white shadow"><div class="container mx-auto px-4 py-4 flex justify-between items-center"><a href="../index.html" class="text-2xl font-bold text-blue-600 hover:text-blue-700 transition">Edu-TVET</a><nav class="space-x-4 flex items-center"><a href="../documents.html" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">Documents</a><a href="../index.html" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition flex items-center space-x-2"><i class="fas fa-home"></i><span>Home</span></a></nav></div></header>
   <main class="container mx-auto px-4 py-12">
-    <div class="mb-8"><a href="../index.html" class="text-blue-600 hover:text-blue-700 text-sm">← Back to Home</a></div>
-    <div class="mb-12"><h1 class="text-4xl font-bold text-blue-700 mb-2">Cosmetology</h1><p class="text-gray-600 text-lg">Explore courses by qualification level</p></div>
-    <div class="course-level"><h2 class="text-2xl font-bold text-blue-600 mb-6">Level 4</h2><div class="empty-state"><p>No courses available for this level</p></div></div>
-    <div class="course-level"><h2 class="text-2xl font-bold text-blue-600 mb-6">Level 5</h2><div class="empty-state"><p>No courses available for this level</p></div></div>
-    <div class="course-level"><h2 class="text-2xl font-bold text-blue-600 mb-6">Level 6</h2><div class="empty-state"><p>No courses available for this level</p></div></div>
+    <div class="mb-8">
+      <a href="../index.html" class="text-blue-600 hover:text-blue-700 text-sm">← Back to Home</a>
+    </div>
+    <div class="mb-12">
+      <h1 class="text-4xl font-bold text-blue-700 mb-2 animate-on-scroll animate-slide-in-up">Cosmetology</h1>
+      <p class="text-gray-600 text-lg animate-on-scroll animate-slide-in-up">Click a course to view details, notes, curriculum, and more</p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <aside class="md:col-span-1">
+        <div class="bg-white rounded-lg shadow p-4 course-sidebar">
+          <h3 class="text-lg font-bold mb-4 text-blue-600 flex items-center">
+            <i class="fas fa-list mr-2"></i>Courses
+          </h3>
+          <div class="mb-6">
+            <h4 class="font-semibold text-gray-700 mb-2 text-sm uppercase text-blue-600">Level 3</h4>
+            <p class="text-gray-500 italic text-sm px-3 py-2">No courses available</p>
+          </div>
+          <div class="mb-6">
+            <h4 class="font-semibold text-gray-700 mb-2 text-sm uppercase text-blue-600">Level 4</h4>
+            <p class="text-gray-500 italic text-sm px-3 py-2">No courses available</p>
+          </div>
+          <div class="mb-6">
+            <h4 class="font-semibold text-gray-700 mb-2 text-sm uppercase text-blue-600">Level 5</h4>
+            <p class="text-gray-500 italic text-sm px-3 py-2">No courses available</p>
+          </div>
+          <div>
+            <h4 class="font-semibold text-gray-700 mb-2 text-sm uppercase text-blue-600">Level 6</h4>
+            <p class="text-gray-500 italic text-sm px-3 py-2">No courses available</p>
+          </div>
+        </div>
+      </aside>
+      <div class="md:col-span-3">
+        <div class="bg-white rounded-lg shadow p-6">
+          <div class="text-center py-16">
+            <i class="fas fa-spa text-6xl text-blue-300 mb-4"></i>
+            <h2 class="text-3xl font-bold text-gray-800 mb-4">Cosmetology Department</h2>
+            <p class="text-gray-600 text-lg mb-8">We're currently developing our cosmetology program offerings. Check back soon for available courses and training opportunities in:</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 mb-8">
+              <div class="bg-blue-50 p-6 rounded-lg border border-blue-200">
+                <i class="fas fa-cut text-blue-600 text-3xl mb-3"></i>
+                <h3 class="font-semibold text-gray-800 mb-2">Hair Services</h3>
+                <p class="text-gray-600 text-sm">Professional hair cutting, styling, and treatment techniques</p>
+              </div>
+              <div class="bg-blue-50 p-6 rounded-lg border border-blue-200">
+                <i class="fas fa-palette text-blue-600 text-3xl mb-3"></i>
+                <h3 class="font-semibold text-gray-800 mb-2">Makeup & Beauty</h3>
+                <p class="text-gray-600 text-sm">Aesthetic design and professional makeup application</p>
+              </div>
+              <div class="bg-blue-50 p-6 rounded-lg border border-blue-200">
+                <i class="fas fa-hand-spock text-blue-600 text-3xl mb-3"></i>
+                <h3 class="font-semibold text-gray-800 mb-2">Nail Care</h3>
+                <p class="text-gray-600 text-sm">Manicure, pedicure, and nail art services</p>
+              </div>
+            </div>
+            <p class="text-gray-600 mb-4">Contact us for information about upcoming programs:</p>
+            <div class="flex flex-col md:flex-row items-center justify-center gap-4">
+              <a href="tel:0708715547" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition flex items-center space-x-2">
+                <i class="fas fa-phone"></i><span>Call: 0708715547</span>
+              </a>
+              <a href="mailto:educhemain@gmail.com" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition flex items-center space-x-2">
+                <i class="fas fa-envelope"></i><span>Email: educhemain@gmail.com</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </main>
   <footer class="bg-gray-900 text-white py-10 mt-12"><div class="container mx-auto px-4"><div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-center md:text-left"><div><h4 class="text-xl font-semibold mb-4 text-blue-400">Contact Us</h4><p class="text-gray-300">Phone: <a href="tel:0708715547" class="text-blue-300 hover:underline">0708715547</a></p><p class="text-gray-300">Email: <a href="mailto:educhemain@gmail.com" class="text-blue-300 hover:underline">educhemain@gmail.com</a></p></div><div><h4 class="text-xl font-semibold mb-4 text-blue-400">Follow Us</h4><div class="flex flex-col items-center md:items-start space-y-4 text-gray-300"><a href="https://x.com" target="_blank" class="flex items-center space-x-2 hover:text-blue-400 transition"><i class="fab fa-twitter"></i><span>X</span></a><a href="https://facebook.com" target="_blank" class="flex items-center space-x-2 hover:text-blue-400 transition"><i class="fab fa-facebook"></i><span>Facebook</span></a><a href="https://linkedin.com" target="_blank" class="flex items-center space-x-2 hover:text-blue-400 transition"><i class="fab fa-linkedin"></i><span>LinkedIn</span></a></div></div></div><div class="border-t border-gray-700 mt-8 pt-4 text-center text-sm text-gray-400">&copy; <span id="year">2026</span> <span class="text-blue-400 font-semibold">Edu-TVET</span>. All rights reserved.</div></div></footer>
-  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+    const courseButtons = document.querySelectorAll('.course-button');
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+    courseButtons.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const courseName = btn.getAttribute('data-course');
+        courseButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('courseTitle').textContent = courseName;
+        document.getElementById('courseLevel').textContent = 'Level ' + courseName.slice(-1) + ' Course';
+        document.getElementById('notesCourseName').textContent = courseName;
+        document.getElementById('curriculumCourseName').textContent = courseName;
+        document.getElementById('occupationalCourseName').textContent = courseName;
+        document.getElementById('learningCourseName').textContent = courseName;
+        document.getElementById('sessionsCourseName').textContent = courseName;
+        tabButtons.forEach(tb => tb.classList.remove('active'));
+        tabContents.forEach(tc => tc.classList.remove('active'));
+        tabButtons[0].classList.add('active');
+        tabContents[0].classList.add('active');
+      });
+    });
+    tabButtons.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const tabName = btn.getAttribute('data-tab');
+        tabButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        tabContents.forEach(tc => tc.classList.remove('active'));
+        document.getElementById(tabName).classList.add('active');
+      });
+    });
+    if (courseButtons.length > 0) {
+      courseButtons[0].classList.add('active');
+    }
+  </script>
   <script src="../scripts/scroll-animations.js"></script>
 </body>
 </html>

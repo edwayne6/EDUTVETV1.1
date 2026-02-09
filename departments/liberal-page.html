@@ -9,25 +9,150 @@
   <link rel="stylesheet" href="../styles.css">
   <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
   <style>
-    .course-level { background-color: #f0f9ff; border-left: 4px solid #3b82f6; margin-bottom: 24px; padding: 20px; border-radius: 8px; }
-    .course-list { list-style: none; padding-left: 0; }
-    .course-item { padding: 10px 0; border-bottom: 1px solid #e5e7eb; display: flex; align-items: flex-start; }
-    .course-item:last-child { border-bottom: none; }
-    .course-item::before { content: "✓"; color: #10b981; font-weight: bold; margin-right: 12px; font-size: 1.1em; }
+    .course-sidebar { max-height: calc(100vh - 200px); overflow-y: auto; }
+    .course-button { cursor: pointer; transition: all 0.3s ease; border-left: 4px solid transparent; padding: 12px 16px; margin: 4px 0; border-radius: 6px; background: white; font-size: 14px; }
+    .course-button:hover { background-color: #e0e7ff; border-left-color: #3b82f6; }
+    .course-button.active { background-color: #3b82f6; color: white; border-left-color: #1e40af; }
+    .tab-button { cursor: pointer; padding: 12px 20px; border-bottom: 3px solid transparent; transition: all 0.3s ease; font-weight: 500; }
+    .tab-button:hover { border-bottom-color: #3b82f6; color: #3b82f6; }
+    .tab-button.active { border-bottom-color: #3b82f6; color: #3b82f6; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
-  <header class="bg-white shadow"><div class="container mx-auto px-4 py-4 flex justify-between items-center"><a href="../index.html" class="text-2xl font-bold text-blue-600 hover:text-blue-700 transition">Edu-TVET</a><nav class="space-x-4 flex items-center"><a href="../documents.html" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">Documents</a><a href="../index.html" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition flex items-center space-x-2"><i class="fas fa-home"></i><span>Home</span></a></nav></div></header>
+  <header class="bg-white shadow">
+    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="../index.html" class="text-2xl font-bold text-blue-600 hover:text-blue-700 transition">Edu-TVET</a>
+      <nav class="space-x-4 flex items-center">
+        <a href="../documents.html" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">Documents</a>
+        <a href="../index.html" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition flex items-center space-x-2"><i class="fas fa-home"></i><span>Home</span></a>
+      </nav>
+    </div>
+  </header>
   <main class="container mx-auto px-4 py-12">
-    <div class="mb-8"><a href="../index.html" class="text-blue-600 hover:text-blue-700 text-sm">← Back to Home</a></div>
-    <div class="mb-12"><h1 class="text-4xl font-bold text-blue-700 mb-2">Liberal Studies</h1><p class="text-gray-600 text-lg">Explore courses by qualification level</p></div>
-    <div class="course-level"><h2 class="text-2xl font-bold text-blue-600 mb-6">Level 3</h2><ul class="course-list"><li class="course-item">Home Based Assistant Level 3</li></ul></div>
-    <div class="course-level"><h2 class="text-2xl font-bold text-blue-600 mb-6">Level 4</h2><ul class="course-list"><li class="course-item">Care Giver Level 4</li></ul></div>
-    <div class="course-level"><h2 class="text-2xl font-bold text-blue-600 mb-6">Level 5</h2><ul class="course-list"><li class="course-item">Child Protection Level 5</li><li class="course-item">Counselling 5</li><li class="course-item">Health Care Support 5</li><li class="course-item">Information Assistant L5</li><li class="course-item">Social Work L5</li></ul></div>
-    <div class="course-level"><h2 class="text-2xl font-bold text-blue-600 mb-6">Level 6</h2><ul class="course-list"><li class="course-item">Child Protection Level 6</li><li class="course-item">Counseling L6</li><li class="course-item">Information Manager Level 6</li><li class="course-item">Social Work L6</li></ul></div>
+    <div class="mb-8">
+      <a href="../index.html" class="text-blue-600 hover:text-blue-700 text-sm">← Back to Home</a>
+    </div>
+    <div class="mb-12">
+      <h1 class="text-4xl font-bold text-blue-700 mb-2 animate-on-scroll animate-slide-in-up">Liberal Studies</h1>
+      <p class="text-gray-600 text-lg animate-on-scroll animate-slide-in-up">Click a course to view details, notes, curriculum, and more</p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <aside class="md:col-span-1">
+        <div class="bg-white rounded-lg shadow p-4 course-sidebar">
+          <h3 class="text-lg font-bold mb-4 text-blue-600 flex items-center">
+            <i class="fas fa-list mr-2"></i>Courses
+          </h3>
+          <div class="mb-6">
+            <h4 class="font-semibold text-gray-700 mb-2 text-sm uppercase text-blue-600">Level 3</h4>
+            <button class="course-button active" data-course="General Education l3"><span class="text-xs">General Education l3</span></button>
+            <button class="course-button" data-course="Home Based Assistant l3"><span class="text-xs">Home Based Assistant</span></button>
+          </div>
+          <div class="mb-6">
+            <h4 class="font-semibold text-gray-700 mb-2 text-sm uppercase text-blue-600">Level 4</h4>
+            <button class="course-button" data-course="General Education l4"><span class="text-xs">General Education l4</span></button>
+            <button class="course-button" data-course="Care Giver l4"><span class="text-xs">Care Giver l4</span></button>
+          </div>
+          <div class="mb-6">
+            <h4 class="font-semibold text-gray-700 mb-2 text-sm uppercase text-blue-600">Level 5</h4>
+            <button class="course-button" data-course="General Education l5"><span class="text-xs">General Education l5</span></button>
+            <button class="course-button" data-course="Child Protection l5"><span class="text-xs">Child Protection l5</span></button>
+            <button class="course-button" data-course="Counselling l5"><span class="text-xs">Counselling l5</span></button>
+            <button class="course-button" data-course="Health Care Support l5"><span class="text-xs">Health Care Support</span></button>
+            <button class="course-button" data-course="Information Assistant l5"><span class="text-xs">Information Assistant</span></button>
+            <button class="course-button" data-course="Social Work l5"><span class="text-xs">Social Work l5</span></button>
+          </div>
+          <div>
+            <h4 class="font-semibold text-gray-700 mb-2 text-sm uppercase text-blue-600">Level 6</h4>
+            <button class="course-button" data-course="General Education l6"><span class="text-xs">General Education l6</span></button>
+            <button class="course-button" data-course="Child Protection l6"><span class="text-xs">Child Protection l6</span></button>
+            <button class="course-button" data-course="Counseling l6"><span class="text-xs">Counseling l6</span></button>
+            <button class="course-button" data-course="Information Manager l6"><span class="text-xs">Information Manager</span></button>
+            <button class="course-button" data-course="Social Work l6"><span class="text-xs">Social Work l6</span></button>
+          </div>
+        </div>
+      </aside>
+      <div class="md:col-span-3">
+        <div class="bg-white rounded-lg shadow p-6">
+          <h2 id="courseTitle" class="text-3xl font-bold text-blue-700 mb-2">General Education l3</h2>
+          <p id="courseLevel" class="text-gray-600 mb-6">Level 3 Course</p>
+          <div class="border-b border-gray-200 mb-6 flex flex-wrap">
+            <button class="tab-button active" data-tab="notes"><i class="fas fa-sticky-note mr-2"></i>Notes</button>
+            <button class="tab-button" data-tab="curriculum"><i class="fas fa-book mr-2"></i>Curriculum</button>
+            <button class="tab-button" data-tab="occupational"><i class="fas fa-briefcase mr-2"></i>Occupational Standards</button>
+            <button class="tab-button" data-tab="learning"><i class="fas fa-graduation-cap mr-2"></i>Learning Plans</button>
+            <button class="tab-button" data-tab="sessions"><i class="fas fa-calendar mr-2"></i>Session Plans</button>
+          </div>
+          <div class="tab-content active" id="notes"><div class="bg-blue-50 p-6 rounded-lg border-l-4 border-blue-500"><h3 class="text-xl font-bold mb-4 text-blue-700">Course Notes</h3><p class="text-gray-700">Download or view course notes for <span id="notesCourseName">General Education l3</span>:</p><div class="mt-4 space-y-3"><button class="block w-full text-left p-3 bg-white rounded hover:bg-gray-100 transition border border-gray-300"><i class="fas fa-file-pdf text-red-600 mr-2"></i>Course Notes - PDF</button><button class="block w-full text-left p-3 bg-white rounded hover:bg-gray-100 transition border border-gray-300"><i class="fas fa-file-word text-blue-600 mr-2"></i>Course Notes - DOCX</button></div></div></div>
+          <div class="tab-content" id="curriculum"><div class="bg-green-50 p-6 rounded-lg border-l-4 border-green-500"><h3 class="text-xl font-bold mb-4 text-green-700">Curriculum</h3><p class="text-gray-700 mb-4">Curriculum outline for <span id="curriculumCourseName">General Education l3</span>:</p><div class="space-y-3"><div class="bg-white p-4 rounded border border-gray-300"><h4 class="font-semibold text-gray-800">Module 1: Communication & Language</h4><p class="text-gray-600 text-sm">Communication skills and professional writing</p></div><div class="bg-white p-4 rounded border border-gray-300"><h4 class="font-semibold text-gray-800">Module 2: Workplace Competencies</h4><p class="text-gray-600 text-sm">Work ethics and professional development</p></div><div class="bg-white p-4 rounded border border-gray-300"><h4 class="font-semibold text-gray-800">Module 3: Civic Responsibility</h4><p class="text-gray-600 text-sm">Social and civic engagement</p></div></div><button class="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"><i class="fas fa-download mr-2"></i>Download Curriculum</button></div></div>
+          <div class="tab-content" id="occupational"><div class="bg-purple-50 p-6 rounded-lg border-l-4 border-purple-500"><h3 class="text-xl font-bold mb-4 text-purple-700">Occupational Standards</h3><p class="text-gray-700 mb-4">Standard competencies for <span id="occupationalCourseName">General Education l3</span>:</p><ul class="space-y-3"><li class="flex items-start"><i class="fas fa-check-circle text-purple-600 mr-3 mt-1"></i><span class="text-gray-700">Communicate effectively in diverse situations</span></li><li class="flex items-start"><i class="fas fa-check-circle text-purple-600 mr-3 mt-1"></i><span class="text-gray-700">Demonstrate professional workplace conduct</span></li><li class="flex items-start"><i class="fas fa-check-circle text-purple-600 mr-3 mt-1"></i><span class="text-gray-700">Apply critical thinking and problem-solving</span></li><li class="flex items-start"><i class="fas fa-check-circle text-purple-600 mr-3 mt-1"></i><span class="text-gray-700">Contribute to community development</span></li></ul><button class="mt-4 bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition"><i class="fas fa-download mr-2"></i>Download Standards</button></div></div>
+          <div class="tab-content" id="learning"><div class="bg-orange-50 p-6 rounded-lg border-l-4 border-orange-500"><h3 class="text-xl font-bold mb-4 text-orange-700">Learning Plans</h3><p class="text-gray-700 mb-4">Structured learning pathway for <span id="learningCourseName">General Education l3</span>:</p><div class="space-y-4"><div class="bg-white p-4 rounded border border-gray-300"><h4 class="font-semibold text-gray-800 mb-2">Week 1-2: Foundation</h4><p class="text-gray-600 text-sm">Communication and professional skills</p></div><div class="bg-white p-4 rounded border border-gray-300"><h4 class="font-semibold text-gray-800 mb-2">Week 3-4: Practice</h4><p class="text-gray-600 text-sm">Workplace applications and case studies</p></div><div class="bg-white p-4 rounded border border-gray-300"><h4 class="font-semibold text-gray-800 mb-2">Week 5-6: Assessment</h4><p class="text-gray-600 text-sm">Project-based assessment and presentation</p></div></div><button class="mt-4 bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700 transition"><i class="fas fa-download mr-2"></i>Download Learning Plan</button></div></div>
+          <div class="tab-content" id="sessions"><div class="bg-indigo-50 p-6 rounded-lg border-l-4 border-indigo-500"><h3 class="text-xl font-bold mb-4 text-indigo-700">Session Plans</h3><p class="text-gray-700 mb-4">Detailed session plans for <span id="sessionsCourseName">General Education l3</span>:</p><div class="space-y-3"><button class="block w-full text-left p-4 bg-white rounded hover:bg-gray-100 transition border border-gray-300"><h4 class="font-semibold text-gray-800">Session 1: Communication Skills</h4><p class="text-gray-600 text-sm">Duration: 2 hours</p></button><button class="block w-full text-left p-4 bg-white rounded hover:bg-gray-100 transition border border-gray-300"><h4 class="font-semibold text-gray-800">Session 2: Workplace Conduct</h4><p class="text-gray-600 text-sm">Duration: 3 hours</p></button><button class="block w-full text-left p-4 bg-white rounded hover:bg-gray-100 transition border border-gray-300"><h4 class="font-semibold text-gray-800">Session 3: Civic Responsibility</h4><p class="text-gray-600 text-sm">Duration: 4 hours</p></button></div><button class="mt-4 bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition"><i class="fas fa-download mr-2"></i>Download All Session Plans</button></div></div>
+        </div>
+      </div>
+    </div>
   </main>
-  <footer class="bg-gray-900 text-white py-10 mt-12"><div class="container mx-auto px-4"><div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-center md:text-left"><div><h4 class="text-xl font-semibold mb-4 text-blue-400">Contact Us</h4><p class="text-gray-300">Phone: <a href="tel:0708715547" class="text-blue-300 hover:underline">0708715547</a></p><p class="text-gray-300">Email: <a href="mailto:educhemain@gmail.com" class="text-blue-300 hover:underline">educhemain@gmail.com</a></p></div><div><h4 class="text-xl font-semibold mb-4 text-blue-400">Follow Us</h4><div class="flex flex-col items-center md:items-start space-y-4 text-gray-300"><a href="https://x.com" target="_blank" class="flex items-center space-x-2 hover:text-blue-400 transition"><i class="fab fa-twitter"></i><span>X</span></a><a href="https://facebook.com" target="_blank" class="flex items-center space-x-2 hover:text-blue-400 transition"><i class="fab fa-facebook"></i><span>Facebook</span></a><a href="https://linkedin.com" target="_blank" class="flex items-center space-x-2 hover:text-blue-400 transition"><i class="fab fa-linkedin"></i><span>LinkedIn</span></a></div></div></div><div class="border-t border-gray-700 mt-8 pt-4 text-center text-sm text-gray-400">&copy; <span id="year">2026</span> <span class="text-blue-400 font-semibold">Edu-TVET</span>. All rights reserved.</div></div></footer>
-  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+  <footer class="bg-gray-900 text-white py-10 mt-12">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-center md:text-left">
+        <div>
+          <h4 class="text-xl font-semibold mb-4 text-blue-400">Contact Us</h4>
+          <p class="text-gray-300">Phone: <a href="tel:0708715547" class="text-blue-300 hover:underline">0708715547</a></p>
+          <p class="text-gray-300">Email: <a href="mailto:educhemain@gmail.com" class="text-blue-300 hover:underline">educhemain@gmail.com</a></p>
+        </div>
+        <div>
+          <h4 class="text-xl font-semibold mb-4 text-blue-400">Follow Us</h4>
+          <div class="flex flex-col items-center md:items-start space-y-4 text-gray-300">
+            <a href="https://x.com" target="_blank" class="flex items-center space-x-2 hover:text-blue-400 transition"><i class="fab fa-twitter"></i><span>X</span></a>
+            <a href="https://facebook.com" target="_blank" class="flex items-center space-x-2 hover:text-blue-400 transition"><i class="fab fa-facebook"></i><span>Facebook</span></a>
+            <a href="https://linkedin.com" target="_blank" class="flex items-center space-x-2 hover:text-blue-400 transition"><i class="fab fa-linkedin"></i><span>LinkedIn</span></a>
+          </div>
+        </div>
+      </div>
+      <div class="border-t border-gray-700 mt-8 pt-4 text-center text-sm text-gray-400">
+        &copy; <span id="year">2026</span> <span class="text-blue-400 font-semibold">Edu-TVET</span>. All rights reserved.
+      </div>
+    </div>
+  </footer>
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+    const courseButtons = document.querySelectorAll('.course-button');
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+    courseButtons.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const courseName = btn.getAttribute('data-course');
+        courseButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('courseTitle').textContent = courseName;
+        document.getElementById('courseLevel').textContent = 'Level ' + courseName.slice(-1) + ' Course';
+        document.getElementById('notesCourseName').textContent = courseName;
+        document.getElementById('curriculumCourseName').textContent = courseName;
+        document.getElementById('occupationalCourseName').textContent = courseName;
+        document.getElementById('learningCourseName').textContent = courseName;
+        document.getElementById('sessionsCourseName').textContent = courseName;
+        tabButtons.forEach(tb => tb.classList.remove('active'));
+        tabContents.forEach(tc => tc.classList.remove('active'));
+        tabButtons[0].classList.add('active');
+        tabContents[0].classList.add('active');
+      });
+    });
+    tabButtons.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const tabName = btn.getAttribute('data-tab');
+        tabButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        tabContents.forEach(tc => tc.classList.remove('active'));
+        document.getElementById(tabName).classList.add('active');
+      });
+    });
+    if (courseButtons.length > 0) {
+      courseButtons[0].classList.add('active');
+    }
+  </script>
   <script src="../scripts/scroll-animations.js"></script>
 </body>
 </html>
