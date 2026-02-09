@@ -154,26 +154,66 @@
         const card = document.createElement('div');
         card.className = 'document-card bg-white p-4 rounded shadow hover:shadow-lg transition';
         
+        const downloadUrl = doc.documentCode 
+          ? `/api/documents/code/${doc.documentCode}/download`
+          : `/api/documents/${doc.id}/download`;
+        
         card.innerHTML = `
           <h4 class="font-bold text-lg mb-2 text-blue-700">${doc.title}</h4>
+          <p class="text-sm mb-2 text-gray-600">
+            <strong>Code:</strong> 
+            <span class="bg-gray-200 px-2 py-1 rounded font-mono text-xs">${doc.documentCode || 'N/A'}</span>
+            ${doc.documentCode ? `<button onclick="copyToClipboard('${doc.documentCode}')" class="ml-2 text-blue-600 hover:text-blue-800" title="Copy code"><i class="fas fa-copy"></i></button>` : ''}
+          </p>
           <p class="text-sm mb-1 text-gray-600"><strong>Department:</strong> ${doc.department}</p>
           <p class="text-sm mb-1 text-gray-600"><strong>Type:</strong> ${doc.docType || 'Notes'} | <strong>Level:</strong> ${doc.level}</p>
           <p class="text-xs text-gray-500 mb-2">Uploaded: ${doc.date}</p>
           <p class="text-sm text-gray-600 mb-4">${doc.description || 'No description available'}</p>
-          <a href="javascript:void(0)" class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition" onclick="alert('Download feature coming soon! Document: ${doc.title}')"><i class="fas fa-download"></i> Download</a>
+          <div class="flex gap-2">
+            <a href="${downloadUrl}" class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition" title="Download this document">
+              <i class="fas fa-download"></i> Download
+            </a>
+            ${doc.documentCode ? `<a href="javascript:void(0)" onclick="openDocumentByCode('${doc.documentCode}')" class="inline-block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition" title="View document details">
+              <i class="fas fa-search"></i> Find by Code
+            </a>` : ''}
+          </div>
         `;
         
         documentsContainer.appendChild(card);
       });
     }
 
+    function copyToClipboard(text) {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => {
+          alert('Document code copied: ' + text);
+        }).catch(() => {
+          document.querySelector('input').value = text;
+          document.querySelector('input').select();
+          document.execCommand('copy');
+          alert('Document code copied: ' + text);
+        });
+      }
+    }
+
+    function openDocumentByCode(code) {
+      const doc = allDocuments.find(d => d.documentCode === code);
+      if (doc) {
+        alert(`Found Document:\n\nTitle: ${doc.title}\nCode: ${doc.documentCode}\nDepartment: ${doc.department}\n\nClick Download to get the file.`);
+      } else {
+        alert('Document not found with code: ' + code);
+      }
+    }
+
     function filterDocumentsArray() {
       const query = document.getElementById("searchInput").value.toLowerCase();
 
       return allDocuments.filter(doc => {
-        const matchesSearch = query === '' || doc.title.toLowerCase().includes(query) || 
+        const matchesSearch = query === '' || 
+                             doc.title.toLowerCase().includes(query) || 
                              doc.description.toLowerCase().includes(query) ||
-                             doc.department.toLowerCase().includes(query);
+                             doc.department.toLowerCase().includes(query) ||
+                             (doc.documentCode && doc.documentCode.toLowerCase().includes(query));
         const matchesType = currentType === 'All' || doc.docType === currentType;
         const matchesLevel = currentLevel === 'All' || doc.level === currentLevel;
         const matchesDepartment = currentDepartment === 'All' || doc.department === currentDepartment;

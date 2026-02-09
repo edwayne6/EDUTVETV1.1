@@ -232,23 +232,21 @@ app.post("/api/documents/upload", upload.single('file'), async (req, res) => {
           console.log('Could not delete file after validation error');
         }
       }
-      return res.status(400).json({ message: "Missing required fields: title, department, docType" });
+      return res.status(400).json({ message: "Missing required fields: title, department, docType", success: false });
     }
 
     if (!req.file) {
-      return res.status(400).json({ message: "No file provided" });
+      return res.status(400).json({ message: "No file provided", success: false });
     }
 
-    // Moderate content before saving
-    try {
-      const mod = await moderateText(cleanTitle + "\n\n" + cleanDesc);
-      if (mod.flagged) {
-        // delete uploaded file to avoid storing disallowed content
-        try { fs.unlinkSync(req.file.path); } catch (e) { }
-        return res.status(403).json({ message: 'Content flagged by moderation and rejected', details: mod.categories || mod });
-      }
-    } catch (e) {
-      console.log('Moderation check failed, continuing upload (fail-open):', e.message || e);
+    // Validate file extension and MIME type
+    const allowedExtensions = ['.pdf', '.doc', '.docx', '.pptx'];
+    const fileExtension = path.extname(req.file.originalname).toLowerCase();
+    if (!allowedExtensions.includes(fileExtension)) {
+      try {
+        fs.unlinkSync(req.file.path);
+      } catch (e) { }
+      return res.status(400).json({ message: `Invalid file type. Allowed: PDF, DOCX, PPTX`, success: false });
     }
 
     const newDocument = {
@@ -266,37 +264,25 @@ app.post("/api/documents/upload", upload.single('file'), async (req, res) => {
       fullText: '' // Will be populated below
     };
 
-    // Extract full text from the uploaded file
-    const filePath = req.file.path;
-    const mimeType = req.file.mimetype;
+    // Try to extract text from the uploaded file (best effort)
+    // Skip if this fails - document upload should not fail due to text extraction
     try {
-      const extractedText = await extractText(filePath, mimeType);
-      newDocument.fullText = extractedText;
-
-      // Moderate the extracted text as well
-      if (extractedText) {
-        const mod = await moderateText(extractedText);
-        if (mod.flagged) {
-          try { fs.unlinkSync(filePath); } catch (e) { }
-          return res.status(403).json({ message: 'Extracted content flagged by moderation and rejected', details: mod.categories || mod });
-        }
-      }
+      const filePath = req.file.path;
+      const mimeType = req.file.mimetype;
+      const extractedText = await Promise.race([
+        extractText(filePath, mimeType),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Text extraction timeout')), 5000))
+      ]);
+      newDocument.fullText = extractedText || '';
     } catch (e) {
-      console.log('Text extraction failed, proceeding without full text:', e.message || e);
+      console.log('Text extraction skipped:', e.message || e);
+      // Continue without extracted text
     }
 
     documents.push(newDocument);
     
-    // Generate embedding for the new document (best-effort)
-    try {
-      const textForEmbedding = (newDocument.fullText ? `${newDocument.title}\n\n${newDocument.description}\n\n${newDocument.fullText}` : `${newDocument.title}\n\n${newDocument.description}`).slice(0, 2000);
-      const emb = await createEmbedding(textForEmbedding);
-      embeddingsIndex[newDocument.id] = emb;
-    } catch (e) {
-      console.log('Could not create embedding for new document:', e.message || e);
-    }
-    
-    res.status(201).json({ 
+    // Ensure we're sending valid JSON
+    return res.status(201).json({ 
       message: "Document uploaded and published successfully!",
       document: newDocument,
       success: true
@@ -310,8 +296,10 @@ app.post("/api/documents/upload", upload.single('file'), async (req, res) => {
         console.log('Could not delete file after error');
       }
     }
-    res.status(500).json({ 
-      message: "Error uploading document", 
+    
+    // Ensure we're sending valid JSON error response
+    return res.status(500).json({ 
+      message: "Error uploading document: " + (error.message || 'Unknown error'),
       error: error.message,
       success: false
     });

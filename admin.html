@@ -1220,12 +1220,25 @@
       })
       .then(res => {
         console.log('Response status:', res.status);
+        
+        // Check if response is ok
+        if (!res.ok && res.status !== 201) {
+          console.error('HTTP error! status:', res.status);
+        }
+        
+        // Get content type
+        const contentType = res.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          console.error('Invalid response type:', contentType);
+          throw new Error('Server returned non-JSON response');
+        }
+        
         return res.json().then(data => ({ status: res.status, data: data }));
       })
       .then(({ status, data }) => {
         console.log('Response data:', data);
         
-        if (status === 201 || status === 200) {
+        if (status === 201 || status === 200 || (data && data.document)) {
           if (data.document) {
             const doc = data.document;
             const docCode = doc.documentCode;
@@ -1247,7 +1260,7 @@
             saveDocumentsToSession();
             loadAllData();
           } else {
-            throw new Error(data.message || 'No document returned');
+            throw new Error(data.message || 'No document returned in response');
           }
         } else {
           throw new Error(data.message || `Server error: ${status}`);
@@ -1255,7 +1268,7 @@
       })
       .catch(error => {
         console.error('Upload error:', error);
-        alert('Upload failed: ' + error.message + '\n\nNote: File may have been uploaded. Check documents folder.');
+        alert('Upload failed: ' + error.message + '\n\nPlease check:\n1. Backend server is running on port 5000\n2. Documents folder exists\n3. File size is under 10MB');
       })
       .finally(() => {
         uploadBtn.disabled = false;

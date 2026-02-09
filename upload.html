@@ -227,7 +227,22 @@
         method: 'POST',
         body: uploadFormData
       })
-      .then(response => response.json())
+      .then(response => {
+        // Check if response is ok
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        // Get content type
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          console.error('Invalid response type:', contentType);
+          console.error('Response status:', response.status);
+          throw new Error('Server returned non-JSON response. Check server logs.');
+        }
+        
+        return response.json();
+      })
       .then(data => {
         if (data.success || data.document) {
           const doc = data.document;
@@ -257,13 +272,16 @@
             successMsg.classList.add('hidden');
           }, 10000);
         } else {
-          throw new Error(data.message || 'Upload failed');
+          throw new Error(data.message || 'Upload failed - no document returned');
         }
       })
       .catch(error => {
         console.error('Error uploading document:', error);
         const errorMsg = document.getElementById('errorMessage');
-        errorMsg.textContent = error.message || 'Failed to upload document. Please try again.';
+        errorMsg.innerHTML = `
+          <p>Failed to upload document: ${error.message}</p>
+          <p class="text-xs mt-2">Please ensure the backend server is running on port 5000.</p>
+        `;
         errorMsg.classList.remove('hidden');
         document.getElementById('successMessage').classList.add('hidden');
       });
