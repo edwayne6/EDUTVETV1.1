@@ -39,7 +39,7 @@
   <nav class="bg-blue-700 text-white px-6 py-4 flex justify-between items-center sticky top-0 z-50">
     <div class="flex items-center space-x-4">
       <!-- sidebar toggle removed -->
-      <a href="index.html" class="text-2xl font-bold hover:text-blue-200 transition">EduTVET Admin</a>
+      <a href="index.html" class="text-2xl font-bold hover:text-blue-200 transition">Edu-VET Admin</a>
     </div>
     <div class="flex items-center space-x-4">
       <span id="adminName" class="text-sm">Administrator</span>
@@ -331,7 +331,7 @@
             <div class="pt-4">
               <div class="flex gap-3">
                 <button type="button" onclick="publishDocument()" class="flex-1 bg-green-600 text-white px-6 py-3 rounded hover:bg-green-700 transition flex items-center justify-center space-x-2 font-medium">
-                  <i class="fas fa-check-circle"></i> <span>Upload & Publish</span>
+                  <i class="fas fa-check-circle"></i> <span> Publish</span>
                 </button>
                 <button type="button" onclick="autoSummarize()" class="bg-gray-200 text-gray-800 px-4 py-3 rounded hover:bg-gray-300">Auto-summarize</button>
               </div>
@@ -813,6 +813,14 @@
       event.target.classList.add('bg-gray-700');
     }
 
+    // Helper function to get API URL based on environment
+    function getApiUrl(endpoint) {
+      const baseUrl = window.location.hostname === 'localhost'
+        ? 'http://localhost:5000'
+        : '';
+      return baseUrl + endpoint;
+    }
+
     function loadAllData() {
       loadPendingSubmissions(); // Load public submissions first
       updateDashboard();
@@ -1141,7 +1149,7 @@
     }
 
     function loadVisitorStats() {
-      fetch('http://localhost:5000/api/stats')
+      fetch(getApiUrl('/api/stats'))
         .then(res => res.json())
         .then(data => {
           const totalVisits = data.totalVisits || 0;
@@ -1210,9 +1218,7 @@
       uploadBtn.textContent = 'Uploading...';
 
       // Send to backend
-      const apiUrl = window.location.hostname === 'localhost' 
-        ? 'http://localhost:5000/api/documents/upload'
-        : '/api/documents/upload';
+      const apiUrl = getApiUrl('/api/documents/upload');
 
       fetch(apiUrl, {
         method: 'POST',
@@ -1356,11 +1362,12 @@
       publishBtn.disabled = true;
       publishBtn.textContent = 'Publishing...';
 
-      console.log('Starting upload to: http://localhost:5000/api/documents/upload');
+      const apiUrl = getApiUrl('/api/documents/upload');
+      console.log('Starting upload to:', apiUrl);
       console.log('File:', fileInput.files[0].name, 'Size:', fileInput.files[0].size);
 
       // Send to backend
-      fetch('http://localhost:5000/api/documents/upload', {
+      fetch(apiUrl, {
         method: 'POST',
         body: formData
       })
@@ -1524,7 +1531,7 @@
 
       const doc = documents.find(d => d.id === previewingDocId);
       if (doc && doc.fileName) {
-        const downloadLink = 'http://localhost:5000/api/documents/' + doc.id + '/download';
+        const downloadLink = getApiUrl('/api/documents/' + doc.id + '/download');
         const link = document.createElement('a');
         link.href = downloadLink;
         link.download = doc.title + '.' + doc.fileName.split('.').pop();

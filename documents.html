@@ -17,12 +17,18 @@
     let currentLevel = 'All';
     let currentDepartment = 'All';
 
+    // Helper function to get API URL based on environment
+    function getApiUrl(endpoint) {
+      const baseUrl = window.location.hostname === 'localhost'
+        ? 'http://localhost:5000'
+        : '';
+      return baseUrl + endpoint;
+    }
+
     // Load documents from backend API or fallback to storage
     function loadDocuments() {
       // Try to load from API first (server-side)
-      const apiUrl = window.location.hostname === 'localhost' 
-        ? 'http://localhost:5000/api/documents/published'
-        : '/api/documents/published';
+      const apiUrl = getApiUrl('/api/documents/published');
 
       fetch(apiUrl)
         .then(res => res.json())
@@ -155,8 +161,8 @@
         card.className = 'document-card bg-white p-4 rounded shadow hover:shadow-lg transition';
         
         const downloadUrl = doc.documentCode 
-          ? `/api/documents/code/${doc.documentCode}/download`
-          : `/api/documents/${doc.id}/download`;
+          ? getApiUrl(`/api/documents/code/${doc.documentCode}/download`)
+          : getApiUrl(`/api/documents/${doc.id}/download`);
         
         card.innerHTML = `
           <h4 class="font-bold text-lg mb-2 text-blue-700">${doc.title}</h4>

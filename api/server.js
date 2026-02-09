@@ -11,9 +11,20 @@ const app = express();
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 
-// Enable CORS
+// Enable CORS - allow localhost and standard ports
 app.use(cors({
-  origin: ["http://localhost:3000", "http://localhost:5000"],
+  origin: function (origin, callback) {
+    // Allow requests from localhost or without origin (same-origin)
+    if (!origin || origin.includes('localhost') || origin.includes('127.0.0.1')) {
+      callback(null, true);
+    } else {
+      // In production, you might want to restrict this
+      callback(null, true);
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 // Security headers
@@ -54,6 +65,15 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
+// Serve static files from parent directory (CSS, JS, HTML, etc.)
+const parentDir = path.join(__dirname, '..');
+app.use(express.static(parentDir, {
+  // Cache static assets for 1 hour
+  maxAge: '1h',
+  // Don't log every static file request
+  dotfiles: 'deny'
+}));
 
 // Ensure documents folder exists
 const documentsFolder = path.join(__dirname, '../documents');

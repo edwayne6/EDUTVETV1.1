@@ -193,6 +193,14 @@
       }
     }
 
+    // Helper function to get API URL based on environment
+    function getApiUrl(endpoint) {
+      const baseUrl = window.location.hostname === 'localhost'
+        ? 'http://localhost:5000'
+        : '';
+      return baseUrl + endpoint;
+    }
+
     // Handle form submission with API
     document.getElementById('uploadForm').addEventListener('submit', function(e) {
       e.preventDefault();
@@ -222,12 +230,19 @@
       uploadFormData.append('description', descriptionInput.value);
       uploadFormData.append('submittedBy', 'Public User');
 
+      // Get API URL using helper
+      const apiUrl = getApiUrl('/api/documents/upload');
+      console.log('Uploading to:', apiUrl);
+
       // Send to backend API
-      fetch('/api/documents/upload', {
+      fetch(apiUrl, {
         method: 'POST',
-        body: uploadFormData
+        body: uploadFormData,
+        credentials: 'same-origin'
       })
       .then(response => {
+        console.log('Response received:', response.status);
+        
         // Check if response is ok
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -250,13 +265,14 @@
           
           // Display success message with document code
           const successMsg = document.getElementById('successMessage');
+          const downloadUrl = getApiUrl(`/api/documents/code/${docCode}/download`);
           successMsg.innerHTML = `
             <div class="mb-4">
               <p class="font-semibold mb-2">✓ Document uploaded successfully!</p>
               <p class="text-sm mb-3">Your document code for retrieval:</p>
               <p class="bg-blue-100 text-blue-800 p-3 rounded font-mono font-bold text-lg text-center">${docCode}</p>
               <p class="text-xs text-gray-600 mt-2">Save this code to easily download your document later.</p>
-              <a href="/api/documents/code/${docCode}/download" class="inline-block mt-3 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
+              <a href="${downloadUrl}" class="inline-block mt-3 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
                 <i class="fas fa-download"></i> Download Now
               </a>
             </div>
@@ -342,3 +358,7 @@
   <script src="scripts/analytics.js"></script> <!-- Visitor tracking -->
 </body>
 </html>
+========================================
+✅ Server running on port 5000
+✅ Listening at http://localhost:5000
+========================================
