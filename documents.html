@@ -17,8 +17,32 @@
     let currentLevel = 'All';
     let currentDepartment = 'All';
 
-    // Load documents from admin dashboard
+    // Load documents from backend API or fallback to storage
     function loadDocuments() {
+      // Try to load from API first (server-side)
+      const apiUrl = window.location.hostname === 'localhost' 
+        ? 'http://localhost:5000/api/documents/published'
+        : '/api/documents/published';
+
+      fetch(apiUrl)
+        .then(res => res.json())
+        .then(apiDocs => {
+          if (Array.isArray(apiDocs) && apiDocs.length > 0) {
+            allDocuments = apiDocs;
+            populateDropdowns();
+            displayDocuments();
+            return;
+          }
+          // Fall back to localStorage if API returns no data
+          loadFromStorage();
+        })
+        .catch(err => {
+          console.log('API load failed, falling back to storage:', err);
+          loadFromStorage();
+        });
+    }
+
+    function loadFromStorage() {
       // Try to load from admin sessionStorage first (for current session)
       try {
         const sessionData = sessionStorage.getItem('adminDocuments');
@@ -63,7 +87,7 @@
     function populateDropdowns() {
       // Get unique values for filters
       const departments = ['All', 'Agriculture and Environmental studies', 'Applied Sciences', 'Automotive and Mechanical Engineering', 'Building & Civil Engineering', 'Business & Entrepreneurship Studies', 'Computing & Informatics', 'Cosmetology', 'Electrical & Electronics Engineering', 'Fashion & Design', 'Health Sciences', 'Liberal Studies', 'Tourism & Hospitality'];
-      const types = ['Notes', 'Curriculum', 'Occupational Standards'];
+      const types = ['Notes', 'Curriculum', 'Occupational Standards', 'Learning Plans', 'Session Plans'];
       const levels = ['Level 3', 'Level 4', 'Level 5', 'Level 6'];
 
       // Populate Department dropdown

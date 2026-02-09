@@ -1,0 +1,297 @@
+{
+  "Agriculture and Environmental studies": {
+    "Level 3": [
+      "Agripreneurship l3",
+      "Aquaculture l3",
+      "Bee hive and Bee equipment l3",
+      "Dairy farm attendance l3",
+      "Horticulture l3",
+      "Passion fruit l3",
+      "Pig production l3",
+      "Poultry broiler production l3",
+      "Poultry layer production l3",
+      "Poultry kienyeji production l3",
+      "Sheep shearing l3"
+    ],
+    "Level 4": [
+      "Agripreneurship l4",
+      "Aquaculture l4",
+      "Animal production technology l4",
+      "Apiary attendance l4",
+      "Bee products processing l4",
+      "Dairy farm operations l4",
+      "Farm machinery operation l4",
+      "General agriculture l4",
+      "Livestock feed production l4",
+      "Pig production l4",
+      "Poultry broiler production l4",
+      "Poultry layer production l4",
+      "Poultry kienyeji production l4",
+      "Poultry hatchery l4"
+    ],
+    "Level 5": [
+      "Agriculture and extension l5",
+      "Agripreneurship l5",
+      "Animal health and production l5",
+      "Animal production l5",
+      "Aquaculture l5",
+      "Environmental technology l5",
+      "Fire & rescue technology l5",
+      "Horticulture l5"
+    ],
+    "Level 6": [
+      "Agriculture and extension l6",
+      "Agripreneurship l6",
+      "Animal health and production l6",
+      "Animal production l6",
+      "Environmental technology l6",
+      "Horticulture l6"
+    ]
+  },
+  "Applied Sciences": {
+    "Level 3": [],
+    "Level 4": [
+      "Dairy processing l4",
+      "Meat processing l4"
+    ],
+    "Level 5": [
+      "Dairy technology l5",
+      "Food technology l5",
+      "Science laboratory tech l5"
+    ],
+    "Level 6": [
+      "Analytical chemistry tech l6",
+      "Applied biology l6",
+      "Applied statistics l6",
+      "Dairy management l6",
+      "Food technology l6",
+      "Industrial chemistry tec l6",
+      "Science laboratory technology l6"
+    ]
+  },
+  "Automotive and Mechanical Engineering": {
+    "Level 3": [
+      "Motorcycle mechanics l3",
+      "Motor vehicle electrician l3",
+      "Motor vehicle mechanic l3",
+      "Panel beating l3",
+      "Ridging l3",
+      "Welding l3"
+    ],
+    "Level 4": [
+      "CNC Lathe Operations l4 (Production)",
+      "CNC Milling Operations (Production) l4",
+      "Mechanical Piping Fabricator Level 4",
+      "Mechanical Production Machine Operator l4",
+      "Motor Cycle Mechanics Level 4",
+      "Motor Vehicle Electrician Level 4",
+      "Motor Vehicle Mechanic Level 4",
+      "Rigging Level 4",
+      "Spray Painting Level 4",
+      "Welding Level 4"
+    ],
+    "Level 5": [
+      "Autobody Technician Level 5",
+      "Automotive Technician Level 5",
+      "Construction Plant Level 5",
+      "Mechanical Plant Tech Level 5",
+      "Mechanical Prod Technician L5",
+      "WELDING TECHNOLOGY LEVEL 5"
+    ],
+    "Level 6": [
+      "Autobody Technician Level 6",
+      "Automotive Technician Level 6",
+      "Construction Plant Level 6",
+      "Mechanical Plant Tech Level 6",
+      "Mechanical Production Technician Level 6",
+      "WELDING TECHNOLOGY LEVEL 6"
+    ]
+  },
+  "Building & Civil Engineering": {
+    "Level 3": [
+      "Carpentry and Joinery Level 3",
+      "GYPSUM LEVEL 3",
+      "MASONRY LEVEL 3",
+      "Plumbing Level 3",
+      "STEEL FIXING L3",
+      "TILE FIXER L3"
+    ],
+    "Level 4": [
+      "CARPENTRY & JOINERY LEVEL 4",
+      "MASONRY L4",
+      "Plumbing Level 4"
+    ],
+    "Level 5": [
+      "Building Level 5",
+      "CARPENRTY AND JOINERY LEVEL 5",
+      "plumbing level 5",
+      "ROAD CONSTRUCTION LEVEL 5"
+    ],
+    "Level 6": [
+      "ARCHITECTURE",
+      "CIVIL ENGINEERING L6",
+      "Highway Engineering LEVEL 6"
+    ]
+  },
+  "Business & Entrepreneurship Studies": {
+    "Level 3": [],
+    "Level 4": [
+      "Office Administration L4",
+      "STOREKEEPING L4"
+    ],
+    "Level 5": [
+      "BUSINESS MNGT L5",
+      "COOPERTIVE MNGT L5",
+      "CREDT MNGT L 5",
+      "HRM L 5",
+      "MARKETING L5",
+      "Office Administration L5",
+      "Procurement L5",
+      "PROJECT MNGT L5"
+    ],
+    "Level 6": [
+      "ACCOUNTANCY L6",
+      "Banking & Finance L6",
+      "BUSINESS MNGT L6",
+      "COOPERATIVE MNG L6",
+      "CREDIT MNGT L6",
+      "HRM L6",
+      "MARKETING L 6",
+      "Office Administration L6",
+      "PROCUREMENT L6",
+      "PROJECT MNGT L 6"
+    ]
+  },
+  "Computing & Informatics": {
+    "Level 3": [],
+    "Level 4": [
+      "ICT Operations Level 4"
+    ],
+    "Level 5": [
+      "ICT Technician Level 5",
+      "Network System Technician L5",
+      "Software Developer Level 5"
+    ],
+    "Level 6": [
+      "ICT Technician Level 6",
+      "Network System Administration L6",
+      "Software Developer Level 6"
+    ]
+  },
+  "Cosmetology": {
+    "Level 3": [],
+    "Level 4": [],
+    "Level 5": [],
+    "Level 6": []
+  },
+  "Electrical & Electronics Engineering": {
+    "Level 3": [
+      "Electrical Installation Level 3",
+      "Electronics Level 3",
+      "Solar PV System Installation Level 3"
+    ],
+    "Level 4": [
+      "Electrical Installation Level 4",
+      "Electronics Level 4",
+      "Industrial AUTH & Robotics Level 4",
+      "Instrumentation and control LEVEL 4",
+      "Solar PV System Installation Level 4"
+    ],
+    "Level 5": [
+      "Biomedical Engineering Level 5",
+      "Electrical Installation Level 5",
+      "Industrial AUTH &Robotics L5",
+      "Instrumentation Level 5",
+      "Solar PV System Install Level 5",
+      "Telecom Level 5"
+    ],
+    "Level 6": [
+      "Biomedical Engineering Level 6",
+      "Electrical Installation Level 6",
+      "Industrial Aut &Robotics Level 6",
+      "Industrial Mechatronics Technology Level 6",
+      "Instrumentation Level 6",
+      "Telecommunication Level 6"
+    ]
+  },
+  "Fashion & Design": {
+    "Level 3": [
+      "Fashion Design level 3",
+      "FOOTWEAR L3"
+    ],
+    "Level 4": [
+      "Fashion Design level 4",
+      "FOOTWEAR L4"
+    ],
+    "Level 5": [
+      "Fashion Design Level 5",
+      "FOOTWEAR L5"
+    ],
+    "Level 6": [
+      "Fashion Design Level 6"
+    ]
+  },
+  "Health Sciences": {
+    "Level 3": [],
+    "Level 4": [],
+    "Level 5": [
+      "COMMUNITY HEALTH L 5",
+      "NUTRITION AND DIETETICS L 5"
+    ],
+    "Level 6": [
+      "COMMUNITY HEALTH L6",
+      "NUTRITION AND DIETETICS LEVEL 6"
+    ]
+  },
+  "Liberal Studies": {
+    "Level 3": [
+      "Home Based Assistant Level 3"
+    ],
+    "Level 4": [
+      "Care Giver Level 4"
+    ],
+    "Level 5": [
+      "Child Protection Level 5",
+      "Counselling 5",
+      "Health Care Support 5",
+      "Information Assistant L5",
+      "Social Work L5"
+    ],
+    "Level 6": [
+      "Child Protection Level 6",
+      "Counseling L6",
+      "Information Manager Level 6",
+      "Social Work L6"
+    ]
+  },
+  "Tourism & Hospitality": {
+    "Level 3": [
+      "Baking Level 3",
+      "Barista Skills Level 3",
+      "Food and Beverage Service (Waiter) Level 3",
+      "Food Production (Cookery) L3",
+      "Mixology Level 3"
+    ],
+    "Level 4": [
+      "Accommodation Operations Level 4",
+      "Baking Level 4",
+      "Bartending Level 4",
+      "Food and Beverage Service (Waiter) Level 4",
+      "Food Production (Cookery) Level 4",
+      "Wildlife Tour Guide Level 4"
+    ],
+    "Level 5": [
+      "Catering and Accommodation Level 5",
+      "Food and Beverage Technician (Production & Service) Level 5",
+      "Food and Beverage Technician (Service & Production) Level 5",
+      "Tour and Travel Operator Level 5",
+      "Tour Guiding Level 5"
+    ],
+    "Level 6": [
+      "Catering and Accommodation L6",
+      "Food and Beverage Management (Production & Service) Level 6",
+      "Food and Beverage Management (Service & Production) Level 6",
+      "Tour and Travel Management L6"
+    ]
+  }
+}

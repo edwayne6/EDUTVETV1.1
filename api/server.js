@@ -95,6 +95,7 @@ const upload = multer({
 let documents = [
   { 
     id: 1, 
+    documentCode: 'EDU-AGR-001',
     title: 'Crop Protection Guide', 
     department: 'Agriculture', 
     level: 'Level 5', 
@@ -107,6 +108,7 @@ let documents = [
   },
   { 
     id: 2, 
+    documentCode: 'EDU-BUS-001',
     title: 'Business Plans', 
     department: 'Business', 
     level: 'Level 6', 
@@ -119,6 +121,7 @@ let documents = [
   },
   { 
     id: 3, 
+    documentCode: 'EDU-ICT-001',
     title: 'Python Basics', 
     department: 'ICT', 
     level: 'Level 4', 
@@ -132,6 +135,14 @@ let documents = [
 ];
 
 let nextDocId = 4;
+
+// Function to generate unique document code
+function generateDocumentCode() {
+  // Format: EDU-YYYY-XXXXXX where YYYY is year and XXXXXX is random alphanumeric
+  const year = new Date().getFullYear().toString().slice(2); // Last 2 digits of year
+  const randomPart = Math.random().toString(36).substring(2, 8).toUpperCase();
+  return `EDU-${year}-${randomPart}`;
+}
 
 // ============================================
 // DOCUMENT ENDPOINTS
@@ -166,6 +177,40 @@ app.get("/api/documents/:id", (req, res) => {
     res.json(doc);
   } catch (error) {
     res.status(500).json({ message: "Error retrieving document", error: error.message });
+  }
+});
+
+// Get document by code (for easy retrieval)
+app.get("/api/documents/code/:code", (req, res) => {
+  try {
+    const code = req.params.code.toUpperCase();
+    const doc = documents.find(d => d.documentCode === code);
+    if (!doc) {
+      return res.status(404).json({ message: "Document not found with code: " + code });
+    }
+    res.json(doc);
+  } catch (error) {
+    res.status(500).json({ message: "Error retrieving document by code", error: error.message });
+  }
+});
+
+// Download document by code (for easy retrieval)
+app.get("/api/documents/code/:code/download", (req, res) => {
+  try {
+    const code = req.params.code.toUpperCase();
+    const doc = documents.find(d => d.documentCode === code);
+    if (!doc || !doc.fileName) {
+      return res.status(404).json({ message: "Document or file not found with code: " + code });
+    }
+
+    const filePath = path.join(documentsFolder, doc.fileName);
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ message: "File not found on server" });
+    }
+
+    res.download(filePath, doc.title + path.extname(doc.fileName));
+  } catch (error) {
+    res.status(500).json({ message: "Error downloading document by code", error: error.message });
   }
 });
 
@@ -208,6 +253,7 @@ app.post("/api/documents/upload", upload.single('file'), async (req, res) => {
 
     const newDocument = {
       id: nextDocId++,
+      documentCode: generateDocumentCode(), // Add unique document code
       title: cleanTitle,
       description: cleanDesc,
       department,
@@ -283,6 +329,7 @@ app.post("/api/documents", (req, res) => {
 
     const newDocument = {
       id: nextDocId++,
+      documentCode: generateDocumentCode(), // Add unique document code
       title,
       description: description || '',
       department,

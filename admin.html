@@ -43,7 +43,6 @@
     </div>
     <div class="flex items-center space-x-4">
       <span id="adminName" class="text-sm">Administrator</span>
-      <button onclick="openAIAssistant()" class="bg-indigo-600 hover:bg-indigo-700 px-3 py-2 rounded text-white">AI Assistant</button>
       <a href="index.html" class="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded transition flex items-center space-x-2">
         <i class="fas fa-home"></i>
         <span>Home</span>
@@ -258,6 +257,17 @@
         <div class="bg-white p-8 rounded-lg shadow max-w-2xl">
           <form id="uploadForm" class="space-y-4">
             <div>
+              <label class="block text-sm font-semibold mb-2">File Upload *</label>
+              <div class="border-2 border-dashed border-gray-300 rounded p-6 text-center cursor-pointer hover:border-blue-500 transition" onclick="document.getElementById('fileInput').click()">
+                <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-2"></i>
+                <p class="text-gray-600">Click to upload or drag and drop</p>
+                <p class="text-sm text-gray-500">PDF, DOC, DOCX up to 10MB</p>
+                <input type="file" id="fileInput" hidden accept=".pdf,.doc,.docx" onchange="updateFileName(this)">
+              </div>
+              <p id="fileName" class="text-sm text-gray-600 mt-2"></p>
+            </div>
+
+            <div>
               <label class="block text-sm font-semibold mb-2">Document Title *</label>
               <input type="text" id="docTitle" required class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
@@ -267,7 +277,7 @@
               <textarea id="docDescription" rows="4" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label class="block text-sm font-semibold mb-2">Department *</label>
                 <select id="docDepartment" required class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -297,6 +307,13 @@
                   <option value="Level 6">Level 6</option>
                 </select>
               </div>
+
+              <div>
+                <label class="block text-sm font-semibold mb-2">Course</label>
+                <select id="docCourse" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <option value="">Select Course (optional)</option>
+                </select>
+              </div>
             </div>
 
             <div>
@@ -306,18 +323,9 @@
                 <option value="Notes">Notes</option>
                 <option value="Curriculum">Curriculum</option>
                 <option value="Occupational Standards">Occupational Standards</option>
+                <option value="Learning Plans">Learning Plans</option>
+                <option value="Session Plans">Session Plans</option>
               </select>
-            </div>
-
-            <div>
-              <label class="block text-sm font-semibold mb-2">File Upload *</label>
-              <div class="border-2 border-dashed border-gray-300 rounded p-6 text-center cursor-pointer hover:border-blue-500 transition" onclick="document.getElementById('fileInput').click()">
-                <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-2"></i>
-                <p class="text-gray-600">Click to upload or drag and drop</p>
-                <p class="text-sm text-gray-500">PDF, DOC, DOCX up to 10MB</p>
-                <input type="file" id="fileInput" hidden accept=".pdf,.doc,.docx" onchange="updateFileName(this)">
-              </div>
-              <p id="fileName" class="text-sm text-gray-600 mt-2"></p>
             </div>
 
             <div class="pt-4">
@@ -594,23 +602,6 @@
           </div>
         </div>
 
-          <!-- AI Assistant Modal -->
-          <div id="aiAssistantModal" class="hidden fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
-            <div class="bg-white p-6 rounded-lg shadow-2xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto flex flex-col">
-              <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-bold">AI Assistant</h2>
-                <button onclick="closeAIAssistant()" class="text-gray-600 hover:text-gray-900 text-2xl">&times;</button>
-              </div>
-              <div id="aiChatWindow" class="flex-1 overflow-y-auto p-3 space-y-3 border rounded bg-gray-50">
-                <p class="text-gray-500">Ask the assistant about documents, trends, or request summaries.</p>
-              </div>
-              <div class="mt-3 flex items-center gap-3">
-                <input id="aiChatInput" type="text" placeholder="Type a message and press Enter" class="flex-1 px-3 py-2 border rounded focus:outline-none" onkeydown="if(event.key==='Enter'){ sendAIMessage(); }" />
-                <button onclick="sendAIMessage()" class="bg-indigo-600 text-white px-4 py-2 rounded">Send</button>
-              </div>
-            </div>
-          </div>
-
         <div>
           <label class="block text-sm font-semibold mb-2">Document Type *</label>
           <select id="editDocType" required class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -618,6 +609,8 @@
             <option value="Notes">Notes</option>
             <option value="Curriculum">Curriculum</option>
             <option value="Occupational Standards">Occupational Standards</option>
+            <option value="Learning Plans">Learning Plans</option>
+            <option value="Session Plans">Session Plans</option>
           </select>
         </div>
 
@@ -1183,6 +1176,7 @@
       const title = document.getElementById('docTitle').value;
       const description = document.getElementById('docDescription').value;
       const department = document.getElementById('docDepartment').value;
+      const course = document.getElementById('docCourse') ? document.getElementById('docCourse').value : '';
       const level = document.getElementById('docLevel').value;
       const docType = document.getElementById('docType').value;
       const fileInput = document.getElementById('fileInput');
@@ -1204,6 +1198,7 @@
       formData.append('description', description);
       formData.append('department', department);
       formData.append('level', level || 'N/A');
+      formData.append('course', course || 'N/A');
       formData.append('docType', docType);
       formData.append('file', fileInput.files[0]);
       formData.append('submittedBy', 'Admin');
@@ -1215,7 +1210,11 @@
       uploadBtn.textContent = 'Uploading...';
 
       // Send to backend
-      fetch('http://localhost:5000/api/documents/upload', {
+      const apiUrl = window.location.hostname === 'localhost' 
+        ? 'http://localhost:5000/api/documents/upload'
+        : '/api/documents/upload';
+
+      fetch(apiUrl, {
         method: 'POST',
         body: formData
       })
@@ -1228,9 +1227,21 @@
         
         if (status === 201 || status === 200) {
           if (data.document) {
+            const doc = data.document;
+            const docCode = doc.documentCode;
+            
             // Add to local array
-            documents.push(data.document);
-            alert('Document uploaded successfully!');
+            documents.push(doc);
+            
+            // Show document code to admin
+            const message = `Document uploaded successfully!\n\nDocument Code: ${docCode}\n\nShare this code with users for easy retrieval.`;
+            alert(message);
+            
+            // Copy code to clipboard
+            if (navigator.clipboard) {
+              navigator.clipboard.writeText(docCode).catch(() => {});
+            }
+            
             document.getElementById('uploadForm').reset();
             document.getElementById('fileName').textContent = '';
             saveDocumentsToSession();
@@ -1251,6 +1262,51 @@
         uploadBtn.textContent = originalText;
       });
     }
+
+    // Load course lists from data/courses.json and populate the course select
+    let COURSES_DATA = {};
+    function loadCoursesData() {
+      fetch('data/courses.json')
+        .then(res => res.json())
+        .then(data => {
+          COURSES_DATA = data || {};
+          populateCourseOptions();
+        })
+        .catch(err => {
+          console.warn('Could not load courses.json:', err);
+        });
+    }
+
+    function populateCourseOptions() {
+      const deptEl = document.getElementById('docDepartment');
+      const levelEl = document.getElementById('docLevel');
+      const courseEl = document.getElementById('docCourse');
+      if (!courseEl || !deptEl || !levelEl) return;
+
+      const dept = deptEl.value;
+      const level = levelEl.value;
+      // Clear existing options
+      courseEl.innerHTML = '<option value="">Select Course (optional)</option>';
+      if (!dept || !level) return;
+
+      const deptObj = COURSES_DATA[dept];
+      if (!deptObj) return;
+      const list = deptObj[level] || [];
+      list.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c;
+        opt.textContent = c;
+        courseEl.appendChild(opt);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadCoursesData();
+      const deptEl = document.getElementById('docDepartment');
+      const levelEl = document.getElementById('docLevel');
+      if (deptEl) deptEl.addEventListener('change', populateCourseOptions);
+      if (levelEl) levelEl.addEventListener('change', populateCourseOptions);
+    });
 
     function publishDocument() {
       const title = document.getElementById('docTitle').value;
@@ -1659,55 +1715,12 @@
 
     function updateFileName(input) {
       if (input.files && input.files[0]) {
-        document.getElementById('fileName').textContent = 'Selected: ' + input.files[0].name;
-      }
-    }
-
-    function openAIAssistant() {
-      document.getElementById('aiAssistantModal').classList.remove('hidden');
-      document.getElementById('aiChatInput').focus();
-    }
-
-    function closeAIAssistant() {
-      document.getElementById('aiAssistantModal').classList.add('hidden');
-    }
-
-    function appendAIMessage(text, from = 'assistant') {
-      const win = document.getElementById('aiChatWindow');
-      const wrapper = document.createElement('div');
-      wrapper.className = from === 'assistant' ? 'text-left' : 'text-right';
-      wrapper.innerHTML = `<div class="inline-block max-w-full px-3 py-2 rounded ${from === 'assistant' ? 'bg-white border' : 'bg-indigo-600 text-white'}">${text}</div>`;
-      win.appendChild(wrapper);
-      win.scrollTop = win.scrollHeight;
-    }
-
-    let aiPending = false;
-    async function sendAIMessage() {
-      const input = document.getElementById('aiChatInput');
-      const text = input.value.trim();
-      if (!text || aiPending) return;
-      appendAIMessage(text, 'user');
-      input.value = '';
-      aiPending = true;
-      appendAIMessage('...', 'assistant');
-      try {
-        const res = await fetch('/api/ai/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message: text })
-        });
-        const data = await res.json();
-        // remove the placeholder '...'
-        const win = document.getElementById('aiChatWindow');
-        const last = win.lastChild;
-        if (last && last.innerText === '...') last.remove();
-        if (data.reply) appendAIMessage(data.reply, 'assistant');
-        else appendAIMessage('No reply from AI', 'assistant');
-      } catch (e) {
-        console.error('AI chat error', e);
-        appendAIMessage('AI chat failed. See console.', 'assistant');
-      } finally {
-        aiPending = false;
+        const fileName = input.files[0].name;
+        document.getElementById('fileName').textContent = 'Selected: ' + fileName;
+        
+        // Auto-populate title from file name (remove extension)
+        const titleWithoutExtension = fileName.substring(0, fileName.lastIndexOf('.')) || fileName;
+        document.getElementById('docTitle').value = titleWithoutExtension;
       }
     }
 
