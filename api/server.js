@@ -76,9 +76,12 @@ app.use(express.static(parentDir, {
 }));
 
 // Ensure documents folder exists
-const documentsFolder = path.join(__dirname, '../documents');
+const documentsFolder = path.join(__dirname, 'documents');
 if (!fs.existsSync(documentsFolder)) {
   fs.mkdirSync(documentsFolder, { recursive: true });
+  console.log(`✓ Created documents folder at: ${documentsFolder}`);
+} else {
+  console.log(`✓ Documents folder found at: ${documentsFolder}`);
 }
 
 // Configure multer for file uploads
@@ -87,8 +90,8 @@ const storage = multer.diskStorage({
     cb(null, documentsFolder);
   },
   filename: (req, file, cb) => {
-    const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1E9) + path.extname(file.originalname);
-    cb(null, uniqueName);
+    // Use original filename to preserve the document name
+    cb(null, file.originalname);
   },
 });
 
@@ -163,6 +166,14 @@ function generateDocumentCode() {
   const randomPart = Math.random().toString(36).substring(2, 8).toUpperCase();
   return `EDU-${year}-${randomPart}`;
 }
+
+// Initialize documents
+function initializeDocuments() {
+  console.log(`✓ Total documents loaded: ${documents.length}`);
+}
+
+// Execute initialization
+initializeDocuments();
 
 // ============================================
 // DOCUMENT ENDPOINTS
@@ -452,12 +463,17 @@ app.get("/api/documents/:id/download", (req, res) => {
     if (!doc || !doc.fileName) {
       return res.status(404).json({ message: "Document or file not found" });
     }
-
-    const filePath = path.join(documentsFolder, doc.fileName);
+    let filePath;
+    if (doc.filePath) {
+      // filePath is relative to documentsFolder
+      filePath = path.join(documentsFolder, doc.filePath);
+    } else {
+      // fallback for legacy/manual uploads
+      filePath = path.join(documentsFolder, doc.fileName);
+    }
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ message: "File not found on server" });
     }
-
     res.download(filePath, doc.title + path.extname(doc.fileName));
   } catch (error) {
     res.status(500).json({ message: "Error downloading document", error: error.message });
@@ -921,4 +937,8 @@ app.get("/api/health", (req, res) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`\n========================================`);
-  // Server started
+  console.log(`✅ Server running on port ${PORT}`);
+  console.log(`✅ Listening at http://localhost:${PORT}`);
+  console.log(`========================================`);
+  console.log('OS/CU document auto-registration complete.');
+});
