@@ -398,6 +398,30 @@ form {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
+/* Ensure link/tab text is readable on hover */
+/* Header navigation links: force white text on hover */
+header nav a:hover {
+  color: #ffffff !important;
+}
+
+/* Department cards and grouped links: make title, description and icons white on hover */
+.group:hover h4,
+.group:hover p,
+.group:hover i {
+  color: #ffffff !important;
+}
+
+/* For any anchor that becomes dark on hover, ensure its text stays white */
+a:hover, button:hover {
+  color: #ffffff !important;
+}
+
+/* Hero-specific: keep white buttons readable but make the white 'Browse' hero button text black on hover */
+section.bg-gradient-to-br a.bg-white:hover,
+section.bg-gradient-to-br a.bg-white:hover i {
+  color: #000000 !important;
+}
+
 form:hover {
   transform: translateY(-5px);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
