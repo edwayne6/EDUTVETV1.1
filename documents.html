@@ -16,6 +16,8 @@
     let currentType = 'All';
     let currentLevel = 'All';
     let currentDepartment = 'All';
+    let currentCourse = 'All';
+    let COURSES_DATA = {};
 
     // Helper function to get API URL based on environment
     function getApiUrl(endpoint) {
@@ -94,7 +96,6 @@
       // Get unique values for filters
       const departments = ['All', 'Agriculture and Environmental studies', 'Applied Sciences', 'Automotive and Mechanical Engineering', 'Building & Civil Engineering', 'Business & Entrepreneurship Studies', 'Computing & Informatics', 'Cosmetology', 'Electrical & Electronics Engineering', 'Fashion & Design', 'Health Sciences', 'Liberal Studies', 'Tourism & Hospitality'];
       const types = ['Notes', 'Curriculum', 'Occupational Standards', 'Learning Plans', 'Session Plans'];
-      const levels = ['Level 3', 'Level 4', 'Level 5', 'Level 6'];
 
       // Populate Department dropdown
       const deptSelect = document.getElementById('departmentFilter');
@@ -112,28 +113,14 @@
       // Populate Type buttons
       const typeContainer = document.getElementById('typeButtons');
       if (typeContainer) {
-        typeContainer.innerHTML = '<button class="filter-btn bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold transition" onclick="selectType(\'All\')" data-type="All">All Types</button>';
+        typeContainer.innerHTML = '<button class="filter-btn bg-gradient-to-r from-blue-600 to-blue-700 text-white px-5 py-2 rounded-lg font-bold transition transform hover:scale-105 shadow" onclick="selectType(\'All\')" data-type="All"><i class="fas fa-check-circle mr-1"></i>All Types</button>';
         types.forEach(type => {
           const btn = document.createElement('button');
-          btn.className = 'filter-btn bg-gray-200 text-gray-800 px-4 py-2 rounded-lg font-semibold hover:bg-blue-600 hover:text-white transition';
-          btn.textContent = type;
+          btn.className = 'filter-btn bg-gray-200 text-gray-800 px-5 py-2 rounded-lg font-bold hover:bg-gradient-to-r hover:from-blue-600 hover:to-blue-700 hover:text-white transition transform hover:scale-105 hover:shadow';
+          btn.innerHTML = `<i class="fas fa-tag mr-1"></i>${type}`;
           btn.setAttribute('data-type', type);
           btn.onclick = () => selectType(type);
           typeContainer.appendChild(btn);
-        });
-      }
-
-      // Populate Level buttons
-      const levelContainer = document.getElementById('levelButtons');
-      if (levelContainer) {
-        levelContainer.innerHTML = '<button class="filter-btn bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold transition" onclick="selectLevel(\'All\')" data-level="All">All Levels</button>';
-        levels.forEach(level => {
-          const btn = document.createElement('button');
-          btn.className = 'filter-btn bg-gray-200 text-gray-800 px-4 py-2 rounded-lg font-semibold hover:bg-blue-600 hover:text-white transition';
-          btn.textContent = level;
-          btn.setAttribute('data-level', level);
-          btn.onclick = () => selectLevel(level);
-          levelContainer.appendChild(btn);
         });
       }
     }
@@ -146,42 +133,98 @@
       updateActiveFiltersDisplay();
 
       if (filteredDocs.length === 0) {
-        documentsContainer.innerHTML = '<div class="col-span-full text-center py-12"><i class="fas fa-search text-5xl text-gray-300 mb-4"></i><p class="text-gray-500 text-lg">No documents found. Try adjusting your filters or search terms.</p></div>';
+        documentsContainer.innerHTML = '<div class="col-span-full text-center py-16"><div class="mb-4"><i class="fas fa-inbox text-6xl text-gray-300"></i></div><p class="text-gray-500 text-xl font-semibold">No documents found</p><p class="text-gray-400 mt-2">Try adjusting your filters or search terms.</p></div>';
         return;
       }
 
       // Show results count
-      const resultsDiv = document.createElement('p');
-      resultsDiv.className = 'col-span-3 text-sm text-gray-600 mb-4 font-semibold';
-      resultsDiv.innerHTML = `Found <strong>${filteredDocs.length}</strong> document(s)`;
+      const resultsDiv = document.createElement('div');
+      resultsDiv.className = 'col-span-full mb-2';
+      resultsDiv.innerHTML = `<p class="text-sm text-gray-600"><i class="fas fa-check-circle text-green-600 mr-2"></i>Found <strong class="text-lg text-blue-600">${filteredDocs.length}</strong> document(s)</p>`;
       documentsContainer.appendChild(resultsDiv);
 
       filteredDocs.forEach(doc => {
         const card = document.createElement('div');
-        card.className = 'document-card bg-white p-4 rounded shadow hover:shadow-lg transition';
+        card.className = 'document-card bg-white rounded-xl shadow-md hover:shadow-xl transition transform hover:-translate-y-1 overflow-hidden border border-gray-100';
         
         const downloadUrl = doc.documentCode 
           ? getApiUrl(`/api/documents/code/${doc.documentCode}/download`)
           : getApiUrl(`/api/documents/${doc.id}/download`);
         
+        // Determine document type icon and color
+        const typeIcons = {
+          'Notes': 'fa-sticky-note',
+          'Curriculum': 'fa-book-open',
+          'Occupational Standards': 'fa-certificate',
+          'Learning Plans': 'fa-chart-line',
+          'Session Plans': 'fa-calendar-check'
+        };
+        
+        const docType = doc.docType || 'Notes';
+        const typeIcon = typeIcons[docType] || 'fa-file-alt';
+        
+        const colorClasses = {
+          'Notes': 'bg-yellow-100 border-yellow-300 text-yellow-800',
+          'Curriculum': 'bg-blue-100 border-blue-300 text-blue-800',
+          'Occupational Standards': 'bg-purple-100 border-purple-300 text-purple-800',
+          'Learning Plans': 'bg-green-100 border-green-300 text-green-800',
+          'Session Plans': 'bg-pink-100 border-pink-300 text-pink-800'
+        };
+        
+        const colorClass = colorClasses[docType] || 'bg-gray-100 border-gray-300 text-gray-800';
+        
         card.innerHTML = `
-          <h4 class="font-bold text-lg mb-2 text-blue-700">${doc.title}</h4>
-          <p class="text-sm mb-2 text-gray-600">
-            <strong>Code:</strong> 
-            <span class="bg-gray-200 px-2 py-1 rounded font-mono text-xs">${doc.documentCode || 'N/A'}</span>
-            ${doc.documentCode ? `<button onclick="copyToClipboard('${doc.documentCode}')" class="ml-2 text-blue-600 hover:text-blue-800" title="Copy code"><i class="fas fa-copy"></i></button>` : ''}
-          </p>
-          <p class="text-sm mb-1 text-gray-600"><strong>Department:</strong> ${doc.department}</p>
-          <p class="text-sm mb-1 text-gray-600"><strong>Type:</strong> ${doc.docType || 'Notes'} | <strong>Level:</strong> ${doc.level}</p>
-          <p class="text-xs text-gray-500 mb-2">Uploaded: ${doc.date}</p>
-          <p class="text-sm text-gray-600 mb-4">${doc.description || 'No description available'}</p>
-          <div class="flex gap-2">
-            <a href="${downloadUrl}" class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition" title="Download this document">
-              <i class="fas fa-download"></i> Download
-            </a>
-            ${doc.documentCode ? `<a href="javascript:void(0)" onclick="openDocumentByCode('${doc.documentCode}')" class="inline-block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition" title="View document details">
-              <i class="fas fa-search"></i> Find by Code
-            </a>` : ''}
+          <div class="p-6 h-full flex flex-col">
+            <!-- Header with Type Badge -->
+            <div class="flex items-start justify-between mb-3">
+              <div class="flex-1">
+                <h4 class="font-bold text-lg mb-2 text-gray-900 line-clamp-2 hover:text-blue-600 transition">${doc.title}</h4>
+              </div>
+              <span class="flex-shrink-0 ml-2 px-3 py-1 rounded-full text-xs font-bold border ${colorClass} whitespace-nowrap">
+                <i class="fas ${typeIcon} mr-1"></i>${docType}
+              </span>
+            </div>
+
+            <!-- Department & Level -->
+            <div class="space-y-2 mb-4">
+              <div class="flex items-center text-sm text-gray-600">
+                <i class="fas fa-building text-blue-600 mr-2 w-4"></i>
+                <span class="font-medium truncate">${doc.department}</span>
+              </div>
+              <div class="flex items-center text-sm text-gray-600">
+                <i class="fas fa-layer-group text-blue-600 mr-2 w-4"></i>
+                <span class="font-medium">${doc.level}</span>
+              </div>
+            </div>
+
+            <!-- Document Code -->
+            <div class="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
+              <p class="text-xs text-gray-600 font-semibold mb-1">CODE:</p>
+              <div class="flex items-center justify-between">
+                <code class="text-sm font-mono font-bold text-blue-700">${doc.documentCode || 'N/A'}</code>
+                ${doc.documentCode ? `<button onclick="copyToClipboard('${doc.documentCode}')" class="text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded px-2 py-1 transition" title="Copy code"><i class="fas fa-copy text-sm"></i></button>` : ''}
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div class="mb-4 flex-grow">
+              <p class="text-sm text-gray-600 line-clamp-3">${doc.description || 'No description available'}</p>
+            </div>
+
+            <!-- Upload Date -->
+            <div class="text-xs text-gray-500 mb-4 flex items-center">
+              <i class="fas fa-calendar-alt mr-1"></i> ${doc.date}
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex gap-2 mt-auto">
+              <a href="${downloadUrl}" class="flex-1 text-center bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-2 rounded-lg transition transform hover:scale-105 shadow" title="Download this document">
+                <i class="fas fa-download mr-1"></i> Download
+              </a>
+              ${doc.documentCode ? `<button onclick="openDocumentByCode('${doc.documentCode}')" class="flex-1 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-semibold py-2 rounded-lg transition transform hover:scale-105 shadow" title="View document info">
+                <i class="fas fa-info-circle mr-1"></i> Info
+              </button>` : ''}
+            </div>
           </div>
         `;
         
@@ -192,7 +235,15 @@
     function copyToClipboard(text) {
       if (navigator.clipboard) {
         navigator.clipboard.writeText(text).then(() => {
-          alert('Document code copied: ' + text);
+          // Visual feedback
+          const btn = event.target.closest('button');
+          const originalHTML = btn.innerHTML;
+          btn.innerHTML = '<i class="fas fa-check text-green-600"></i>';
+          btn.classList.add('text-green-600');
+          setTimeout(() => {
+            btn.innerHTML = originalHTML;
+            btn.classList.remove('text-green-600');
+          }, 2000);
         }).catch(() => {
           document.querySelector('input').value = text;
           document.querySelector('input').select();
@@ -205,7 +256,7 @@
     function openDocumentByCode(code) {
       const doc = allDocuments.find(d => d.documentCode === code);
       if (doc) {
-        alert(`Found Document:\n\nTitle: ${doc.title}\nCode: ${doc.documentCode}\nDepartment: ${doc.department}\n\nClick Download to get the file.`);
+        alert(`📄 ${doc.title}\n\n📋 Code: ${doc.documentCode}\n🏢 Department: ${doc.department}\n📊 Type: ${doc.docType}\n📍 Level: ${doc.level}\n\n💾 Click Download to get the file.`);
       } else {
         alert('Document not found with code: ' + code);
       }
@@ -223,23 +274,66 @@
         const matchesType = currentType === 'All' || doc.docType === currentType;
         const matchesLevel = currentLevel === 'All' || doc.level === currentLevel;
         const matchesDepartment = currentDepartment === 'All' || doc.department === currentDepartment;
+        const matchesCourse = currentCourse === 'All' || doc.course === currentCourse;
 
-        return matchesSearch && matchesType && matchesLevel && matchesDepartment;
+        return matchesSearch && matchesType && matchesLevel && matchesDepartment && matchesCourse;
       });
     }
 
-    function onFilterChange() {
-      currentType = document.getElementById('typeFilter').value;
-      currentLevel = document.getElementById('levelFilter').value;
+    function onDepartmentChange() {
       currentDepartment = document.getElementById('departmentFilter').value;
+      currentCourse = 'All';
+      populateCourseOptions();
+      displayDocuments();
+    }
+
+    function onLevelChange() {
+      currentLevel = document.getElementById('levelFilter').value;
+      currentCourse = 'All';
+      populateCourseOptions();
+      displayDocuments();
+    }
+
+    function onCourseChange() {
+      currentCourse = document.getElementById('courseFilter').value;
       displayDocuments();
       updateActiveFiltersDisplay();
     }
 
-    function selectDepartment(dept) {
-      currentDepartment = dept;
-      updateButtonStates();
-      displayDocuments();
+    // Load courses from JSON file
+    function loadCourses() {
+      fetch('data/courses.json')
+        .then(r => r.json())
+        .then(d => {
+          COURSES_DATA = d || {};
+          populateCourseOptions();
+        })
+        .catch(err => console.warn('Could not load courses.json', err));
+    }
+
+    // Populate course dropdown based on selected department and level
+    function populateCourseOptions() {
+      const dept = document.getElementById('departmentFilter').value;
+      const level = document.getElementById('levelFilter').value;
+      const courseEl = document.getElementById('courseFilter');
+      if (!courseEl) return;
+      
+      courseEl.innerHTML = '<option value="All">All Courses (optional)</option>';
+      
+      if (!dept || dept === 'All' || !level || level === 'All') {
+        return;
+      }
+      
+      const deptObj = COURSES_DATA[dept];
+      if (!deptObj) return;
+      
+      const list = deptObj[level] || [];
+      list.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c;
+        opt.textContent = c;
+        courseEl.appendChild(opt);
+      });
     }
 
     function selectType(type) {
@@ -248,40 +342,14 @@
       displayDocuments();
     }
 
-    function selectLevel(level) {
-      currentLevel = level;
-      updateButtonStates();
-      displayDocuments();
-    }
-
     function updateButtonStates() {
-      // Update department buttons
-      const deptBtns = document.querySelectorAll('#departmentButtons .filter-btn');
-      deptBtns.forEach(btn => {
-        if (btn.getAttribute('data-dept') === currentDepartment || btn.textContent === currentDepartment) {
-          btn.className = 'filter-btn bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold transition';
-        } else {
-          btn.className = 'filter-btn bg-gray-200 text-gray-800 px-4 py-2 rounded-lg font-semibold hover:bg-blue-600 hover:text-white transition';
-        }
-      });
-
       // Update type buttons
       const typeBtns = document.querySelectorAll('#typeButtons .filter-btn');
       typeBtns.forEach(btn => {
-        if (btn.getAttribute('data-type') === currentType || btn.textContent === currentType) {
-          btn.className = 'filter-btn bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold transition';
+        if (btn.getAttribute('data-type') === currentType || btn.textContent.includes(currentType)) {
+          btn.className = 'filter-btn bg-gradient-to-r from-blue-600 to-blue-700 text-white px-5 py-2 rounded-lg font-bold transition transform hover:scale-105 shadow';
         } else {
-          btn.className = 'filter-btn bg-gray-200 text-gray-800 px-4 py-2 rounded-lg font-semibold hover:bg-blue-600 hover:text-white transition';
-        }
-      });
-
-      // Update level buttons
-      const levelBtns = document.querySelectorAll('#levelButtons .filter-btn');
-      levelBtns.forEach(btn => {
-        if (btn.getAttribute('data-level') === currentLevel || btn.textContent === currentLevel) {
-          btn.className = 'filter-btn bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold transition';
-        } else {
-          btn.className = 'filter-btn bg-gray-200 text-gray-800 px-4 py-2 rounded-lg font-semibold hover:bg-blue-600 hover:text-white transition';
+          btn.className = 'filter-btn bg-gray-200 text-gray-800 px-5 py-2 rounded-lg font-bold hover:bg-gradient-to-r hover:from-blue-600 hover:to-blue-700 hover:text-white transition transform hover:scale-105 hover:shadow';
         }
       });
 
@@ -292,18 +360,15 @@
       displayDocuments();
     }
 
-    function onDepartmentChange() {
-      currentDepartment = document.getElementById('departmentFilter').value;
-      updateButtonStates();
-      displayDocuments();
-    }
-
     function resetFilters() {
       document.getElementById('searchInput').value = '';
       document.getElementById('departmentFilter').value = 'All';
+      document.getElementById('levelFilter').value = 'All';
+      document.getElementById('courseFilter').value = 'All';
       currentType = 'All';
       currentLevel = 'All';
       currentDepartment = 'All';
+      currentCourse = 'All';
       updateButtonStates();
       displayDocuments();
       updateActiveFiltersDisplay();
@@ -313,16 +378,17 @@
       const filters = [];
       const searchQuery = document.getElementById('searchInput').value;
       
-      if (searchQuery) filters.push(`Search: "${searchQuery}"`);
-      if (currentDepartment !== 'All') filters.push(`Department: ${currentDepartment}`);
-      if (currentType !== 'All') filters.push(`Type: ${currentType}`);
-      if (currentLevel !== 'All') filters.push(`Level: ${currentLevel}`);
+      if (searchQuery) filters.push(`<span class="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap"><i class="fas fa-search mr-1"></i>${searchQuery}</span>`);
+      if (currentDepartment !== 'All') filters.push(`<span class="bg-purple-600 text-white px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap"><i class="fas fa-building mr-1"></i>${currentDepartment}</span>`);
+      if (currentCourse !== 'All') filters.push(`<span class="bg-indigo-600 text-white px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap"><i class="fas fa-book mr-1"></i>${currentCourse}</span>`);
+      if (currentType !== 'All') filters.push(`<span class="bg-orange-600 text-white px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap"><i class="fas fa-file-alt mr-1"></i>${currentType}</span>`);
+      if (currentLevel !== 'All') filters.push(`<span class="bg-green-600 text-white px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap"><i class="fas fa-graduation-cap mr-1"></i>${currentLevel}</span>`);
 
       const activeFiltersDiv = document.getElementById('activeFilters');
       const filterTags = document.getElementById('filterTags');
 
       if (filters.length > 0) {
-        filterTags.innerHTML = filters.map(f => `<span class="bg-blue-200 text-blue-800 px-2 py-1 rounded mx-1 inline-block">${f}</span>`).join('');
+        filterTags.innerHTML = filters.join('');
         activeFiltersDiv.classList.remove('hidden');
       } else {
         activeFiltersDiv.classList.add('hidden');
@@ -330,7 +396,17 @@
     }
 
     // Load documents when page loads
-    document.addEventListener('DOMContentLoaded', loadDocuments);
+    document.addEventListener('DOMContentLoaded', function() {
+      loadDocuments();
+      loadCourses();
+      
+      // Add event listeners for filter changes
+      const deptEl = document.getElementById('departmentFilter');
+      const levelEl = document.getElementById('levelFilter');
+      
+      if (deptEl) deptEl.addEventListener('change', onDepartmentChange);
+      if (levelEl) levelEl.addEventListener('change', onLevelChange);
+    });
   </script>
   <script src="scripts/scripts.js"></script>
   <script type="module">
@@ -356,78 +432,115 @@
   </header>
 
   <!-- Breadcrumb Navigation -->
-  <nav class="bg-gray-100 py-3">
+  <nav class="bg-white border-b border-gray-200 py-3">
     <div class="container mx-auto px-4 text-sm text-gray-600">
-      <a href="index.html" class="text-blue-600 hover:underline">Home</a>
+      <a href="index.html" class="text-blue-600 hover:underline flex items-center"><i class="fas fa-home mr-2"></i>Home</a>
       <span class="mx-2">/</span>
-      <span class="text-gray-800 font-semibold">Documents</span>
+      <span class="text-gray-800 font-semibold flex items-center"><i class="fas fa-book mr-2"></i>Documents Library</span>
     </div>
   </nav>
 
   <!-- Hero Section with Integrated Search Engine -->
-  <section class="bg-gradient-to-b from-blue-50 to-blue-100 py-16">
-    <div class="container mx-auto px-4">
-      <h2 class="text-4xl font-bold mb-2 text-blue-700 text-center">Find the Documents You Need</h2>
-      <p class="text-lg text-gray-700 mb-8 text-center">Search and filter by keywords, department, document type, and level.</p>
+  <section class="bg-gradient-to-br from-blue-600 via-blue-500 to-blue-700 py-16 text-white relative overflow-hidden">
+    <!-- Decorative background elements -->
+    <div class="absolute top-0 right-0 w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 -mr-40 -mt-40"></div>
+    <div class="absolute bottom-0 left-0 w-96 h-96 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 -ml-40 -mb-40"></div>
+    
+    <div class="container mx-auto px-4 relative z-10">
+      <div class="text-center mb-12">
+        <div class="flex justify-center mb-4">
+          <i class="fas fa-magnifying-glass text-5xl opacity-90"></i>
+        </div>
+        <h2 class="text-5xl font-bold mb-4">Explore TVET Resources</h2>
+        <p class="text-xl text-blue-100 max-w-2xl mx-auto">Discover curriculum-aligned documents designed to support trainers and trainees. Search by keywords, filter by department, type, and level.</p>
+      </div>
       
       <!-- Advanced Search Engine -->
-      <div class="bg-white rounded-lg shadow-lg p-8 max-w-5xl mx-auto">
+      <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-5xl mx-auto">
         <!-- Search Input -->
-        <div class="mb-6">
-          <label class="block text-sm font-semibold text-gray-700 mb-2">Search by Keywords</label>
+        <div class="mb-8">
+          <label class="block text-sm font-bold text-gray-800 mb-3 flex items-center">
+            <i class="fas fa-search text-blue-600 mr-2"></i> Search by Keywords
+          </label>
           <input 
             type="text" 
             id="searchInput" 
-            placeholder="Search by title, description, or keyword..." 
-            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-600 transition"
+            placeholder="Search by title, description, code, or keyword..." 
+            class="w-full px-5 py-4 text-lg rounded-lg border-2 border-gray-300 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 transition"
             oninput="onSearchInput()"
           >
         </div>
 
         <!-- Department Filter Dropdown -->
-        <div class="mb-6">
-          <label class="block text-sm font-semibold text-gray-700 mb-2">Select Department</label>
-          <select id="departmentFilter" onchange="onDepartmentChange()" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 transition">
+        <div class="mb-8">
+          <label class="block text-sm font-bold text-gray-800 mb-3 flex items-center">
+            <i class="fas fa-building text-blue-600 mr-2"></i> Select Department
+          </label>
+          <select id="departmentFilter" onchange="onDepartmentChange()" class="w-full px-5 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 transition bg-white text-gray-800 font-medium">
             <option value="All">All Departments</option>
           </select>
         </div>
 
-        <!-- Document Type Filter Buttons -->
-        <div class="mb-6">
-          <label class="block text-sm font-semibold text-gray-700 mb-3">Select Document Type</label>
-          <div id="typeButtons" class="flex flex-wrap gap-2">
-            <!-- Buttons will be populated here -->
-          </div>
+        <!-- Level Filter Dropdown -->
+        <div class="mb-8">
+          <label class="block text-sm font-bold text-gray-800 mb-3 flex items-center">
+            <i class="fas fa-layer-group text-blue-600 mr-2"></i> Select Level
+          </label>
+          <select id="levelFilter" onchange="onLevelChange()" class="w-full px-5 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 transition bg-white text-gray-800 font-medium">
+            <option value="All">All Levels</option>
+            <option value="Level 3">Level 3</option>
+            <option value="Level 4">Level 4</option>
+            <option value="Level 5">Level 5</option>
+            <option value="Level 6">Level 6</option>
+          </select>
         </div>
 
-        <!-- Level Filter Buttons -->
-        <div class="mb-6">
-          <label class="block text-sm font-semibold text-gray-700 mb-3">Select Level</label>
-          <div id="levelButtons" class="flex flex-wrap gap-2">
+        <!-- Course Filter Dropdown (Dynamic based on Department & Level) -->
+        <div class="mb-8">
+          <label class="block text-sm font-bold text-gray-800 mb-3 flex items-center">
+            <i class="fas fa-book text-blue-600 mr-2"></i> Select Specific Course
+          </label>
+          <select id="courseFilter" onchange="onCourseChange()" class="w-full px-5 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 transition bg-white text-gray-800 font-medium">
+            <option value="All">All Courses (optional)</option>
+          </select>
+          <p class="text-xs text-gray-500 mt-2"><i class="fas fa-info-circle mr-1"></i>Courses appear after selecting department and level</p>
+        </div>
+
+        <!-- Document Type Filter Buttons -->
+        <div class="mb-8">
+          <label class="block text-sm font-bold text-gray-800 mb-3 flex items-center">
+            <i class="fas fa-file-alt text-blue-600 mr-2"></i> Select Document Type
+          </label>
+          <div id="typeButtons" class="flex flex-wrap gap-3">
             <!-- Buttons will be populated here -->
           </div>
         </div>
 
         <!-- Reset Button -->
-        <div class="flex mb-6">
-          <button onclick="resetFilters()" class="bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-6 rounded-lg transition">
-            Reset All Filters
+        <div class="flex gap-3 mb-6">
+          <button onclick="resetFilters()" class="bg-gradient-to-r from-gray-400 to-gray-500 hover:from-gray-500 hover:to-gray-600 text-white font-bold py-3 px-8 rounded-lg transition transform hover:scale-105 shadow-lg flex items-center">
+            <i class="fas fa-redo mr-2"></i> Reset All Filters
           </button>
         </div>
 
         <!-- Active Filters Display -->
-        <div id="activeFilters" class="text-sm text-gray-600 mt-4 p-3 bg-gray-50 rounded-lg hidden">
-          <span class="font-semibold">Active Filters:</span>
-          <span id="filterTags" class="ml-2"></span>
+        <div id="activeFilters" class="text-sm text-gray-700 mt-6 p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg border border-blue-300 hidden">
+          <div class="flex items-start">
+            <i class="fas fa-filter text-blue-600 mr-3 mt-1 flex-shrink-0"></i>
+            <div>
+              <span class="font-bold block mb-2">Active Filters:</span>
+              <span id="filterTags" class="flex flex-wrap gap-2"></span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Documents Section -->
-  <section class="py-12 bg-gray-50">
+  <section class="py-16 bg-gray-50">
     <div class="container mx-auto px-4">
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
         <!-- Documents will be loaded here dynamically -->
       </div>
     </div>

@@ -36,91 +36,101 @@
   <!-- Main Dashboard Container -->
   <div id="dashboardContainer" class="dashboard-container">
     <!-- Navbar -->
-  <nav class="bg-blue-700 text-white px-6 py-4 flex justify-between items-center sticky top-0 z-50">
+  <nav class="bg-gradient-to-r from-blue-600 via-blue-500 to-blue-700 text-white px-6 py-3 flex justify-between items-center sticky top-0 z-50 shadow-lg">
     <div class="flex items-center space-x-4">
-      <!-- sidebar toggle removed -->
-      <a href="index.html" class="text-2xl font-bold hover:text-blue-200 transition">Edu-VET Admin</a>
+      <i class="fas fa-shield-alt text-2xl"></i>
+      <a href="index.html" class="text-2xl font-bold hover:text-blue-100 transition tracking-wide">Edu-VET Admin</a>
     </div>
-    <div class="flex items-center space-x-4">
-      <span id="adminName" class="text-sm">Administrator</span>
-      <a href="index.html" class="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded transition flex items-center space-x-2">
+    <div class="flex items-center space-x-3">
+      <span id="adminName" class="text-sm font-medium px-3 py-1 bg-blue-500 rounded-full">Administrator</span>
+      <a href="index.html" class="bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg transition flex items-center space-x-2 font-medium">
         <i class="fas fa-home"></i>
         <span>Home</span>
       </a>
-      <button onclick="logoutAdmin()" class="bg-red-600 px-4 py-2 rounded hover:bg-red-700 transition">Logout</button>
+      <button onclick="logoutAdmin()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg transition font-medium">Logout</button>
     </div>
   </nav>
 
   <div class="flex">
     <!-- Sidebar -->
-    <aside id="sidebar" class="sidebar bg-gray-900 text-white w-64 min-h-screen p-6 fixed left-0 top-16">
-      <button id="sidebarCollapseBtn" class="collapse-btn" aria-label="Collapse sidebar" title="Collapse sidebar"><i class="fas fa-chevron-left"></i></button>
-      <nav class="space-y-4">
-        <button class="tab-btn w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition" data-tab="overview">
-          <i class="fas fa-chart-line mr-2"></i> Overview
+    <aside id="sidebar" class="sidebar bg-gradient-to-b from-gray-800 to-gray-900 text-white w-64 min-h-screen p-4 fixed left-0 top-12">
+      <button id="sidebarCollapseBtn" class="collapse-btn absolute right-4 top-4 bg-gray-700 hover:bg-gray-600 p-1 rounded" aria-label="Collapse sidebar" title="Collapse sidebar"><i class="fas fa-chevron-left"></i></button>
+      <nav class="space-y-2 mt-12">
+        <button class="tab-btn w-full text-left px-4 py-3 rounded-lg hover:bg-blue-600 transition border-l-4 border-transparent hover:border-blue-400 hover:bg-opacity-80" data-tab="overview">
+          <i class="fas fa-chart-line mr-2 text-blue-400"></i> <span class="font-medium">Overview</span>
         </button>
-        <button class="tab-btn w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition" data-tab="messages">
-          <i class="fas fa-comments mr-2"></i> Messages
+        <button class="tab-btn w-full text-left px-4 py-3 rounded-lg hover:bg-green-600 transition border-l-4 border-transparent hover:border-green-400 hover:bg-opacity-80" data-tab="messages">
+          <i class="fas fa-comments mr-2 text-green-400"></i> <span class="font-medium">Messages</span>
         </button>
-        <button class="tab-btn w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition" data-tab="documents">
-          <i class="fas fa-file-alt mr-2"></i> Manage Documents
+        <button class="tab-btn w-full text-left px-4 py-3 rounded-lg hover:bg-purple-600 transition border-l-4 border-transparent hover:border-purple-400 hover:bg-opacity-80" data-tab="documents">
+          <i class="fas fa-file-alt mr-2 text-purple-400"></i> <span class="font-medium">Documents</span>
         </button>
-        <button class="tab-btn w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition" data-tab="upload">
-          <i class="fas fa-upload mr-2"></i> Upload Document
+        <button class="tab-btn w-full text-left px-4 py-3 rounded-lg hover:bg-orange-600 transition border-l-4 border-transparent hover:border-orange-400 hover:bg-opacity-80" data-tab="upload">
+          <i class="fas fa-upload mr-2 text-orange-400"></i> <span class="font-medium">Upload</span>
         </button>
-        <button class="tab-btn w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition" data-tab="pending">
-          <i class="fas fa-clock mr-2"></i> Pending Approval
+        <button class="tab-btn w-full text-left px-4 py-3 rounded-lg hover:bg-red-600 transition border-l-4 border-transparent hover:border-red-400 hover:bg-opacity-80" data-tab="pending">
+          <i class="fas fa-clock mr-2 text-red-400"></i> <span class="font-medium">Pending</span>
         </button>
-        <button class="tab-btn w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition" data-tab="departments">
-          <i class="fas fa-building mr-2"></i> Departments
+        <button class="tab-btn w-full text-left px-4 py-3 rounded-lg hover:bg-cyan-600 transition border-l-4 border-transparent hover:border-cyan-400 hover:bg-opacity-80" data-tab="departments">
+          <i class="fas fa-building mr-2 text-cyan-400"></i> <span class="font-medium">Departments</span>
         </button>
-        <button class="tab-btn w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition" data-tab="analytics">
-          <i class="fas fa-bar-chart mr-2"></i> Analytics
+        <button class="tab-btn w-full text-left px-4 py-3 rounded-lg hover:bg-indigo-600 transition border-l-4 border-transparent hover:border-indigo-400 hover:bg-opacity-80" data-tab="analytics">
+          <i class="fas fa-bar-chart mr-2 text-indigo-400"></i> <span class="font-medium">Analytics</span>
         </button>
       </nav>
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 ml-64 p-8">
+    <main class="flex-1 ml-64 p-6 bg-gray-50 min-h-screen">
       <!-- Overview Tab -->
       <div id="overview" class="tab-content active">
         <div class="mb-8">
-          <h2 class="text-3xl font-bold text-gray-800 mb-6">Dashboard Overview</h2>
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
-              <div class="flex justify-between items-center">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-3xl font-bold text-gray-800 flex items-center"><i class="fas fa-chart-line mr-3 text-blue-600"></i>Dashboard Overview</h2>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl shadow-md hover:shadow-xl hover:-translate-y-1 transition border-l-4 border-blue-600">
+              <div class="flex justify-between items-start">
                 <div>
-                  <p class="text-gray-600 text-sm">Total Documents</p>
-                  <p id="totalDocs" class="text-3xl font-bold text-blue-600">0</p>
+                  <p class="text-gray-700 text-sm font-semibold uppercase tracking-wide">Total Documents</p>
+                  <p id="totalDocs" class="text-4xl font-bold text-blue-600 mt-2">0</p>
                 </div>
-                <i class="fas fa-file-alt text-4xl text-blue-200"></i>
+                <div class="bg-blue-600 text-white p-3 rounded-lg">
+                  <i class="fas fa-file-alt text-2xl"></i>
+                </div>
               </div>
             </div>
-            <div class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
-              <div class="flex justify-between items-center">
+            <div class="bg-gradient-to-br from-orange-50 to-orange-100 p-6 rounded-xl shadow-md hover:shadow-xl hover:-translate-y-1 transition border-l-4 border-orange-600">
+              <div class="flex justify-between items-start">
                 <div>
-                  <p class="text-gray-600 text-sm">Pending Approval</p>
-                  <p id="pendingDocs" class="text-3xl font-bold text-yellow-600">0</p>
+                  <p class="text-gray-700 text-sm font-semibold uppercase tracking-wide">Pending Approval</p>
+                  <p id="pendingDocs" class="text-4xl font-bold text-orange-600 mt-2">0</p>
                 </div>
-                <i class="fas fa-hourglass-half text-4xl text-yellow-200"></i>
+                <div class="bg-orange-600 text-white p-3 rounded-lg">
+                  <i class="fas fa-hourglass-half text-2xl"></i>
+                </div>
               </div>
             </div>
-            <div class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
-              <div class="flex justify-between items-center">
+            <div class="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-xl shadow-md hover:shadow-xl hover:-translate-y-1 transition border-l-4 border-green-600">
+              <div class="flex justify-between items-start">
                 <div>
-                  <p class="text-gray-600 text-sm">Published</p>
-                  <p id="publishedDocs" class="text-3xl font-bold text-green-600">0</p>
+                  <p class="text-gray-700 text-sm font-semibold uppercase tracking-wide">Published</p>
+                  <p id="publishedDocs" class="text-4xl font-bold text-green-600 mt-2">0</p>
                 </div>
-                <i class="fas fa-check-circle text-4xl text-green-200"></i>
+                <div class="bg-green-600 text-white p-3 rounded-lg">
+                  <i class="fas fa-check-circle text-2xl"></i>
+                </div>
               </div>
             </div>
-            <div class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
-              <div class="flex justify-between items-center">
+            <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-xl shadow-md hover:shadow-xl hover:-translate-y-1 transition border-l-4 border-purple-600">
+              <div class="flex justify-between items-start">
                 <div>
-                  <p class="text-gray-600 text-sm">Departments</p>
-                  <p id="totalDepts" class="text-3xl font-bold text-purple-600">8</p>
+                  <p class="text-gray-700 text-sm font-semibold uppercase tracking-wide">Departments</p>
+                  <p id="totalDepts" class="text-4xl font-bold text-purple-600 mt-2">8</p>
                 </div>
-                <i class="fas fa-building text-4xl text-purple-200"></i>
+                <div class="bg-purple-600 text-white p-3 rounded-lg">
+                  <i class="fas fa-building text-2xl"></i>
+                </div>
               </div>
             </div>
           </div>
@@ -129,28 +139,30 @@
 
       <!-- Messages Tab -->
       <div id="messages" class="tab-content">
-        <h2 class="text-3xl font-bold text-gray-800 mb-6">Visitor Messages</h2>
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-3xl font-bold text-gray-800 flex items-center"><i class="fas fa-envelope mr-3 text-green-600"></i>Visitor Messages</h2>
+        </div>
         
-        <div class="bg-white p-6 rounded-lg shadow mb-6">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div class="bg-white p-5 rounded-xl shadow-md mb-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
             <input 
               type="text" 
               id="searchMessages" 
               placeholder="Search messages..." 
-              class="px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
               oninput="filterMessages()"
             >
-            <select id="filterMessageStatus" class="px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" onchange="filterMessages()">
+            <select id="filterMessageStatus" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" onchange="filterMessages()">
               <option value="">All Messages</option>
               <option value="unanswered">Unanswered</option>
               <option value="answered">Answered</option>
             </select>
+            <button onclick="clearAllMessages()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition text-sm font-medium">Clear All</button>
           </div>
-          <button onclick="clearAllMessages()" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition text-sm">Clear All Messages</button>
         </div>
 
-        <div class="bg-white rounded-lg shadow overflow-hidden">
-          <div id="messagesContainer" class="divide-y max-h-screen overflow-y-auto">
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+          <div id="messagesContainer" class="divide-y max-h-96 overflow-y-auto">
             <div class="p-8 text-center text-gray-500">No messages yet.</div>
           </div>
         </div>
@@ -192,22 +204,24 @@
 
       <!-- Manage Documents Tab -->
       <div id="documents" class="tab-content">
-        <h2 class="text-3xl font-bold text-gray-800 mb-6">Manage Documents</h2>
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-3xl font-bold text-gray-800 flex items-center"><i class="fas fa-folder-open mr-3 text-purple-600"></i>Manage Documents</h2>
+        </div>
         
-        <div class="bg-white p-6 rounded-lg shadow mb-6">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        <div class="bg-white p-5 rounded-xl shadow-md mb-6">
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3">
             <input 
               type="text" 
               id="searchDocs" 
               placeholder="Search documents..." 
-              class="px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               oninput="filterDocuments()"
             >
               <div class="flex">
-                <input type="text" id="aiSearchInput" placeholder="AI semantic search..." class="px-4 py-2 border border-gray-300 rounded-l w-full focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-                <button onclick="aiSearch()" class="bg-indigo-600 text-white px-4 rounded-r">Search</button>
+                <input type="text" id="aiSearchInput" placeholder="AI search..." class="px-4 py-2 border border-gray-300 rounded-l-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                <button onclick="aiSearch()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 rounded-r-lg font-medium">AI</button>
               </div>
-            <select id="filterDept" class="px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" onchange="filterDocuments()">
+            <select id="filterDept" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" onchange="filterDocuments()">
               <option value="">All Departments</option>
               <option value="Agriculture and Environmental studies">Agriculture and Environmental studies</option>
               <option value="Applied Sciences">Applied Sciences</option>
@@ -252,35 +266,37 @@
 
       <!-- Upload Document Tab -->
       <div id="upload" class="tab-content">
-        <h2 class="text-3xl font-bold text-gray-800 mb-6">Upload New Document</h2>
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-3xl font-bold text-gray-800 flex items-center"><i class="fas fa-cloud-upload-alt mr-3 text-orange-600"></i>Upload New Document</h2>
+        </div>
         
-        <div class="bg-white p-8 rounded-lg shadow max-w-2xl">
-          <form id="uploadForm" class="space-y-4">
+        <div class="bg-white p-8 rounded-xl shadow-md max-w-2xl">
+          <form id="uploadForm" class="space-y-4" onsubmit="return false;">
             <div>
-              <label class="block text-sm font-semibold mb-2">File Upload *</label>
-              <div class="border-2 border-dashed border-gray-300 rounded p-6 text-center cursor-pointer hover:border-blue-500 transition" onclick="document.getElementById('fileInput').click()">
-                <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-2"></i>
-                <p class="text-gray-600">Click to upload or drag and drop</p>
+              <label class="block text-sm font-semibold mb-3 text-gray-800"><i class="fas fa-file mr-2 text-orange-600"></i>File Upload *</label>
+              <div class="border-2 border-dashed border-orange-300 rounded-lg p-8 text-center cursor-pointer hover:border-orange-500 hover:bg-orange-50 transition" onclick="document.getElementById('fileInput').click()">
+                <i class="fas fa-cloud-upload-alt text-5xl text-orange-400 mb-3"></i>
+                <p class="text-gray-700 font-medium">Click to upload or drag and drop</p>
                 <p class="text-sm text-gray-500">PDF, DOC, DOCX up to 10MB</p>
                 <input type="file" id="fileInput" hidden accept=".pdf,.doc,.docx" onchange="updateFileName(this)">
               </div>
-              <p id="fileName" class="text-sm text-gray-600 mt-2"></p>
+              <p id="fileName" class="text-sm text-green-600 font-medium mt-2"></p>
             </div>
 
             <div>
-              <label class="block text-sm font-semibold mb-2">Document Title *</label>
-              <input type="text" id="docTitle" required class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <label class="block text-sm font-semibold mb-2 text-gray-800"><i class="fas fa-heading mr-2 text-blue-600"></i>Document Title *</label>
+              <input type="text" id="docTitle" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
             
             <div>
-              <label class="block text-sm font-semibold mb-2">Description</label>
-              <textarea id="docDescription" rows="4" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+              <label class="block text-sm font-semibold mb-2 text-gray-800"><i class="fas fa-align-left mr-2 text-purple-600"></i>Description</label>
+              <textarea id="docDescription" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label class="block text-sm font-semibold mb-2">Department *</label>
-                <select id="docDepartment" required class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <label class="block text-sm font-semibold mb-2 text-gray-800"><i class="fas fa-briefcase mr-2 text-indigo-600"></i>Department *</label>
+                <select id="docDepartment" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                   <option value="">Select Department</option>
                   <option value="Agriculture and Environmental studies">Agriculture and Environmental studies</option>
                   <option value="Applied Sciences">Applied Sciences</option>
@@ -298,8 +314,8 @@
               </div>
               
               <div>
-                <label class="block text-sm font-semibold mb-2">Level *</label>
-                <select id="docLevel" required class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <label class="block text-sm font-semibold mb-2 text-gray-800"><i class="fas fa-layer-group mr-2 text-green-600"></i>Level *</label>
+                <select id="docLevel" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                   <option value="">Select Level</option>
                   <option value="Level 3">Level 3</option>
                   <option value="Level 4">Level 4</option>
@@ -309,16 +325,16 @@
               </div>
 
               <div>
-                <label class="block text-sm font-semibold mb-2">Course</label>
-                <select id="docCourse" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <label class="block text-sm font-semibold mb-2 text-gray-800"><i class="fas fa-book mr-2 text-yellow-600"></i>Course</label>
+                <select id="docCourse" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                   <option value="">Select Course (optional)</option>
                 </select>
               </div>
             </div>
 
             <div>
-              <label class="block text-sm font-semibold mb-2">Document Type *</label>
-              <select id="docType" required class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <label class="block text-sm font-semibold mb-2 text-gray-800"><i class="fas fa-tag mr-2 text-red-600"></i>Document Type *</label>
+              <select id="docType" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <option value="">Select Document Type</option>
                 <option value="Notes">Notes</option>
                 <option value="Curriculum">Curriculum</option>
@@ -328,12 +344,14 @@
               </select>
             </div>
 
-            <div class="pt-4">
+            <div class="pt-6 border-t">
               <div class="flex gap-3">
-                <button type="button" onclick="publishDocument()" class="flex-1 bg-green-600 text-white px-6 py-3 rounded hover:bg-green-700 transition flex items-center justify-center space-x-2 font-medium">
-                  <i class="fas fa-check-circle"></i> <span> Publish</span>
+                <button type="button" onclick="uploadNewDocument()" class="flex-1 bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-3 rounded-lg hover:shadow-lg transition flex items-center justify-center space-x-2 font-semibold">
+                  <i class="fas fa-check-circle"></i> <span>Publish</span>
                 </button>
-                <button type="button" onclick="autoSummarize()" class="bg-gray-200 text-gray-800 px-4 py-3 rounded hover:bg-gray-300">Auto-summarize</button>
+                <button type="button" onclick="autoSummarize()" class="bg-gradient-to-r from-gray-400 to-gray-500 hover:from-gray-500 hover:to-gray-600 text-white px-6 py-3 rounded-lg transition font-semibold flex items-center justify-center space-x-2">
+                  <i class="fas fa-magic"></i> <span>AI Summary</span>
+                </button>
               </div>
             </div>
           </form>
@@ -1226,20 +1244,25 @@
       })
       .then(res => {
         console.log('Response status:', res.status);
-        
-        // Check if response is ok
-        if (!res.ok && res.status !== 201) {
-          console.error('HTTP error! status:', res.status);
-        }
+        console.log('Response URL:', res.url);
         
         // Get content type
         const contentType = res.headers.get('content-type');
+        console.log('Content-Type:', contentType);
+        
         if (!contentType || !contentType.includes('application/json')) {
-          console.error('Invalid response type:', contentType);
-          throw new Error('Server returned non-JSON response');
+          // Try to get response as text for debugging
+          return res.text().then(text => {
+            console.error('Invalid response type. Server returned:', text.substring(0, 500));
+            throw new Error('Server returned non-JSON response. Check if backend is running on port 5000');
+          });
         }
         
-        return res.json().then(data => ({ status: res.status, data: data }));
+        return res.json().then(data => ({ status: res.status, data: data }))
+          .catch(err => {
+            console.error('JSON parse error:', err);
+            throw new Error('Failed to parse server response as JSON');
+          });
       })
       .then(({ status, data }) => {
         console.log('Response data:', data);
@@ -1273,8 +1296,27 @@
         }
       })
       .catch(error => {
-        console.error('Upload error:', error);
-        alert('Upload failed: ' + error.message + '\n\nPlease check:\n1. Backend server is running on port 5000\n2. Documents folder exists\n3. File size is under 10MB');
+        console.error('Upload error details:', error);
+        console.error('Error name:', error.name);
+        console.error('Error message:', error.message);
+        
+        let userMessage = 'Upload failed:\n\n';
+        
+        if (error.message.includes('fetch')) {
+          userMessage += '❌ Cannot reach the server.\n\n';
+          userMessage += 'Fix: Start the backend server by running:\nnpm start\n\n';
+          userMessage += 'The server should run on http://localhost:5000';
+        } else if (error.message.includes('JSON')) {
+          userMessage += '❌ Server returned an invalid response.\n\n';
+          userMessage += 'Possible fixes:\n';
+          userMessage += '1. Make sure backend server is running (npm start)\n';
+          userMessage += '2. Check that /api/documents/upload endpoint exists\n';
+          userMessage += '3. Check server console for error details';
+        } else {
+          userMessage += error.message || 'Unknown error occurred';
+        }
+        
+        alert(userMessage);
       })
       .finally(() => {
         uploadBtn.disabled = false;
@@ -1374,13 +1416,26 @@
       .then(res => {
         console.log('Response received:');
         console.log('- Status:', res.status);
-        console.log('- Status Text:', res.statusText);
-        console.log('- OK:', res.ok);
+        console.log('- URL:', res.url);
         
-        // Parse response as JSON
+        // Get content type
+        const contentType = res.headers.get('content-type');
+        console.log('- Content-Type:', contentType);
+        
+        if (!contentType || !contentType.includes('application/json')) {
+          // Try to get response as text for debugging
+          return res.text().then(text => {
+            console.error('Invalid response type. Server returned:', text.substring(0, 500));
+            throw new Error('Server returned non-JSON response. Check if backend is running on port 5000');
+          });
+        }
+        
         return res.json().then(data => {
           console.log('Response JSON:', data);
           return { status: res.status, ok: res.ok, data: data };
+        }).catch(err => {
+          console.error('JSON parse error:', err);
+          throw new Error('Failed to parse server response as JSON');
         });
       })
       .then(({ status, ok, data }) => {
@@ -1403,15 +1458,26 @@
         }
       })
       .catch(error => {
-        console.error('Full error object:', error);
+        console.error('Publish error details:', error);
+        console.error('Error name:', error.name);
         console.error('Error message:', error.message);
         
-        // Distinguish between network errors and response errors
+        let userMessage = '❌ Document upload failed:\n\n';
+        
         if (error instanceof TypeError && error.message.includes('fetch')) {
-          alert('❌ Cannot reach server.\n\nMake sure the Node.js server is running:\nnpm start');
+          userMessage += 'Cannot reach the server.\n\n';
+          userMessage += 'Fix: Start the backend server:\nnpm start\n\nServer URL: http://localhost:5000';
+        } else if (error.message && error.message.includes('JSON')) {
+          userMessage += 'Server returned an invalid response.\n\n';
+          userMessage += 'Possible fixes:\n';
+          userMessage += '1. Ensure backend server is running (npm start)\n';
+          userMessage += '2. Check the /api/documents/upload endpoint\n';
+          userMessage += '3. Review backend console for errors';
         } else {
-          alert('❌ ' + error.message);
+          userMessage += error.message || 'Unknown error occurred';
         }
+        
+        alert(userMessage);
       })
       .finally(() => {
         publishBtn.disabled = false;
