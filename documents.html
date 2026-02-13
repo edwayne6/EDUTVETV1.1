@@ -441,24 +441,16 @@
   </nav>
 
   <!-- Hero Section with Integrated Search Engine -->
-  <section class="bg-gradient-to-br from-blue-600 via-blue-500 to-blue-700 py-16 text-white relative overflow-hidden">
+  <section class="bg-gradient-to-br from-blue-600 via-blue-500 to-blue-700 py-10 text-white relative overflow-hidden">
     <!-- Decorative background elements -->
     <div class="absolute top-0 right-0 w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 -mr-40 -mt-40"></div>
     <div class="absolute bottom-0 left-0 w-96 h-96 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 -ml-40 -mb-40"></div>
     
     <div class="container mx-auto px-4 relative z-10">
-      <div class="text-center mb-12">
-        <div class="flex justify-center mb-4">
-          <i class="fas fa-magnifying-glass text-5xl opacity-90"></i>
-        </div>
-        <h2 class="text-5xl font-bold mb-4">Explore TVET Resources</h2>
-        <p class="text-xl text-blue-100 max-w-2xl mx-auto">Discover curriculum-aligned documents designed to support trainers and trainees. Search by keywords, filter by department, type, and level.</p>
-      </div>
-      
       <!-- Advanced Search Engine -->
-      <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-5xl mx-auto">
+      <div class="bg-white rounded-2xl shadow-2xl p-6 max-w-5xl mx-auto">
         <!-- Search Input -->
-        <div class="mb-8">
+        <div class="mb-5">
           <label class="block text-sm font-bold text-gray-800 mb-3 flex items-center">
             <i class="fas fa-search text-blue-600 mr-2"></i> Search by Keywords
           </label>
@@ -471,32 +463,35 @@
           >
         </div>
 
-        <!-- Department Filter Dropdown -->
-        <div class="mb-8">
-          <label class="block text-sm font-bold text-gray-800 mb-3 flex items-center">
-            <i class="fas fa-building text-blue-600 mr-2"></i> Select Department
-          </label>
-          <select id="departmentFilter" onchange="onDepartmentChange()" class="w-full px-5 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 transition bg-white text-gray-800 font-medium">
-            <option value="All">All Departments</option>
-          </select>
-        </div>
+        <!-- Department & Level Filters (Side by Side) -->
+        <div class="flex gap-4 mb-6">
+          <!-- Department Filter Dropdown -->
+          <div class="flex-1">
+            <label class="block text-sm font-bold text-gray-800 mb-3 flex items-center">
+              <i class="fas fa-building text-blue-600 mr-2"></i> Select Department
+            </label>
+            <select id="departmentFilter" onchange="onDepartmentChange()" class="w-full px-5 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 transition bg-white text-gray-800 font-medium">
+              <option value="All">All Departments</option>
+            </select>
+          </div>
 
-        <!-- Level Filter Dropdown -->
-        <div class="mb-8">
-          <label class="block text-sm font-bold text-gray-800 mb-3 flex items-center">
-            <i class="fas fa-layer-group text-blue-600 mr-2"></i> Select Level
-          </label>
-          <select id="levelFilter" onchange="onLevelChange()" class="w-full px-5 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 transition bg-white text-gray-800 font-medium">
-            <option value="All">All Levels</option>
-            <option value="Level 3">Level 3</option>
-            <option value="Level 4">Level 4</option>
-            <option value="Level 5">Level 5</option>
-            <option value="Level 6">Level 6</option>
-          </select>
+          <!-- Level Filter Dropdown -->
+          <div class="flex-1">
+            <label class="block text-sm font-bold text-gray-800 mb-3 flex items-center">
+              <i class="fas fa-layer-group text-blue-600 mr-2"></i> Select Level
+            </label>
+            <select id="levelFilter" onchange="onLevelChange()" class="w-full px-5 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 transition bg-white text-gray-800 font-medium">
+              <option value="All">All Levels</option>
+              <option value="Level 3">Level 3</option>
+              <option value="Level 4">Level 4</option>
+              <option value="Level 5">Level 5</option>
+              <option value="Level 6">Level 6</option>
+            </select>
+          </div>
         </div>
 
         <!-- Course Filter Dropdown (Dynamic based on Department & Level) -->
-        <div class="mb-8">
+        <div class="mb-5">
           <label class="block text-sm font-bold text-gray-800 mb-3 flex items-center">
             <i class="fas fa-book text-blue-600 mr-2"></i> Select Specific Course
           </label>
@@ -507,7 +502,7 @@
         </div>
 
         <!-- Document Type Filter Buttons -->
-        <div class="mb-8">
+        <div class="mb-5">
           <label class="block text-sm font-bold text-gray-800 mb-3 flex items-center">
             <i class="fas fa-file-alt text-blue-600 mr-2"></i> Select Document Type
           </label>
@@ -538,9 +533,9 @@
   </section>
 
   <!-- Documents Section -->
-  <section class="py-16 bg-gray-50">
+  <section class="py-12 bg-gray-50">
     <div class="container mx-auto px-4">
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
         <!-- Documents will be loaded here dynamically -->
       </div>
     </div>

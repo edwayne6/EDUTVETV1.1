@@ -75,8 +75,8 @@ app.use(express.static(parentDir, {
   dotfiles: 'deny'
 }));
 
-// Ensure documents folder exists
-const documentsFolder = path.join(__dirname, 'documents');
+// Ensure documents folder exists (store uploads at workspace root `documents/`)
+const documentsFolder = path.join(__dirname, '..', 'documents');
 if (!fs.existsSync(documentsFolder)) {
   fs.mkdirSync(documentsFolder, { recursive: true });
   console.log(`✓ Created documents folder at: ${documentsFolder}`);
@@ -180,7 +180,7 @@ initializeDocuments();
 // ============================================
 
 // Get all documents
-app.get("/api/documents", (req, res) => {
+app.get("/documents", (req, res) => {
   try {
     res.json(documents);
   } catch (error) {
@@ -189,7 +189,7 @@ app.get("/api/documents", (req, res) => {
 });
 
 // Get published documents only
-app.get("/api/documents/published", (req, res) => {
+app.get("/documents/published", (req, res) => {
   try {
     const published = documents.filter(doc => doc.status === 'published');
     res.json(published);
@@ -199,7 +199,7 @@ app.get("/api/documents/published", (req, res) => {
 });
 
 // Get single document
-app.get("/api/documents/:id", (req, res) => {
+app.get("/documents/:id", (req, res) => {
   try {
     const doc = documents.find(d => d.id === parseInt(req.params.id));
     if (!doc) {
@@ -212,7 +212,7 @@ app.get("/api/documents/:id", (req, res) => {
 });
 
 // Get document by code (for easy retrieval)
-app.get("/api/documents/code/:code", (req, res) => {
+app.get("/documents/code/:code", (req, res) => {
   try {
     const code = req.params.code.toUpperCase();
     const doc = documents.find(d => d.documentCode === code);
@@ -226,7 +226,7 @@ app.get("/api/documents/code/:code", (req, res) => {
 });
 
 // Download document by code (for easy retrieval)
-app.get("/api/documents/code/:code/download", (req, res) => {
+app.get("/documents/code/:code/download", (req, res) => {
   try {
     const code = req.params.code.toUpperCase();
     const doc = documents.find(d => d.documentCode === code);
@@ -246,7 +246,7 @@ app.get("/api/documents/code/:code/download", (req, res) => {
 });
 
 // Upload document
-app.post("/api/documents/upload", upload.single('file'), async (req, res) => {
+app.post("/documents/upload", upload.single('file'), async (req, res) => {
   try {
     const { title, description, department, level, docType, submittedBy } = req.body;
 
