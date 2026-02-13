@@ -216,12 +216,7 @@
               placeholder="Search documents..." 
               class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               oninput="filterDocuments()"
-            >
-              <div class="flex">
-                <input type="text" id="aiSearchInput" placeholder="AI search..." class="px-4 py-2 border border-gray-300 rounded-l-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-                <button onclick="aiSearch()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 rounded-r-lg font-medium">AI</button>
-              </div>
-            <select id="filterDept" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" onchange="filterDocuments()">
+            ><select id="filterDept" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" onchange="filterDocuments()">
               <option value="">All Departments</option>
               <option value="Agriculture and Environmental studies">Agriculture and Environmental studies</option>
               <option value="Applied Sciences">Applied Sciences</option>
@@ -345,14 +340,9 @@
             </div>
 
             <div class="pt-6 border-t">
-              <div class="flex gap-3">
-                <button type="button" onclick="uploadNewDocument()" class="flex-1 bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-3 rounded-lg hover:shadow-lg transition flex items-center justify-center space-x-2 font-semibold">
-                  <i class="fas fa-check-circle"></i> <span>Publish</span>
-                </button>
-                <button type="button" onclick="autoSummarize()" class="bg-gradient-to-r from-gray-400 to-gray-500 hover:from-gray-500 hover:to-gray-600 text-white px-6 py-3 rounded-lg transition font-semibold flex items-center justify-center space-x-2">
-                  <i class="fas fa-magic"></i> <span>AI Summary</span>
-                </button>
-              </div>
+              <button type="button" onclick="uploadNewDocument()" class="w-full bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-3 rounded-lg hover:shadow-lg transition flex items-center justify-center space-x-2 font-semibold">
+                <i class="fas fa-check-circle"></i> <span>Publish</span>
+              </button>
             </div>
           </form>
         </div>
@@ -1734,50 +1724,6 @@
         </tr>
       `).join('');
     }
-
-    async function autoSummarize() {
-      const title = document.getElementById('docTitle').value || '';
-      const desc = document.getElementById('docDescription').value || '';
-      const text = (title + '\n\n' + desc).trim();
-      if (!text) { alert('Please enter title or description first'); return; }
-      try {
-        const res = await fetch('/api/ai/summarize', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text })
-        });
-        const data = await res.json();
-        if (data.summary) {
-          document.getElementById('docDescription').value = data.summary;
-          alert('Summary inserted into description');
-        } else {
-          alert('No summary returned');
-        }
-      } catch (e) {
-        console.error('Auto-summarize error', e);
-        alert('Auto-summarize failed. See console.');
-      }
-    }
-
-    async function aiSearch() {
-      const q = document.getElementById('aiSearchInput').value || document.getElementById('searchDocs').value || '';
-      if (!q) { alert('Enter a query'); return; }
-      try {
-        const res = await fetch('/api/ai/search', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query: q, topK: 10 })
-        });
-        const data = await res.json();
-        if (!data.results || data.results.length === 0) {
-          alert('No results');
-          return;
-        }
-        const table = document.getElementById('documentsTable');
-        const noMsg = document.getElementById('noDocsMessage');
-        noMsg.style.display = 'none';
-        table.innerHTML = data.results.map(r => {
-          const doc = r.document;
           return `
             <tr>
               <td class="px-6 py-4">${doc.title}</td>
