@@ -66,6 +66,12 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
+// Simple request logger to help diagnose 4xx/5xx issues
+app.use((req, res, next) => {
+  console.log(`[http] ${new Date().toISOString()} ${req.method} ${req.originalUrl}`);
+  next();
+});
+
 // Serve static files from parent directory (CSS, JS, HTML, etc.)
 const parentDir = path.join(__dirname, '..');
 app.use(express.static(parentDir, {
@@ -180,7 +186,7 @@ initializeDocuments();
 // ============================================
 
 // Get all documents
-app.get("/documents", (req, res) => {
+app.get("/api/documents", (req, res) => {
   try {
     res.json(documents);
   } catch (error) {
@@ -189,7 +195,7 @@ app.get("/documents", (req, res) => {
 });
 
 // Get published documents only
-app.get("/documents/published", (req, res) => {
+app.get("/api/documents/published", (req, res) => {
   try {
     const published = documents.filter(doc => doc.status === 'published');
     res.json(published);
@@ -199,7 +205,7 @@ app.get("/documents/published", (req, res) => {
 });
 
 // Get single document
-app.get("/documents/:id", (req, res) => {
+app.get("/api/documents/:id", (req, res) => {
   try {
     const doc = documents.find(d => d.id === parseInt(req.params.id));
     if (!doc) {
@@ -212,7 +218,7 @@ app.get("/documents/:id", (req, res) => {
 });
 
 // Get document by code (for easy retrieval)
-app.get("/documents/code/:code", (req, res) => {
+app.get("/api/documents/code/:code", (req, res) => {
   try {
     const code = req.params.code.toUpperCase();
     const doc = documents.find(d => d.documentCode === code);
@@ -226,7 +232,7 @@ app.get("/documents/code/:code", (req, res) => {
 });
 
 // Download document by code (for easy retrieval)
-app.get("/documents/code/:code/download", (req, res) => {
+app.get("/api/documents/code/:code/download", (req, res) => {
   try {
     const code = req.params.code.toUpperCase();
     const doc = documents.find(d => d.documentCode === code);
@@ -246,7 +252,7 @@ app.get("/documents/code/:code/download", (req, res) => {
 });
 
 // Upload document
-app.post("/documents/upload", upload.single('file'), async (req, res) => {
+app.post("/api/documents/upload", upload.single('file'), async (req, res) => {
   try {
     const { title, description, department, level, docType, submittedBy } = req.body;
 
@@ -480,8 +486,27 @@ app.get("/api/documents/:id/download", (req, res) => {
   }
 });
 
-// Serve static files from documents folder
-app.use('/documents', express.static(documentsFolder));
+// OPTIONS handler for CORS preflight requests
+app.options('/api/documents', (req, res) => {
+  res.setHeader('Allow', 'GET, POST, OPTIONS');
+  res.status(200).json({ message: 'OK' });
+});
+
+app.options('/api/documents/upload', (req, res) => {
+  res.setHeader('Allow', 'POST, OPTIONS');
+  res.status(200).json({ message: 'OK' });
+});
+
+app.options('/api/documents/:id', (req, res) => {
+  res.setHeader('Allow', 'GET, PUT, DELETE, OPTIONS');
+  res.status(200).json({ message: 'OK' });
+});
+
+// Serve static files from documents folder (make uploaded files accessible)
+app.use('/documents', express.static(documentsFolder, {
+  maxAge: '1h',
+  dotfiles: 'deny'
+}));
 
 // --- Text Extraction Helpers ---
 const pdfParse = require('pdf-parse');
@@ -930,6 +955,25 @@ app.get("/api/health", (req, res) => {
     documentsCount: documents.length,
     documentsFolder: documentsFolder,
     ssrEnabled: ssr !== null
+  });
+});
+
+// 404 and 405 Error Handler - catch undefined routes
+app.use((req, res) => {
+  console.log(`[http] Unmatched route: ${req.method} ${req.originalUrl}`);
+  res.status(404).json({
+    error: 'Not Found',
+    message: `${req.method} ${req.path} not found on this server`,
+    availableMethods: 'GET, POST, PUT, DELETE, OPTIONS'
+  });
+});
+
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error('Error:', err);
+  res.status(err.status || 500).json({
+    error: err.message || 'Internal Server Error',
+    status: err.status || 500
   });
 });
 
