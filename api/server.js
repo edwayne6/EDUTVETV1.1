@@ -254,6 +254,7 @@ app.get("/api/documents/code/:code/download", (req, res) => {
 // Upload document
 app.post("/api/documents/upload", upload.single('file'), async (req, res) => {
   try {
+    console.log('Upload request received');
     const { title, description, department, level, docType, submittedBy } = req.body;
 
     // Basic sanitation and trimming
@@ -301,8 +302,9 @@ app.post("/api/documents/upload", upload.single('file'), async (req, res) => {
     };
 
     documents.push(newDocument);
+    console.log('Document uploaded:',  newDocument.documentCode);
     
-    // Ensure we're sending valid JSON
+    //Ensure we're sending valid JSON
     return res.status(201).json({ 
       message: "Document uploaded and published successfully!",
       document: newDocument,
@@ -599,133 +601,39 @@ app.get("/api/stats", (req, res) => {
   }
 });
 
-// ============================================
-// SERVER-SIDE RENDERING (SSR) ROUTES
-// ============================================
-
-// Initialize SSR utilities
-let ssr = null;
-try {
-  ssr = require('../utils/ssr');
-  app.use(ssr.ssrMiddleware);
-  console.log('✅ SSR enabled');
-} catch (e) {
-  console.warn('⚠️  SSR module not available, using standard rendering');
-}
-
-// Home page - Server-Side Rendered
-app.get('/', async (req, res) => {
-  try {
-    if (ssr) {
-      const data = {
-        title: 'Edu-TVET - Empowering Learning',
-        description: 'EduTVET provides access to quality TVET documents for teaching, learning, and professional growth.',
-        scripts: ['/scripts/scripts.js', '/scripts/scroll-animations.js', '/scripts/document-cache.js']
-      };
-      // Use cache key to avoid re-rendering
-      await res.renderSSR('index', data, 'home-page');
-    } else {
-      // Fallback to static file
-      res.sendFile(path.join(__dirname, '../index.html'));
-    }
-  } catch (error) {
-    console.error('Home page error:', error);
-    res.status(500).send('Error loading home page');
-  }
-});
-
-// Documents page - Server-Side Rendered with caching
-app.get('/documents', async (req, res) => {
-  try {
-    if (ssr) {
-      const data = {
-        title: 'EduTVET - Documents',
-        description: 'Browse and download TVET documents categorized by type and level.',
-        departments: [
-          'Agriculture & Environmental',
-          'Applied Sciences',
-          'Automotive & Mechanical',
-          'Building & Civil Eng',
-          'Business & Entrepreneurship',
-          'Business Studies',
-          'Computing & ICT',
-          'Cosmetology',
-          'Electrical & Electronics',
-          'Fashion & Apparel Design',
-          'Health & Applied Sciences',
-          'Liberal Studies',
-          'Tourism & Hospitality'
-        ],
-        documents: documents.filter(d => d.status === 'published'),
-        scripts: ['/scripts/document-cache.js']
-      };
-      // Use cache key based on filters
-      const cacheKey = `documents-${JSON.stringify(req.query)}`;
-      await res.renderSSR('documents', data, cacheKey);
-    } else {
-      // Fallback to static file
-      res.sendFile(path.join(__dirname, '../documents.html'));
-    }
-  } catch (error) {
-    console.error('Documents page error:', error);
-    res.status(500).send('Error loading documents page');
-  }
-});
-
-// Admin page - Server-Side Rendered
-app.get('/ssr-admin', async (req, res) => {
-  try {
-    if (ssr) {
-      const data = {
-        title: 'Admin Dashboard',
-        description: 'Administrative panel for document management',
-        scripts: ['/scripts/cache-manager.js']
-      };
-      await res.renderSSR('admin', data, 'admin-page');
-    } else {
-      res.sendFile(path.join(__dirname, '../admin.html'));
-    }
-  } catch (error) {
-    console.error('Admin page error:', error);
-    res.status(500).send('Error loading admin page');
-  }
-});
-
 // Health check
 app.get("/api/health", (req, res) => {
   res.json({ 
     status: "Server is running",
     documentsCount: documents.length,
-    documentsFolder: documentsFolder,
-    ssrEnabled: ssr !== null
+    documentsFolder: documentsFolder
   });
 });
 
-// 404 and 405 Error Handler - catch undefined routes
+// 404 Error Handler
 app.use((req, res) => {
-  console.log(`[http] Unmatched route: ${req.method} ${req.originalUrl}`);
+  console.log(`[404] Unmatched: ${req.method} ${req.originalUrl}`);
   res.status(404).json({
     error: 'Not Found',
-    message: `${req.method} ${req.path} not found on this server`,
-    availableMethods: 'GET, POST, PUT, DELETE, OPTIONS'
+    message: `${req.method} ${req.path} not found`
   });
 });
 
-// Global error handler
+// Error handler
 app.use((err, req, res, next) => {
   console.error('Error:', err);
-  res.status(err.status || 500).json({
-    error: err.message || 'Internal Server Error',
-    status: err.status || 500
+  res.status(500).json({
+    error: err.message || 'Server Error',
+    status: 500
   });
 });
 
-// Start server
+// Start
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`\n========================================`);
   console.log(`✅ Server running on port ${PORT}`);
   console.log(`✅ Listening at http://localhost:${PORT}`);
   console.log(`========================================`);
-  console.log('OS/CU document auto-registration complete.');
+  console.log('Ready for document management.');
 });

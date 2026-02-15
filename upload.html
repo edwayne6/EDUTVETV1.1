@@ -320,9 +320,9 @@
 
     // Helper function to get API URL based on environment
     function getApiUrl(endpoint) {
-      const baseUrl = window.location.hostname === 'localhost'
-        ? 'http://localhost:5000'
-        : '';
+      const hostname = window.location.hostname;
+      const isLocal = hostname === 'localhost' || hostname === '127.0.0.1' || hostname.startsWith('192.168.') || hostname.startsWith('10.');
+      const baseUrl = isLocal ? 'http://localhost:5000' : '';
       return baseUrl + endpoint;
     }
 
@@ -343,6 +343,16 @@
       const levelInput = document.getElementById('level');
       const docTypeInput = document.getElementById('docType');
       const descriptionInput = document.getElementById('description');
+
+      console.log('[FORM] Submission started');
+      console.log('[FORM] Form values:', {
+        file: fileInput.files.length > 0 ? fileInput.files[0].name : 'NO FILE',
+        title: titleInput.value,
+        category: categoryInput.value,
+        level: levelInput.value,
+        docType: docTypeInput.value,
+        description: descriptionInput.value
+      });
 
       // Validate file
       if (!fileInput.files || fileInput.files.length === 0) {
@@ -368,7 +378,7 @@
 
       // Get API URL using helper
       const apiUrl = getApiUrl('/api/documents/upload');
-      console.log('Uploading to:', apiUrl);
+      console.log('[FORM] Uploading to:', apiUrl);
 
       // Disable button during upload
       const submitButton = document.querySelector('button[type="submit"]');
@@ -382,27 +392,31 @@
         credentials: 'same-origin'
       })
       .then(response => {
-        console.log('Response received:', response.status);
+        console.log('[FETCH] Response received:', response.status, response.statusText);
         
         // Check if response is ok
         if (!response.ok) {
+          console.error('[FETCH] Response not OK:', response.status);
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         
         // Get content type
         const contentType = response.headers.get('content-type');
+        console.log('[FETCH] Content-Type:', contentType);
         if (!contentType || !contentType.includes('application/json')) {
-          console.error('Invalid response type:', contentType);
-          console.error('Response status:', response.status);
+          console.error('[FETCH] Invalid response type:', contentType);
           throw new Error('Server returned non-JSON response. Check server logs.');
         }
         
         return response.json();
       })
       .then(data => {
+        console.log('[FETCH] JSON parsed:', data);
         if (data.success || data.document) {
           const doc = data.document;
           const docCode = doc.documentCode;
+          
+          console.log('[UPLOAD] Success! Document code:', docCode);
           
           // Display success message with document code
           const successMsg = document.getElementById('successMessage');
@@ -434,11 +448,12 @@
             successMsg.classList.add('hidden');
           }, 15000);
         } else {
+          console.error('[UPLOAD] No success flag in response');
           throw new Error(data.message || 'Upload failed - no document returned');
         }
       })
       .catch(error => {
-        console.error('Error uploading document:', error);
+        console.error('[UPLOAD] Error:', error.message);
         showError(error.message);
       })
       .finally(() => {
