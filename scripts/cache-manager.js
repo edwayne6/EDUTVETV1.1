@@ -4,8 +4,8 @@
  */
 
 const CacheManager = (() => {
-  const CACHE_PREFIX = 'edutvet_cache_';
-  const CACHE_TTL = 'edutvet_ttl_';
+  const CACHE_PREFIX = 'edu-tvet_cache_';
+  const CACHE_TTL = 'edu-tvet_ttl_';
   const DEFAULT_TTL = 5 * 60 * 1000; // 5 minutes default
   const FOREVER_TTL = 24 * 60 * 60 * 1000; // 24 hours for static data
 

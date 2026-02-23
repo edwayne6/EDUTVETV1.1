@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="EduTVET provides access to quality TVET documents for teaching, learning, and professional growth.">
+  <meta name="description" content="Edu-TVET provides access to quality TVET documents for teaching, learning, and professional growth.">
   <title>Edu-TVET - Empowering Learning</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link rel="stylesheet" href="styles.css"> <!-- Link to the custom stylesheet -->
@@ -254,7 +254,6 @@
           <ul class="space-y-1 text-gray-300 text-xs">
             <li><a href="index.html" class="text-blue-300 hover:underline">Home</a></li>
             <li><a href="documents.html" class="text-blue-300 hover:underline">Documents</a></li>
-            <li><a href="#features" class="text-blue-300 hover:underline">Features</a></li>
             <li><a href="admin.html" class="text-blue-300 hover:underline">Admin</a></li>
           </ul>
         </div>
@@ -290,7 +289,7 @@
   </button>
 
   <!-- Chat Modal -->
-  <div id="chatModal" class="hidden fixed bottom-24 right-6 bg-white rounded-lg shadow-2xl w-80 max-h-96 flex flex-col z-50 overflow-hidden">
+  <div id="chatModal" class="fixed bottom-24 right-6 bg-white rounded-lg shadow-2xl w-80 max-h-96 flex flex-col z-50 overflow-hidden" style="display: none;">
     <!-- Chat Header -->
     <div class="bg-blue-600 text-white p-4 flex justify-between items-center">
       <h3 class="font-bold">Edu-TVET Support</h3>
@@ -355,10 +354,10 @@
       if (!message) return;
 
       // Generate visitor ID
-      let visitorId = localStorage.getItem('edutvet_visitor_id');
+      let visitorId = localStorage.getItem('edu-tvet_visitor_id');
       if (!visitorId) {
         visitorId = 'visitor_' + Math.random().toString(36).substr(2, 9);
-        localStorage.setItem('edutvet_visitor_id', visitorId);
+        localStorage.setItem('edu-tvet_visitor_id', visitorId);
       }
 
       // Create message object
@@ -373,9 +372,9 @@
       };
 
       // Save to localStorage
-      let messages = JSON.parse(localStorage.getItem('edutvet_chat_messages') || '[]');
+      let messages = JSON.parse(localStorage.getItem('edu-tvet_chat_messages') || '[]');
       messages.push(msgObj);
-      localStorage.setItem('edutvet_chat_messages', JSON.stringify(messages));
+      localStorage.setItem('edu-tvet_chat_messages', JSON.stringify(messages));
 
       // Display message
       displayMessage(msgObj, true);
@@ -426,7 +425,7 @@
     // Load existing messages on page load
     function loadChatMessages() {
       const messagesDiv = document.getElementById('chatMessages');
-      let messages = JSON.parse(localStorage.getItem('edutvet_chat_messages') || '[]');
+      let messages = JSON.parse(localStorage.getItem('edu-tvet_chat_messages') || '[]');
       
       if (messages.length === 0) {
         messagesDiv.innerHTML = '<div class="text-center text-gray-500 text-sm py-4"><p>Welcome! How can we help you?</p></div>';
@@ -434,7 +433,7 @@
       }
 
       messagesDiv.innerHTML = '';
-      let visitorId = localStorage.getItem('edutvet_visitor_id');
+      let visitorId = localStorage.getItem('edu-tvet_visitor_id');
       
       messages.forEach(msg => {
         const isOwn = msg.visitorId === visitorId;

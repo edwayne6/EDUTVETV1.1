@@ -1,10 +1,10 @@
-// EduTVET Visitor & Activity Tracker
+// Edu-TVET Visitor & Activity Tracker
 // Tracks page views, time on site, downloads, and document additions
 // Stores data in localStorage and optionally sends to backend API
 
 (function() {
-  const TRACKER_KEY = 'edutvet_analytics';
-  const SESSION_KEY = 'edutvet_session';
+  const TRACKER_KEY = 'edu-tvet_analytics';
+  const SESSION_KEY = 'edu-tvet_session';
   const API_ENDPOINT = 'http://localhost:5000/api/analytics';
   
   // Initialize or retrieve session

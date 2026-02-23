@@ -169,7 +169,7 @@
       </div>
 
       <!-- Reply Message Modal -->
-      <div id="replyModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div id="replyModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" style="display: none;">
         <div class="bg-white p-8 rounded-lg shadow-2xl max-w-2xl w-full mx-4">
           <div class="flex justify-between items-center mb-6">
             <h2 class="text-2xl font-bold text-gray-800">Reply to Message</h2>
@@ -1109,7 +1109,7 @@
       // Get activity data from localStorage
       let analyticsData = { activities: [] };
       try {
-        const saved = localStorage.getItem('edutvet_analytics');
+        const saved = localStorage.getItem('edu-tvet_analytics');
         if (saved) analyticsData = JSON.parse(saved);
       } catch (e) {
         console.log('Could not load analytics data');
@@ -1724,26 +1724,6 @@
         </tr>
       `).join('');
     }
-          return `
-            <tr>
-              <td class="px-6 py-4">${doc.title}</td>
-              <td class="px-6 py-4">${doc.department}</td>
-              <td class="px-6 py-4"><span class="px-3 py-1 rounded text-sm font-semibold ${doc.status === 'published' ? 'bg-green-100 text-green-800' : doc.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'}">${doc.status.charAt(0).toUpperCase()+doc.status.slice(1)}</span></td>
-              <td class="px-6 py-4">${doc.date}</td>
-              <td class="px-6 py-4">
-                ${doc.fileName ? `<button onclick="previewDocument(${doc.id})" class="text-purple-600 hover:underline mr-3" title="Preview"><i class="fas fa-eye"></i></button>` : ''}
-                <button onclick="editDocument(${doc.id})" class="text-blue-600 hover:underline mr-3" title="Edit"><i class="fas fa-edit"></i></button>
-                <button onclick="publishDoc(${doc.id})" class="text-green-600 hover:underline mr-3" title="Publish"><i class="fas fa-check-circle"></i></button>
-                <button onclick="deleteDocument(${doc.id})" class="text-red-600 hover:underline" title="Delete"><i class="fas fa-trash"></i></button>
-              </td>
-            </tr>
-          `;
-        }).join('');
-      } catch (e) {
-        console.error('AI search error', e);
-        alert('AI search failed. See console.');
-      }
-    }
 
     function updateFileName(input) {
       if (input.files && input.files[0]) {
@@ -1760,7 +1740,7 @@
     let replyingToMessageId = null;
 
     function loadChatMessages() {
-      let messages = JSON.parse(localStorage.getItem('edutvet_chat_messages') || '[]');
+      let messages = JSON.parse(localStorage.getItem('edu-tvet_chat_messages') || '[]');
       const container = document.getElementById('messagesContainer');
       
       if (messages.length === 0) {
@@ -1823,13 +1803,13 @@
         return;
       }
 
-      let messages = JSON.parse(localStorage.getItem('edutvet_chat_messages') || '[]');
+      let messages = JSON.parse(localStorage.getItem('edu-tvet_chat_messages') || '[]');
       const msg = messages.find(m => m.id === replyingToMessageId);
       
       if (msg) {
         msg.reply = replyText;
         msg.replyTime = new Date().toISOString();
-        localStorage.setItem('edutvet_chat_messages', JSON.stringify(messages));
+        localStorage.setItem('edu-tvet_chat_messages', JSON.stringify(messages));
         
         alert('Reply sent successfully!');
         closeReplyModal();
@@ -1841,7 +1821,7 @@
       const search = document.getElementById('searchMessages').value.toLowerCase();
       const status = document.getElementById('filterMessageStatus').value;
       
-      let messages = JSON.parse(localStorage.getItem('edutvet_chat_messages') || '[]');
+      let messages = JSON.parse(localStorage.getItem('edu-tvet_chat_messages') || '[]');
       
       const filtered = messages.filter(msg => {
         const matchSearch = msg.message.toLowerCase().includes(search) || 
@@ -1890,7 +1870,7 @@
 
     function clearAllMessages() {
       if (confirm('Are you sure you want to delete all messages? This action cannot be undone.')) {
-        localStorage.setItem('edutvet_chat_messages', JSON.stringify([]));
+        localStorage.setItem('edu-tvet_chat_messages', JSON.stringify([]));
         alert('All messages have been cleared.');
         loadChatMessages();
       }

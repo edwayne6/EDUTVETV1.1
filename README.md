@@ -1,7 +1,7 @@
-# EDUTVETV1.1
-# EDUTVETV1.1
+# Edu-TVET V1.1
+# Edu-TVET V1.1
 
-EDUTVET is a resource website that collects and shares vocational and technical education (TVET) materials intended for students, trainers, and industry partners. This repository stores content, lesson plans, project guides, and other learning materials used on the EDUTVET website.
+EDU-TVET is a resource website that collects and shares vocational and technical education (TVET) materials intended for students, trainers, and industry partners. This repository stores content, lesson plans, project guides, and other learning materials used on the EDU-TVET website.
 
 ## Purpose
 Provide easy access to practical, competency-focused TVET materials that educators can use in workshops and classrooms, and students can use for hands-on learning and exam preparation.
@@ -88,4 +88,4 @@ npm start
 - Harden file upload checks (virus scanning, stricter mime checking).
 - Add logging and alerting for suspicious activity and failed moderation.
 
-Thank you for using and contributing to EDUTVET — together we can make practical skills education more accessible.
+Thank you for using and contributing to Edu-TVET — together we can make practical skills education more accessible.

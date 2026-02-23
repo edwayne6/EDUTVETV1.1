@@ -4,12 +4,17 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 const dotenv = require("dotenv");
+const jwt = require("jsonwebtoken");
+const db = require("./database");
 
 dotenv.config();
 
 const app = express();
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+
+// JWT Secret - use environment variable or default
+const JWT_SECRET = process.env.JWT_SECRET || 'your-default-secret-key-change-this-in-production';
 
 // Enable CORS - allow localhost and standard ports
 app.use(cors({
@@ -120,50 +125,29 @@ const upload = multer({
   limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
 });
 
-// In-memory document storage (can be replaced with a database)
-let documents = [
-  { 
-    id: 1, 
-    documentCode: 'EDU-AGR-001',
-    title: 'Crop Protection Guide', 
-    department: 'Agriculture', 
-    level: 'Level 5', 
-    docType: 'Notes', 
-    status: 'published', 
-    date: '2025-01-20', 
-    description: 'Comprehensive guide on crop protection',
-    fileName: null,
-    submittedBy: 'System'
-  },
-  { 
-    id: 2, 
-    documentCode: 'EDU-BUS-001',
-    title: 'Business Plans', 
-    department: 'Business', 
-    level: 'Level 6', 
-    docType: 'Curriculum', 
-    status: 'published', 
-    date: '2025-01-18', 
-    description: 'Guide to creating business plans',
-    fileName: null,
-    submittedBy: 'System'
-  },
-  { 
-    id: 3, 
-    documentCode: 'EDU-ICT-001',
-    title: 'Python Basics', 
-    department: 'ICT', 
-    level: 'Level 4', 
-    docType: 'Notes', 
-    status: 'published', 
-    date: '2025-01-22', 
-    description: 'Introduction to Python programming',
-    fileName: null,
-    submittedBy: 'System'
-  }
-];
+// Database is now used for document storage (see database.js)
 
-let nextDocId = 4;
+// ============================================
+// AUTHENTICATION MIDDLEWARE
+// ============================================
+
+// Verify JWT token
+function verifyToken(req, res, next) {
+  const authHeader = req.headers.authorization;
+  const token = authHeader && authHeader.split(' ')[1]; // Bearer token
+
+  if (!token) {
+    return res.status(401).json({ message: "No token provided", authenticated: false });
+  }
+
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) {
+      return res.status(403).json({ message: "Invalid or expired token", authenticated: false });
+    }
+    req.user = user;
+    next();
+  });
+}
 
 // Function to generate unique document code
 function generateDocumentCode() {
@@ -173,21 +157,142 @@ function generateDocumentCode() {
   return `EDU-${year}-${randomPart}`;
 }
 
-// Initialize documents
-function initializeDocuments() {
-  console.log(`✓ Total documents loaded: ${documents.length}`);
-}
+// Database initialization will be done on server startup
 
-// Execute initialization
-initializeDocuments();
+// ============================================
+// AUTHENTICATION ENDPOINTS
+// ============================================
+
+// Login endpoint
+app.post("/api/auth/login", async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+      return res.status(400).json({ message: "Username and password required" });
+    }
+
+    // Get user from database
+    const user = await db.getUserByUsername(username);
+    if (!user) {
+      return res.status(401).json({ message: "Invalid username or password" });
+    }
+
+    // Check if user is active
+    if (!user.isActive) {
+      return res.status(401).json({ message: "User account is disabled" });
+    }
+
+    // Verify password
+    const isValidPassword = await db.verifyPassword(password, user.passwordHash);
+    if (!isValidPassword) {
+      return res.status(401).json({ message: "Invalid username or password" });
+    }
+
+    // Generate JWT token (expires in 24 hours)
+    const token = jwt.sign(
+      { id: user.id, username: user.username, role: user.role },
+      JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+
+    res.json({
+      message: "Login successful",
+      authenticated: true,
+      token,
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        role: user.role
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error logging in", error: error.message });
+  }
+});
+
+// Check token validity
+app.post("/api/auth/verify", verifyToken, (req, res) => {
+  res.json({
+    message: "Token is valid",
+    authenticated: true,
+    user: req.user
+  });
+});
+
+// Get current user info
+app.get("/api/auth/me", verifyToken, async (req, res) => {
+  try {
+    const user = await db.getUserById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        isActive: user.isActive
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error retrieving user", error: error.message });
+  }
+});
+
+// Logout endpoint (client-side removes token)
+app.post("/api/auth/logout", verifyToken, (req, res) => {
+  res.json({ message: "Logged out successfully", authenticated: false });
+});
+
+// Change password
+app.post("/api/auth/change-password", verifyToken, async (req, res) => {
+  try {
+    const { currentPassword, newPassword, confirmPassword } = req.body;
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      return res.status(400).json({ message: "All fields required" });
+    }
+
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({ message: "New passwords do not match" });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ message: "Password must be at least 6 characters" });
+    }
+
+    // Get user from database
+    const user = await db.getUserById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Verify current password
+    const isValidPassword = await db.verifyPassword(currentPassword, user.passwordHash);
+    if (!isValidPassword) {
+      return res.status(401).json({ message: "Current password is incorrect" });
+    }
+
+    // Update password
+    await db.updateUserPassword(req.user.id, newPassword);
+    res.json({ message: "Password changed successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error changing password", error: error.message });
+  }
+});
 
 // ============================================
 // DOCUMENT ENDPOINTS
 // ============================================
 
 // Get all documents
-app.get("/api/documents", (req, res) => {
+app.get("/api/documents", async (req, res) => {
   try {
+    const documents = await db.getAllDocuments();
     res.json(documents);
   } catch (error) {
     res.status(500).json({ message: "Error retrieving documents", error: error.message });
@@ -195,9 +300,9 @@ app.get("/api/documents", (req, res) => {
 });
 
 // Get published documents only
-app.get("/api/documents/published", (req, res) => {
+app.get("/api/documents/published", async (req, res) => {
   try {
-    const published = documents.filter(doc => doc.status === 'published');
+    const published = await db.getPublishedDocuments();
     res.json(published);
   } catch (error) {
     res.status(500).json({ message: "Error retrieving published documents", error: error.message });
@@ -205,9 +310,9 @@ app.get("/api/documents/published", (req, res) => {
 });
 
 // Get single document
-app.get("/api/documents/:id", (req, res) => {
+app.get("/api/documents/:id", async (req, res) => {
   try {
-    const doc = documents.find(d => d.id === parseInt(req.params.id));
+    const doc = await db.getDocumentById(parseInt(req.params.id));
     if (!doc) {
       return res.status(404).json({ message: "Document not found" });
     }
@@ -218,10 +323,10 @@ app.get("/api/documents/:id", (req, res) => {
 });
 
 // Get document by code (for easy retrieval)
-app.get("/api/documents/code/:code", (req, res) => {
+app.get("/api/documents/code/:code", async (req, res) => {
   try {
     const code = req.params.code.toUpperCase();
-    const doc = documents.find(d => d.documentCode === code);
+    const doc = await db.getDocumentByCode(code);
     if (!doc) {
       return res.status(404).json({ message: "Document not found with code: " + code });
     }
@@ -232,10 +337,10 @@ app.get("/api/documents/code/:code", (req, res) => {
 });
 
 // Download document by code (for easy retrieval)
-app.get("/api/documents/code/:code/download", (req, res) => {
+app.get("/api/documents/code/:code/download", async (req, res) => {
   try {
     const code = req.params.code.toUpperCase();
-    const doc = documents.find(d => d.documentCode === code);
+    const doc = await db.getDocumentByCode(code);
     if (!doc || !doc.fileName) {
       return res.status(404).json({ message: "Document or file not found with code: " + code });
     }
@@ -251,8 +356,8 @@ app.get("/api/documents/code/:code/download", (req, res) => {
   }
 });
 
-// Upload document
-app.post("/api/documents/upload", upload.single('file'), async (req, res) => {
+// Upload document (requires authentication)
+app.post("/api/documents/upload", verifyToken, upload.single('file'), async (req, res) => {
   try {
     console.log('Upload request received');
     const { title, description, department, level, docType, submittedBy } = req.body;
@@ -288,26 +393,24 @@ app.post("/api/documents/upload", upload.single('file'), async (req, res) => {
     }
 
     const newDocument = {
-      id: nextDocId++,
-      documentCode: generateDocumentCode(), // Add unique document code
+      documentCode: generateDocumentCode(),
       title: cleanTitle,
       description: cleanDesc,
       department,
       level: level || 'N/A',
       docType,
-      status: 'published', // Admin uploads are directly published
+      status: 'published',
       date: new Date().toISOString().split('T')[0],
       fileName: req.file.filename,
       submittedBy: submittedBy || 'Admin'
     };
 
-    documents.push(newDocument);
-    console.log('Document uploaded:',  newDocument.documentCode);
+    const savedDoc = await db.createDocument(newDocument);
+    console.log('Document uploaded:', savedDoc.documentCode);
     
-    //Ensure we're sending valid JSON
     return res.status(201).json({ 
       message: "Document uploaded and published successfully!",
-      document: newDocument,
+      document: savedDoc,
       success: true
     });
   } catch (error) {
@@ -320,7 +423,6 @@ app.post("/api/documents/upload", upload.single('file'), async (req, res) => {
       }
     }
     
-    // Ensure we're sending valid JSON error response
     return res.status(500).json({ 
       message: "Error uploading document: " + (error.message || 'Unknown error'),
       error: error.message,
@@ -329,8 +431,8 @@ app.post("/api/documents/upload", upload.single('file'), async (req, res) => {
   }
 });
 
-// Create document (without file)
-app.post("/api/documents", (req, res) => {
+// Create document (without file) - requires authentication
+app.post("/api/documents", verifyToken, async (req, res) => {
   try {
     const { title, description, department, level, docType, status, submittedBy } = req.body;
 
@@ -339,8 +441,7 @@ app.post("/api/documents", (req, res) => {
     }
 
     const newDocument = {
-      id: nextDocId++,
-      documentCode: generateDocumentCode(), // Add unique document code
+      documentCode: generateDocumentCode(),
       title,
       description: description || '',
       department,
@@ -352,63 +453,54 @@ app.post("/api/documents", (req, res) => {
       submittedBy: submittedBy || 'System'
     };
 
-    documents.push(newDocument);
+    const savedDoc = await db.createDocument(newDocument);
     res.status(201).json({ 
       message: "Document created successfully.",
-      document: newDocument 
+      document: savedDoc 
     });
   } catch (error) {
     res.status(500).json({ message: "Error creating document", error: error.message });
   }
 });
 
-// Update document
-app.put("/api/documents/:id", (req, res) => {
+// Update document (requires authentication)
+app.put("/api/documents/:id", verifyToken, async (req, res) => {
   try {
-    const doc = documents.find(d => d.id === parseInt(req.params.id));
+    const doc = await db.getDocumentById(parseInt(req.params.id));
     if (!doc) {
       return res.status(404).json({ message: "Document not found" });
     }
 
-    const { title, description, department, level, docType, status } = req.body;
-    
-    if (title) doc.title = title;
-    if (description !== undefined) doc.description = description;
-    if (department) doc.department = department;
-    if (level) doc.level = level;
-    if (docType) doc.docType = docType;
-    if (status) doc.status = status;
-
-    res.json({ message: "Document updated successfully", document: doc });
+    const updatedDoc = await db.updateDocument(parseInt(req.params.id), req.body);
+    res.json({ message: "Document updated successfully", document: updatedDoc });
   } catch (error) {
     res.status(500).json({ message: "Error updating document", error: error.message });
   }
 });
 
-// Approve document
-app.post("/api/documents/:id/approve", (req, res) => {
+// Approve document (requires authentication)
+app.post("/api/documents/:id/approve", verifyToken, async (req, res) => {
   try {
-    const doc = documents.find(d => d.id === parseInt(req.params.id));
+    const doc = await db.getDocumentById(parseInt(req.params.id));
     if (!doc) {
       return res.status(404).json({ message: "Document not found" });
     }
 
-    doc.status = 'published';
-    res.json({ message: "Document approved and published", document: doc });
+    const updatedDoc = await db.updateDocument(parseInt(req.params.id), { status: 'published' });
+    res.json({ message: "Document approved and published", document: updatedDoc });
   } catch (error) {
     res.status(500).json({ message: "Error approving document", error: error.message });
   }
 });
 
-// Reject document
-app.post("/api/documents/:id/reject", (req, res) => {
+// Reject document (requires authentication)
+app.post("/api/documents/:id/reject", verifyToken, async (req, res) => {
   try {
-    const index = documents.findIndex(d => d.id === parseInt(req.params.id));
-    if (index === -1) {
+    const deletedDoc = await db.getDocumentById(parseInt(req.params.id));
+    if (!deletedDoc) {
       return res.status(404).json({ message: "Document not found" });
     }
 
-    const deletedDoc = documents[index];
     // Delete file if exists
     if (deletedDoc.fileName) {
       const filePath = path.join(documentsFolder, deletedDoc.fileName);
@@ -417,22 +509,21 @@ app.post("/api/documents/:id/reject", (req, res) => {
       }
     }
 
-    documents.splice(index, 1);
+    await db.deleteDocument(parseInt(req.params.id));
     res.json({ message: "Document rejected and deleted" });
   } catch (error) {
     res.status(500).json({ message: "Error rejecting document", error: error.message });
   }
 });
 
-// Delete document
-app.delete("/api/documents/:id", (req, res) => {
+// Delete document (requires authentication)
+app.delete("/api/documents/:id", verifyToken, async (req, res) => {
   try {
-    const index = documents.findIndex(d => d.id === parseInt(req.params.id));
-    if (index === -1) {
+    const deletedDoc = await db.getDocumentById(parseInt(req.params.id));
+    if (!deletedDoc) {
       return res.status(404).json({ message: "Document not found" });
     }
 
-    const deletedDoc = documents[index];
     // Delete file if exists
     if (deletedDoc.fileName) {
       const filePath = path.join(documentsFolder, deletedDoc.fileName);
@@ -441,7 +532,7 @@ app.delete("/api/documents/:id", (req, res) => {
       }
     }
 
-    documents.splice(index, 1);
+    await db.deleteDocument(parseInt(req.params.id));
     res.json({ message: "Document deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: "Error deleting document", error: error.message });
@@ -449,18 +540,16 @@ app.delete("/api/documents/:id", (req, res) => {
 });
 
 // Download document file
-app.get("/api/documents/:id/download", (req, res) => {
+app.get("/api/documents/:id/download", async (req, res) => {
   try {
-    const doc = documents.find(d => d.id === parseInt(req.params.id));
+    const doc = await db.getDocumentById(parseInt(req.params.id));
     if (!doc || !doc.fileName) {
       return res.status(404).json({ message: "Document or file not found" });
     }
     let filePath;
     if (doc.filePath) {
-      // filePath is relative to documentsFolder
       filePath = path.join(documentsFolder, doc.filePath);
     } else {
-      // fallback for legacy/manual uploads
       filePath = path.join(documentsFolder, doc.fileName);
     }
     if (!fs.existsSync(filePath)) {
@@ -628,12 +717,22 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start
+// Start server with database initialization
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`\n========================================`);
-  console.log(`✅ Server running on port ${PORT}`);
-  console.log(`✅ Listening at http://localhost:${PORT}`);
-  console.log(`========================================`);
-  console.log('Ready for document management.');
+
+db.initializeDatabase().then(() => {
+  return db.getDocumentCount();
+}).then((count) => {
+  console.log(`✓ Total documents in database: ${count}`);
+  app.listen(PORT, () => {
+    console.log(`\n========================================`);
+    console.log(`✅ Server running on port ${PORT}`);
+    console.log(`✅ Listening at http://localhost:${PORT}`);
+    console.log(`========================================`);
+    console.log('Ready for document management.');
+    console.log('SQLite database: edu-tvet.db');
+  });
+}).catch(err => {
+  console.error('Failed to initialize database:', err);
+  process.exit(1);
 });

@@ -1,9 +1,9 @@
 /**
- * Service Worker for EDUTVET
+ * Service Worker for Edu-TVET
  * Handles offline support, HTTP caching, and asset caching
  */
 
-const CACHE_NAME = 'edutvet-v1';
+const CACHE_NAME = 'edu-tvet-v1';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -155,10 +155,10 @@ self.addEventListener('push', (event) => {
     body: data.body || 'New notification',
     icon: '/icon.png',
     badge: '/badge.png',
-    tag: 'edutvet-notification'
+    tag: 'edu-tvet-notification'
   };
   
   event.waitUntil(
-    self.registration.showNotification(data.title || 'EduTVET', options)
+    self.registration.showNotification(data.title || 'Edu-TVET', options)
   );
 });

@@ -11,11 +11,11 @@
 
   // Generate or retrieve a unique visitor ID
   function getVisitorId() {
-    let visitorId = localStorage.getItem('edutvet_visitor_id');
+    let visitorId = localStorage.getItem('edu-tvet_visitor_id');
     if (!visitorId) {
       // Generate a new unique ID (timestamp + random)
       visitorId = 'visitor_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-      localStorage.setItem('edutvet_visitor_id', visitorId);
+      localStorage.setItem('edu-tvet_visitor_id', visitorId);
     }
     return visitorId;
   }
