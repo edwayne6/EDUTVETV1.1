@@ -14,6 +14,74 @@ Provide easy access to practical, competency-focused TVET materials that educato
 - Video demonstrations and multimedia learning resources
 - Metadata and organization files for website content
 
+## Installation & Setup
+
+### Prerequisites
+- Node.js (v14 or higher)
+- npm or yarn
+
+### Installation Steps
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/edwayne68/edu-tvet.git
+   cd edu-tvet
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Configure environment variables:
+   ```bash
+   cp .env.example .env
+   ```
+   
+   Edit `.env` with your actual values:
+   ```env
+   PORT=5000
+   JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
+   
+   # Email Configuration (for automated notifications)
+   SMTP_HOST=smtp.gmail.com
+   SMTP_PORT=587
+   SMTP_USER=your-email@gmail.com
+   SMTP_PASS=your-gmail-app-password
+   
+   # Admin Email Addresses (comma-separated)
+   ADMIN_EMAILS=admin@edutvet.com,another-admin@edutvet.com
+   ```
+
+4. Start the server:
+   ```bash
+   npm start
+   # or for development with auto-restart:
+   npm run dev
+   ```
+
+5. Open your browser and navigate to `http://localhost:5000`
+
+### Email Configuration
+The system includes automated email notifications for:
+- **New document uploads** (sent to admins)
+- **Document approvals** (sent to uploaders)
+- **Document rejections** (sent to uploaders with feedback)
+
+#### Gmail Setup
+1. Enable 2-factor authentication on your Gmail account
+2. Generate an App Password:
+   - Go to Google Account settings
+   - Security → 2-Step Verification → App passwords
+   - Generate password for "Mail"
+3. Use your Gmail address as `SMTP_USER` and the app password as `SMTP_PASS`
+
+#### Other Email Providers
+The system supports any SMTP provider. Update these variables in `.env`:
+- `SMTP_HOST`: Your SMTP server (e.g., smtp.mailgun.org, smtp.sendgrid.com)
+- `SMTP_PORT`: Usually 587 (TLS) or 465 (SSL)
+- `SMTP_USER`: Your SMTP username
+- `SMTP_PASS`: Your SMTP password or API key
+
 ## Who this is for
 - TVET students and learners
 - Trainers, instructors, and curriculum developers

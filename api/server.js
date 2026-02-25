@@ -6,6 +6,8 @@ const fs = require("fs");
 const dotenv = require("dotenv");
 const jwt = require("jsonwebtoken");
 const db = require("./database");
+const emailService = require("./email-service");
+const recommendationEngine = require("./recommendation-engine");
 
 dotenv.config();
 
@@ -316,6 +318,24 @@ app.get("/api/documents/:id", async (req, res) => {
     if (!doc) {
       return res.status(404).json({ message: "Document not found" });
     }
+    
+    // Track view interaction if user is authenticated
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      try {
+        const token = authHeader.substring(7);
+        const decoded = jwt.verify(token, JWT_SECRET);
+        await recommendationEngine.trackInteraction(decoded.id, doc.id, 'view', { 
+          source: 'details_page',
+          department: doc.department,
+          level: doc.level 
+        });
+      } catch (tokenError) {
+        // Ignore token errors - don't fail the request
+        console.log('Token verification failed for interaction tracking:', tokenError.message);
+      }
+    }
+    
     res.json(doc);
   } catch (error) {
     res.status(500).json({ message: "Error retrieving document", error: error.message });
@@ -407,6 +427,14 @@ app.post("/api/documents/upload", verifyToken, upload.single('file'), async (req
 
     const savedDoc = await db.createDocument(newDocument);
     console.log('Document uploaded:', savedDoc.documentCode);
+
+    // Send email notification to admins
+    try {
+      await emailService.notifyDocumentUploaded(savedDoc);
+    } catch (emailError) {
+      console.error('Failed to send upload notification email:', emailError);
+      // Don't fail the upload if email fails
+    }
     
     return res.status(201).json({ 
       message: "Document uploaded and published successfully!",
@@ -487,6 +515,19 @@ app.post("/api/documents/:id/approve", verifyToken, async (req, res) => {
     }
 
     const updatedDoc = await db.updateDocument(parseInt(req.params.id), { status: 'published' });
+
+    // Send email notification to the user who uploaded the document
+    try {
+      // Get user email from database (assuming we store user emails)
+      const userEmail = await db.getUserEmailByUsername(doc.submittedBy);
+      if (userEmail) {
+        await emailService.notifyDocumentApproved(updatedDoc, userEmail);
+      }
+    } catch (emailError) {
+      console.error('Failed to send approval notification email:', emailError);
+      // Don't fail the approval if email fails
+    }
+
     res.json({ message: "Document approved and published", document: updatedDoc });
   } catch (error) {
     res.status(500).json({ message: "Error approving document", error: error.message });
@@ -499,6 +540,18 @@ app.post("/api/documents/:id/reject", verifyToken, async (req, res) => {
     const deletedDoc = await db.getDocumentById(parseInt(req.params.id));
     if (!deletedDoc) {
       return res.status(404).json({ message: "Document not found" });
+    }
+
+    // Send email notification to the user who uploaded the document before deleting
+    try {
+      const userEmail = await db.getUserEmailByUsername(deletedDoc.submittedBy);
+      const feedback = req.body.feedback || req.body.reason || 'Please review and resubmit with the requested changes.';
+      if (userEmail) {
+        await emailService.notifyDocumentRejected(deletedDoc, userEmail, feedback);
+      }
+    } catch (emailError) {
+      console.error('Failed to send rejection notification email:', emailError);
+      // Don't fail the rejection if email fails
     }
 
     // Delete file if exists
@@ -555,6 +608,25 @@ app.get("/api/documents/:id/download", async (req, res) => {
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ message: "File not found on server" });
     }
+    
+    // Track download interaction if user is authenticated
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      try {
+        const token = authHeader.substring(7);
+        const decoded = jwt.verify(token, JWT_SECRET);
+        await recommendationEngine.trackInteraction(decoded.id, doc.id, 'download', { 
+          source: 'download_link',
+          department: doc.department,
+          level: doc.level,
+          fileSize: doc.fileSize
+        });
+      } catch (tokenError) {
+        // Ignore token errors - don't fail the request
+        console.log('Token verification failed for interaction tracking:', tokenError.message);
+      }
+    }
+    
     res.download(filePath, doc.title + path.extname(doc.fileName));
   } catch (error) {
     res.status(500).json({ message: "Error downloading document", error: error.message });
@@ -699,6 +771,54 @@ app.get("/api/health", (req, res) => {
   });
 });
 
+// Recommendation endpoints
+app.get("/api/recommendations", authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const limit = parseInt(req.query.limit) || 10;
+    
+    const recommendations = await recommendationEngine.getRecommendations(userId, limit);
+    
+    res.json({
+      success: true,
+      recommendations: recommendations
+    });
+  } catch (error) {
+    console.error("Error getting recommendations:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to get recommendations"
+    });
+  }
+});
+
+app.post("/api/interactions", authenticateToken, async (req, res) => {
+  try {
+    const { documentId, interactionType, metadata } = req.body;
+    const userId = req.user.id;
+    
+    if (!documentId || !interactionType) {
+      return res.status(400).json({
+        success: false,
+        message: "Document ID and interaction type are required"
+      });
+    }
+    
+    await recommendationEngine.trackInteraction(userId, documentId, interactionType, metadata);
+    
+    res.json({
+      success: true,
+      message: "Interaction tracked successfully"
+    });
+  } catch (error) {
+    console.error("Error tracking interaction:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to track interaction"
+    });
+  }
+});
+
 // 404 Error Handler
 app.use((req, res) => {
   console.log(`[404] Unmatched: ${req.method} ${req.originalUrl}`);
@@ -722,8 +842,17 @@ const PORT = process.env.PORT || 5000;
 
 db.initializeDatabase().then(() => {
   return db.getDocumentCount();
-}).then((count) => {
+}).then(async (count) => {
   console.log(`✓ Total documents in database: ${count}`);
+
+  // Initialize email service
+  const emailConnected = await emailService.verifyConnection();
+  if (emailConnected) {
+    console.log('✓ Email notifications enabled');
+  } else {
+    console.log('⚠ Email notifications disabled - check SMTP configuration');
+  }
+
   app.listen(PORT, () => {
     console.log(`\n========================================`);
     console.log(`✅ Server running on port ${PORT}`);

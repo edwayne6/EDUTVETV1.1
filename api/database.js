@@ -30,7 +30,20 @@ function initializeDatabase() {
       `, (err) => {
         if (err) console.error('Error creating users table:', err.message);
       });
-
+      // Create user interactions table for recommendation engine
+      db.run(`
+        CREATE TABLE IF NOT EXISTS user_interactions (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          user_id TEXT NOT NULL,
+          document_id INTEGER NOT NULL,
+          interaction_type TEXT NOT NULL,
+          timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+          metadata TEXT,
+          UNIQUE(user_id, document_id, interaction_type)
+        )
+      `, (err) => {
+        if (err) console.error('Error creating user_interactions table:', err.message);
+      });
       db.run(`
         CREATE TABLE IF NOT EXISTS documents (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -282,6 +295,105 @@ function closeDatabase() {
   });
 }
 
+// Get user email by username
+function getUserEmailByUsername(username) {
+  return new Promise((resolve, reject) => {
+    db.get('SELECT email FROM users WHERE username = ?', [username], (err, row) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(row ? row.email : null);
+      }
+    });
+  });
+}
+
+// Get user by username
+function getUserByUsername(username) {
+  return new Promise((resolve, reject) => {
+    db.get('SELECT * FROM users WHERE username = ?', [username], (err, row) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(row);
+      }
+    });
+  });
+}
+
+// Get user by ID
+function getUserById(id) {
+  return new Promise((resolve, reject) => {
+    db.get('SELECT * FROM users WHERE id = ?', [id], (err, row) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(row);
+      }
+    });
+  });
+}
+
+// Verify password
+function verifyPassword(password, hash) {
+  return new Promise((resolve, reject) => {
+    bcrypt.compare(password, hash, (err, result) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(result);
+      }
+    });
+  });
+}
+
+// Create user
+function createUser(username, email, passwordHash, role = 'user') {
+  return new Promise((resolve, reject) => {
+    db.run(
+      'INSERT INTO users (username, email, passwordHash, role, createdAt) VALUES (?, ?, ?, ?, ?)',
+      [username, email, passwordHash, role, new Date().toISOString()],
+      function(err) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve({ id: this.lastID, username, email, role });
+        }
+      }
+    );
+  });
+}
+
+// Update user password
+function updateUserPassword(userId, newPasswordHash) {
+  return new Promise((resolve, reject) => {
+    db.run(
+      'UPDATE users SET passwordHash = ? WHERE id = ?',
+      [newPasswordHash, userId],
+      function(err) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(this.changes > 0);
+        }
+      }
+    );
+  });
+}
+
+// Get all users
+function getAllUsers() {
+  return new Promise((resolve, reject) => {
+    db.all('SELECT id, username, email, role, createdAt FROM users ORDER BY username', (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows);
+      }
+    });
+  });
+}
+
 module.exports = {
   db,
   initializeDatabase,
@@ -300,6 +412,7 @@ module.exports = {
   verifyPassword,
   createUser,
   updateUserPassword,
-  getAllUsers
+  getAllUsers,
+  getUserEmailByUsername
 };
 
