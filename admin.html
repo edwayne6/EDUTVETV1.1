@@ -36,18 +36,22 @@
   <!-- Main Dashboard Container -->
   <div id="dashboardContainer" class="dashboard-container">
     <!-- Navbar -->
-  <nav class="bg-gradient-to-r from-blue-600 via-blue-500 to-blue-700 text-white px-6 py-3 flex justify-between items-center sticky top-0 z-50 shadow-lg">
-    <div class="flex items-center space-x-4">
-      <i class="fas fa-shield-alt text-2xl"></i>
-      <a href="index.html" class="text-2xl font-bold hover:text-blue-100 transition tracking-wide">Edu-VET Admin</a>
+  <nav class="bg-gradient-to-r from-blue-600 via-blue-500 to-blue-700 text-white px-4 md:px-6 py-3 flex justify-between items-center sticky top-0 z-50 shadow-lg">
+    <div class="flex items-center space-x-2 md:space-x-4">
+      <!-- Mobile Menu Button -->
+      <button id="mobileMenuBtn" class="md:hidden text-white p-2">
+        <i class="fas fa-bars text-xl"></i>
+      </button>
+      <i class="fas fa-shield-alt text-xl md:text-2xl"></i>
+      <a href="index.html" class="text-lg md:text-2xl font-bold hover:text-blue-100 transition tracking-wide">Edu-VET Admin</a>
     </div>
-    <div class="flex items-center space-x-3">
-      <span id="adminName" class="text-sm font-medium px-3 py-1 bg-blue-500 rounded-full">Administrator</span>
-      <a href="index.html" class="bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg transition flex items-center space-x-2 font-medium">
+    <div class="flex items-center space-x-2 md:space-x-3">
+      <span id="adminName" class="hidden md:inline text-sm font-medium px-3 py-1 bg-blue-500 rounded-full">Administrator</span>
+      <a href="index.html" class="bg-white bg-opacity-20 hover:bg-opacity-30 px-3 md:px-4 py-2 rounded-lg transition flex items-center space-x-2 font-medium text-sm">
         <i class="fas fa-home"></i>
-        <span>Home</span>
+        <span class="hidden md:inline">Home</span>
       </a>
-      <button onclick="logoutAdmin()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg transition font-medium">Logout</button>
+      <button onclick="logoutAdmin()" class="bg-red-500 hover:bg-red-600 px-3 md:px-4 py-2 rounded-lg transition font-medium text-sm">Logout</button>
     </div>
   </nav>
 
@@ -806,6 +810,23 @@
           }
         });
       }
+
+      // Mobile menu toggle for sidebar
+      document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+        const sidebar = document.getElementById('sidebar');
+        sidebar.classList.toggle('show');
+      });
+
+      // Close sidebar when clicking outside on mobile
+      document.addEventListener('click', function(event) {
+        const sidebar = document.getElementById('sidebar');
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        if (window.innerWidth <= 768 && 
+            !sidebar.contains(event.target) && 
+            !mobileMenuBtn.contains(event.target)) {
+          sidebar.classList.remove('show');
+        }
+      });
 
       // Edit form
       document.getElementById('editForm').addEventListener('submit', saveEditDocument);

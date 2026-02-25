@@ -15,11 +15,38 @@
 
   <!-- Navbar -->
   <header class="bg-white shadow sticky top-0 z-50">
-    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-      <h1 class="text-2xl font-bold text-blue-600 animate-header"><i class="fas fa-graduation-cap mr-2"></i>Edu-TVET</h1>
-      <nav class="space-x-3 flex items-center">
-        <a href="documents.html" class="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-2 rounded-lg font-semibold transition transform hover:scale-105 shadow" aria-label="Go to Documents page"><i class="fas fa-search mr-2"></i>Search Documents</a>
-        <a href="upload.html" class="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-6 py-2 rounded-lg font-semibold transition transform hover:scale-105 shadow" aria-label="Upload documents"><i class="fas fa-upload mr-2"></i>Upload</a>
+    <div class="container mx-auto px-4 py-3">
+      <div class="flex justify-between items-center">
+        <h1 class="text-xl md:text-2xl font-bold text-blue-600 animate-header">
+          <i class="fas fa-graduation-cap mr-2"></i>Edu-TVET
+        </h1>
+
+        <!-- Desktop Navigation -->
+        <nav class="hidden md:flex items-center space-x-3">
+          <a href="documents.html" class="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-2 rounded-lg font-semibold transition transform hover:scale-105 shadow text-sm" aria-label="Go to Documents page">
+            <i class="fas fa-search mr-2"></i>Search Documents
+          </a>
+          <a href="upload.html" class="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-4 py-2 rounded-lg font-semibold transition transform hover:scale-105 shadow text-sm" aria-label="Upload documents">
+            <i class="fas fa-upload mr-2"></i>Upload
+          </a>
+        </nav>
+
+        <!-- Mobile Menu Button -->
+        <button id="mobileMenuBtn" class="md:hidden text-blue-600 p-2">
+          <i class="fas fa-bars text-xl"></i>
+        </button>
+      </div>
+
+      <!-- Mobile Navigation Menu -->
+      <nav id="mobileMenu" class="md:hidden hidden bg-white border-t border-gray-200 mt-3 py-3">
+        <div class="flex flex-col space-y-2">
+          <a href="documents.html" class="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-2 rounded-lg font-semibold transition text-center text-sm" aria-label="Go to Documents page">
+            <i class="fas fa-search mr-2"></i>Search Documents
+          </a>
+          <a href="upload.html" class="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-4 py-2 rounded-lg font-semibold transition text-center text-sm" aria-label="Upload documents">
+            <i class="fas fa-upload mr-2"></i>Upload
+          </a>
+        </div>
       </nav>
     </div>
   </header>
@@ -28,35 +55,42 @@
   <div class="main-content-wrapper flex flex-col">
     
     <!-- Hero Section (reduced size) -->
-    <section class="bg-gradient-to-br from-blue-600 via-blue-500 to-blue-700 text-white py-6 relative overflow-hidden">
-      <div class="absolute top-0 right-0 w-48 h-48 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 -mr-20 -mt-20"></div>
-      <div class="absolute bottom-0 left-0 w-48 h-48 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 -ml-20 -mb-20"></div>
+    <section class="bg-gradient-to-br from-blue-600 via-blue-500 to-blue-700 text-white py-8 md:py-12 relative overflow-hidden">
+      <div class="absolute top-0 right-0 w-32 h-32 md:w-48 md:h-48 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 -mr-16 -mt-16 md:-mr-20 md:-mt-20"></div>
+      <div class="absolute bottom-0 left-0 w-32 h-32 md:w-48 md:h-48 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 -ml-16 -mb-16 md:-ml-20 md:-mb-20"></div>
       
       <div class="container mx-auto px-4 relative z-10 text-center">
-        <h2 class="text-3xl font-bold mb-3">Access Quality TVET Documents Anytime</h2>
-        <p class="text-base text-blue-100 mb-4 max-w-2xl mx-auto">Discover curriculum-aligned resources from 12 departments. Download or upload approved materials for teaching, learning, and professional growth.</p>
-        <div class="flex gap-3 justify-center">
-          <a href="documents.html" class="bg-white text-blue-600 px-6 py-2 rounded-lg font-bold hover:bg-gray-100 transition transform hover:scale-105 shadow-lg"><i class="fas fa-browse mr-2"></i>Browse Documents</a>
-          <a href="upload.html" class="bg-green-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-green-600 transition transform hover:scale-105 shadow-lg"><i class="fas fa-cloud-upload-alt mr-2"></i>Contribute</a>
+        <h2 class="text-2xl md:text-3xl lg:text-4xl font-bold mb-3">Access Quality TVET Documents Anytime</h2>
+        <p class="text-sm md:text-base text-blue-100 mb-6 max-w-2xl mx-auto px-4">Discover curriculum-aligned resources from 12 departments. Download or upload approved materials for teaching, learning, and professional growth.</p>
+        <div class="flex flex-col sm:flex-row gap-3 justify-center px-4">
+          <a href="documents.html" class="bg-white text-blue-600 px-4 md:px-6 py-2 md:py-3 rounded-lg font-bold hover:bg-gray-100 transition transform hover:scale-105 shadow-lg text-sm md:text-base">
+            <i class="fas fa-browse mr-2"></i>Browse Documents
+          </a>
+          <a href="upload.html" class="bg-green-500 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg font-bold hover:bg-green-600 transition transform hover:scale-105 shadow-lg text-sm md:text-base">
+            <i class="fas fa-cloud-upload-alt mr-2"></i>Contribute
+          </a>
         </div>
       </div>
     </section>
 
     <!-- Departments Grid Section -->
-    <section class="py-12 bg-gray-50">
+    <section class="py-8 md:py-12 bg-gray-50">
       <div class="container mx-auto px-4">
+        <div class="text-center mb-8 md:mb-12">
+          <h3 class="text-2xl md:text-3xl font-bold text-gray-800 mb-4">Explore Our Departments</h3>
+          <p class="text-gray-600 max-w-2xl mx-auto px-4 text-sm md:text-base">Choose from our comprehensive range of TVET departments, each offering specialized curriculum and resources.</p>
         </div>
 
-        <!-- Departments Grid (4 columns) -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <a href="departments/agriculture-page.html" class="group bg-white p-5 rounded-xl shadow-md hover:shadow-xl transition transform hover:-translate-y-1 border-l-4 border-green-500">
+        <!-- Departments Grid (responsive columns) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+          <a href="departments/agriculture-page.html" class="group bg-white p-4 md:p-5 rounded-xl shadow-md hover:shadow-xl transition transform hover:-translate-y-1 border-l-4 border-green-500">
             <div class="flex items-center mb-3">
-              <div class="bg-green-100 p-3 rounded-lg mr-3">
-                <i class="fas fa-leaf text-green-600 text-xl"></i>
+              <div class="bg-green-100 p-2 md:p-3 rounded-lg mr-3">
+                <i class="fas fa-leaf text-green-600 text-lg md:text-xl"></i>
               </div>
-              <h4 class="font-bold text-gray-900 group-hover:text-blue-600 transition">Agriculture</h4>
+              <h4 class="font-bold text-gray-900 group-hover:text-blue-600 transition text-sm md:text-base">Agriculture</h4>
             </div>
-            <p class="text-sm text-gray-600 group-hover:text-gray-700">Environmental studies, farming practices, sustainability</p>
+            <p class="text-xs md:text-sm text-gray-600 group-hover:text-gray-700">Environmental studies, farming practices, sustainability</p>
           </a>
 
           <a href="departments/applied-sciences-page.html" class="group bg-white p-5 rounded-xl shadow-md hover:shadow-xl transition transform hover:-translate-y-1 border-l-4 border-purple-500">
@@ -173,28 +207,28 @@
     </section>
 
   <!-- Statistics Section -->
-  <section class="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-6">
+  <section class="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-8 md:py-12">
     <div class="container mx-auto px-4">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
+      <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6 text-center">
         <div class="animate-on-scroll animate-scale-in">
-          <div class="text-3xl font-bold mb-1">5,000+</div>
-          <p class="text-blue-100 text-sm font-semibold"><i class="fas fa-file-pdf mr-2 text-orange-400"></i>Documents</p>
+          <div class="text-2xl md:text-3xl font-bold mb-1">5,000+</div>
+          <p class="text-blue-100 text-xs md:text-sm font-semibold"><i class="fas fa-file-pdf mr-1 md:mr-2 text-orange-400"></i>Documents</p>
         </div>
         <div class="animate-on-scroll animate-scale-in">
-          <div class="text-3xl font-bold mb-1">2,000+</div>
-          <p class="text-blue-100 text-sm font-semibold"><i class="fas fa-users mr-2 text-green-400"></i>Active Users</p>
+          <div class="text-2xl md:text-3xl font-bold mb-1">2,000+</div>
+          <p class="text-blue-100 text-xs md:text-sm font-semibold"><i class="fas fa-users mr-1 md:mr-2 text-green-400"></i>Active Users</p>
         </div>
         <div class="animate-on-scroll animate-scale-in">
-          <div class="text-3xl font-bold mb-1">600+</div>
-          <p class="text-blue-100 text-sm font-semibold"><i class="fas fa-users mr-2 text-green-400"></i>Courses</p>
+          <div class="text-2xl md:text-3xl font-bold mb-1">600+</div>
+          <p class="text-blue-100 text-xs md:text-sm font-semibold"><i class="fas fa-users mr-1 md:mr-2 text-green-400"></i>Courses</p>
         </div>
         <div class="animate-on-scroll animate-scale-in">
-          <div class="text-3xl font-bold mb-1">12</div>
-          <p class="text-blue-100 text-sm font-semibold"><i class="fas fa-graduation-cap mr-2 text-yellow-400"></i>Departments</p>
+          <div class="text-2xl md:text-3xl font-bold mb-1">12</div>
+          <p class="text-blue-100 text-xs md:text-sm font-semibold"><i class="fas fa-graduation-cap mr-1 md:mr-2 text-yellow-400"></i>Departments</p>
         </div>
-        <div class="animate-on-scroll animate-scale-in">
-          <div class="text-3xl font-bold mb-1">4</div>
-          <p class="text-blue-100 text-sm font-semibold"><i class="fas fa-layer-group mr-2 text-purple-400"></i>Levels</p>
+        <div class="animate-on-scroll animate-scale-in md:col-span-1 col-span-2">
+          <div class="text-2xl md:text-3xl font-bold mb-1">4</div>
+          <p class="text-blue-100 text-xs md:text-sm font-semibold"><i class="fas fa-layer-group mr-1 md:mr-2 text-purple-400"></i>Levels</p>
         </div>
       </div>
     </div>
@@ -443,6 +477,21 @@
 
     // Load messages on page load
     loadChatMessages();
+
+    // Mobile menu toggle
+    document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+      const mobileMenu = document.getElementById('mobileMenu');
+      mobileMenu.classList.toggle('hidden');
+    });
+
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', function(event) {
+      const mobileMenu = document.getElementById('mobileMenu');
+      const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+      if (!mobileMenu.contains(event.target) && !mobileMenuBtn.contains(event.target)) {
+        mobileMenu.classList.add('hidden');
+      }
+    });
   </script>
 
   <!-- Service Worker Registration for caching -->

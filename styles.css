@@ -544,10 +544,27 @@ input:focus {
 .sidebar {
   transition: transform 0.25s ease, box-shadow 0.25s ease;
   transform: translateX(0);
+  z-index: 40;
 }
 
 .sidebar.collapsed {
   transform: translateX(calc(-100% + 48px));
+}
+
+/* Mobile sidebar styles */
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+    width: 280px;
+  }
+  
+  .sidebar.show {
+    transform: translateX(0);
+  }
+  
+  .sidebar .collapse-btn {
+    display: none;
+  }
 }
 
 /* Sidebar Collapse Button */

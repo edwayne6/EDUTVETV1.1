@@ -16,20 +16,41 @@
 
   <!-- Navbar -->
   <header class="bg-white shadow">
-    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-      <a href="index.html" class="text-2xl font-bold text-blue-600 hover:text-blue-700 transition">Edu-TVET</a>
-      <nav class="space-x-4 flex items-center">
-        <a href="documents.html" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition" aria-label="Go to Documents page">Documents</a>
-        <a href="index.html" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition flex items-center space-x-2" aria-label="Go to Home page"><i class="fas fa-home"></i><span>Home</span></a>
+    <div class="container mx-auto px-4 py-4">
+      <div class="flex justify-between items-center">
+        <a href="index.html" class="text-xl md:text-2xl font-bold text-blue-600 hover:text-blue-700 transition">Edu-TVET</a>
+
+        <!-- Desktop Navigation -->
+        <nav class="hidden md:flex items-center space-x-4">
+          <a href="documents.html" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition font-medium" aria-label="Go to Documents page">Documents</a>
+          <a href="index.html" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition flex items-center space-x-2 font-medium" aria-label="Go to Home page">
+            <i class="fas fa-home"></i><span>Home</span>
+          </a>
+        </nav>
+
+        <!-- Mobile Menu Button -->
+        <button id="mobileMenuBtn" class="md:hidden text-blue-600 p-2">
+          <i class="fas fa-bars text-xl"></i>
+        </button>
+      </div>
+
+      <!-- Mobile Navigation Menu -->
+      <nav id="mobileMenu" class="md:hidden hidden bg-white border-t border-gray-200 mt-3 py-3">
+        <div class="flex flex-col space-y-2">
+          <a href="documents.html" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition text-center font-medium" aria-label="Go to Documents page">Documents</a>
+          <a href="index.html" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition text-center flex items-center justify-center space-x-2 font-medium" aria-label="Go to Home page">
+            <i class="fas fa-home"></i><span>Home</span>
+          </a>
+        </div>
       </nav>
     </div>
   </header>
 
   <!-- Upload Section -->
-  <section class="container mx-auto px-4 py-16">
+  <section class="container mx-auto px-4 py-8 md:py-16">
     
     <!-- Main Content Grid -->
-    <div class="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
       
       <!-- Form Section -->
       <div class="lg:col-span-2">
@@ -523,6 +544,24 @@
       const levelEl = document.getElementById('level');
       if (deptEl) deptEl.addEventListener('change', populatePublicCourseOptions);
       if (levelEl) levelEl.addEventListener('change', populatePublicCourseOptions);
+    });
+  </script>
+
+  <!-- Mobile menu functionality -->
+  <script>
+    // Mobile menu toggle
+    document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+      const mobileMenu = document.getElementById('mobileMenu');
+      mobileMenu.classList.toggle('hidden');
+    });
+
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', function(event) {
+      const mobileMenu = document.getElementById('mobileMenu');
+      const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+      if (!mobileMenu.contains(event.target) && !mobileMenuBtn.contains(event.target)) {
+        mobileMenu.classList.add('hidden');
+      }
     });
   </script>
 

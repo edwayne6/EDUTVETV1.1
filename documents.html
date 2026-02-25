@@ -422,11 +422,32 @@
 
   <!-- Navbar -->
   <header class="bg-white shadow">
-    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-      <a href="index.html" class="text-2xl font-bold text-blue-600 hover:text-blue-700 transition">Edu-TVET</a>
-      <nav class="space-x-4 flex items-center">
-        <a href="index.html" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition flex items-center space-x-2" aria-label="Go to Home page"><i class="fas fa-home"></i><span>Home</span></a>
-        <a href="upload.html" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition" aria-label="Upload documents">Upload</a>
+    <div class="container mx-auto px-4 py-4">
+      <div class="flex justify-between items-center">
+        <a href="index.html" class="text-xl md:text-2xl font-bold text-blue-600 hover:text-blue-700 transition">Edu-TVET</a>
+
+        <!-- Desktop Navigation -->
+        <nav class="hidden md:flex items-center space-x-4">
+          <a href="index.html" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition flex items-center space-x-2 font-medium" aria-label="Go to Home page">
+            <i class="fas fa-home"></i><span>Home</span>
+          </a>
+          <a href="upload.html" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition font-medium" aria-label="Upload documents">Upload</a>
+        </nav>
+
+        <!-- Mobile Menu Button -->
+        <button id="mobileMenuBtn" class="md:hidden text-blue-600 p-2">
+          <i class="fas fa-bars text-xl"></i>
+        </button>
+      </div>
+
+      <!-- Mobile Navigation Menu -->
+      <nav id="mobileMenu" class="md:hidden hidden bg-white border-t border-gray-200 mt-3 py-3">
+        <div class="flex flex-col space-y-2">
+          <a href="index.html" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition text-center flex items-center justify-center space-x-2 font-medium" aria-label="Go to Home page">
+            <i class="fas fa-home"></i><span>Home</span>
+          </a>
+          <a href="upload.html" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition text-center font-medium" aria-label="Upload documents">Upload</a>
+        </div>
       </nav>
     </div>
   </header>
@@ -441,10 +462,10 @@
   </nav>
 
   <!-- Hero Section with Integrated Search Engine -->
-  <section class="bg-gradient-to-br from-blue-600 via-blue-500 to-blue-700 py-10 text-white relative overflow-hidden">
+  <section class="bg-gradient-to-br from-blue-600 via-blue-500 to-blue-700 py-8 md:py-12 text-white relative overflow-hidden">
     <!-- Decorative background elements -->
-    <div class="absolute top-0 right-0 w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 -mr-40 -mt-40"></div>
-    <div class="absolute bottom-0 left-0 w-96 h-96 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 -ml-40 -mb-40"></div>
+    <div class="absolute top-0 right-0 w-48 h-48 md:w-96 md:h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 -mr-24 -mt-24 md:-mr-40 md:-mt-40"></div>
+    <div class="absolute bottom-0 left-0 w-48 h-48 md:w-96 md:h-96 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 -ml-24 -mb-24 md:-ml-40 md:-mb-40"></div>
     
     <div class="container mx-auto px-4 relative z-10">
       <!-- Advanced Search Engine -->
@@ -630,6 +651,24 @@
         card.classList.add('animate-on-scroll', 'animate-scale-in');
       });
     };
+  </script>
+
+  <!-- Mobile menu functionality -->
+  <script>
+    // Mobile menu toggle
+    document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+      const mobileMenu = document.getElementById('mobileMenu');
+      mobileMenu.classList.toggle('hidden');
+    });
+
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', function(event) {
+      const mobileMenu = document.getElementById('mobileMenu');
+      const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+      if (!mobileMenu.contains(event.target) && !mobileMenuBtn.contains(event.target)) {
+        mobileMenu.classList.add('hidden');
+      }
+    });
   </script>
 
   <!-- Service Worker Registration for caching -->
