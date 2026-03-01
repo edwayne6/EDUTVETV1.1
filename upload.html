@@ -406,18 +406,33 @@
       submitButton.disabled = true;
       submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Uploading...';
 
-      // Send to backend API
-      fetch(apiUrl, {
+      // Build fetch options with optional Authorization header
+      const fetchOptions = {
         method: 'POST',
         body: uploadFormData,
         credentials: 'same-origin'
-      })
+      };
+
+      // If a token exists in localStorage, include it
+      const token = localStorage.getItem('authToken') || localStorage.getItem('token');
+      if (token) {
+        fetchOptions.headers = {
+          'Authorization': `Bearer ${token}`
+        };
+        console.log('[FORM] Using Bearer token from localStorage');
+      }
+
+      // Send to backend API
+      fetch(apiUrl, fetchOptions)
       .then(response => {
         console.log('[FETCH] Response received:', response.status, response.statusText);
         
         // Check if response is ok
         if (!response.ok) {
           console.error('[FETCH] Response not OK:', response.status);
+          if (response.status === 401 || response.status === 403) {
+            throw new Error(`Authentication required (${response.status}). Please log in via the admin dashboard first.`);
+          }
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         
@@ -486,10 +501,25 @@
 
     function showError(message) {
       const errorMsg = document.getElementById('errorMessage');
-      document.getElementById('errorText').innerHTML = `
-        <p>${message}</p>
-        <p class="text-xs mt-2">Please ensure the backend server is running on port 5000.</p>
-      `;
+      let helpText = `<p>${message}</p>`;
+      
+      // Provide context-specific help
+      if (message.includes('Failed to fetch')) {
+        helpText += `<p class="text-xs mt-3 text-red-800"><strong>✓ Fix:</strong> Start the backend server:</p>
+                   <pre class="bg-red-100 p-2 rounded text-xs mt-1 overflow-x-auto">npm start</pre>
+                   <p class="text-xs mt-2">Then reload this page and try again.</p>`;
+      } else if (message.includes('Authentication required') || message.includes('401') || message.includes('403')) {
+        helpText += `<p class="text-xs mt-3 text-red-800"><strong>✓ Fix:</strong> You need to log in first.</p>
+                   <ol class="text-xs mt-2 list-decimal list-inside">
+                     <li>Log in via <a href="admin.html" class="text-blue-600 hover:underline">admin.html</a></li>
+                     <li>Your token will be saved automatically</li>
+                     <li>Return here and upload again</li>
+                   </ol></p>`;
+      }
+      
+      helpText += `<p class="text-xs mt-2">Please ensure the backend server is running on port 5000.</p>`;
+      
+      document.getElementById('errorText').innerHTML = helpText;
       errorMsg.classList.remove('hidden');
       document.getElementById('successMessage').classList.add('hidden');
       errorMsg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -568,7 +598,3 @@
   <script src="scripts/analytics.js"></script> <!-- Visitor tracking -->
 </body>
 </html>
-========================================
-✅ Server running on port 5000
-✅ Listening at http://localhost:5000
-========================================

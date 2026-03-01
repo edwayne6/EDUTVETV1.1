@@ -151,6 +151,11 @@ function verifyToken(req, res, next) {
   });
 }
 
+// Backwards-compatible alias used in some route handlers
+function authenticateToken(req, res, next) {
+  return verifyToken(req, res, next);
+}
+
 // Function to generate unique document code
 function generateDocumentCode() {
   // Format: EDU-YYYY-XXXXXX where YYYY is year and XXXXXX is random alphanumeric

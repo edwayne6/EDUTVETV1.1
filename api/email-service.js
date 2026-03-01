@@ -11,8 +11,8 @@ const emailConfig = {
   }
 };
 
-// Create transporter
-const transporter = nodemailer.createTransporter(emailConfig);
+// Create transporter (use correct nodemailer API)
+const transporter = nodemailer.createTransport(emailConfig);
 
 // Verify connection
 const verifyConnection = async () => {
